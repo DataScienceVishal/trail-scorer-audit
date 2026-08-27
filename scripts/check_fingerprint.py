@@ -222,9 +222,33 @@ def staged_files(root: Path) -> list[Path]:
     return [root / name for name in listing.stdout.split("\n") if name]
 
 
+def tracked_files(root: Path) -> list[Path] | None:
+    """What git considers part of the repo, or None when this is not a repo.
+
+    Asking git rather than the filesystem is what stops a vendored upstream tree
+    from being scanned. A project that clones someone else's repository into a
+    gitignored directory would otherwise have its style check pass or fail
+    depending on whether the reader had run the fetch step yet, which makes the
+    result a fact about the machine instead of about the repo.
+
+    Paths come back relative to `cwd`, including when `cwd` is a subdirectory,
+    so joining onto `root` is correct at any level.
+    """
+    listing = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=root, capture_output=True, text=True,
+    )
+    if listing.returncode != 0:
+        return None
+    return [root / name for name in listing.stdout.split("\0") if name]
+
+
 def walk(root: Path) -> list[Path]:
+    candidates = tracked_files(root)
+    if candidates is None:
+        candidates = list(root.rglob("*"))
     return [
-        path for path in root.rglob("*")
+        path for path in candidates
         if path.is_file() and not any(part in SKIP_DIRS for part in path.parts)
     ]
 
