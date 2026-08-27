@@ -5,7 +5,7 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from trailaudit import adversarial, artifacts, datacheck, normaliser, spans, upstream
+from trailaudit import adversarial, artifacts, catf1, datacheck, normaliser, spans, upstream
 from trailaudit.artifacts import Stale
 from trailaudit.scoring import DiagnosticDrifted
 from trailaudit.spans import IndexInconsistent
@@ -138,6 +138,24 @@ def _normaliser(args: argparse.Namespace) -> int:
     lines, violated = normaliser.report(done)
     print("\n".join(lines))
     return _settle(args, built, normaliser.load, violated)
+
+
+def _catf1(args: argparse.Namespace) -> int:
+    if not upstream.scorer_path(args.into).is_file():
+        print(
+            f"trailaudit: no clone at {args.into}. P7 is the per-category block that TRAIL's "
+            f"own main() returns, so the scorer and the gold both have to be on disk. "
+            f"Run `trailaudit fetch`.",
+            file=sys.stderr,
+        )
+        return 2
+    upstream.verify_corpus(args.into)
+
+    rows = catf1.run(args.into, spans.load(args.index))
+    built = catf1.artifact(rows)
+    lines, violated = catf1.report(rows)
+    print("\n".join(lines))
+    return _settle(args, built, catf1.load, violated)
 
 
 def _settle(
@@ -295,6 +313,31 @@ def build_parser() -> argparse.ArgumentParser:
         help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
         "if any figure moved",
     )
+
+    categories = commands.add_parser(
+        "catf1",
+        help="report P7: the per-category block for a predictor that names all 21 categories "
+        "at one arbitrary span, against three that name them elsewhere",
+    )
+    categories.add_argument("--into", type=Path, default=DEFAULT_CLONE, help="where the clone is")
+    categories.add_argument(
+        "--index",
+        type=Path,
+        default=spans.COMMITTED,
+        help=f"the committed span index, which supplies the one span (default {spans.COMMITTED})",
+    )
+    categories.add_argument(
+        "--out",
+        type=Path,
+        default=catf1.COMMITTED,
+        help=f"where the run artifact is written and read (default {catf1.COMMITTED})",
+    )
+    categories.add_argument(
+        "--check",
+        action="store_true",
+        help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
+        "if any figure moved",
+    )
     return parser
 
 
@@ -306,6 +349,7 @@ def main(argv: list[str] | None = None) -> int:
         "data-check": _data_check,
         "adversarial": _adversarial,
         "normaliser": _normaliser,
+        "catf1": _catf1,
     }
     try:
         return routes[args.command](args)

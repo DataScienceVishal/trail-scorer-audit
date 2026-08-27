@@ -1,0 +1,1118 @@
+{
+  "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
+  "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "identical_per_category_block": [
+    "GAIA",
+    "SWE Bench"
+  ],
+  "differ_only_in_where": [
+    "all-spans-all-categories",
+    "one-span-all-categories"
+  ],
+  "rows": [
+    {
+      "split": "GAIA",
+      "predictor": "gold-exact",
+      "joint_accuracy": 0.974137931,
+      "location_accuracy": 0.974137931,
+      "weighted_f1": 1.0,
+      "files_scored": 116,
+      "categories_with_support": 19,
+      "categories_at_full_recall": 19,
+      "per_category": {
+        "Language-only": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 39.0
+        },
+        "Tool-related": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 36.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 20.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 13.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 14.0
+        },
+        "Tool Selection Errors": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 37.0
+        },
+        "Formatting Errors": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 47.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 51.0
+        },
+        "Tool Definition Issues": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3.0
+        },
+        "Environment Setup Errors": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 5.0
+        },
+        "Service Errors": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2.0
+        },
+        "Resource Not Found": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4.0
+        },
+        "Resource Exhaustion": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2.0
+        },
+        "Timeout Issues": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2.0
+        },
+        "Context Handling Failures": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 21.0
+        },
+        "Resource Abuse": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 29.0
+        },
+        "Goal Deviation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 61.0
+        },
+        "Task Orchestration": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 35.0
+        }
+      }
+    },
+    {
+      "split": "GAIA",
+      "predictor": "gold-spans-all-categories",
+      "joint_accuracy": 0.973354232,
+      "location_accuracy": 0.974137931,
+      "weighted_f1": 0.4816991827,
+      "files_scored": 116,
+      "categories_with_support": 19,
+      "categories_at_full_recall": 19,
+      "per_category": {
+        "Language-only": {
+          "precision": 0.34513274336283184,
+          "recall": 1.0,
+          "f1": 0.5131578947368421,
+          "support": 39.0
+        },
+        "Tool-related": {
+          "precision": 0.3185840707964602,
+          "recall": 1.0,
+          "f1": 0.4832214765100671,
+          "support": 36.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 0.17699115044247787,
+          "recall": 1.0,
+          "f1": 0.3007518796992481,
+          "support": 20.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 0.11504424778761062,
+          "recall": 1.0,
+          "f1": 0.20634920634920637,
+          "support": 13.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 0.12389380530973451,
+          "recall": 1.0,
+          "f1": 0.2204724409448819,
+          "support": 14.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.3274336283185841,
+          "recall": 1.0,
+          "f1": 0.49333333333333335,
+          "support": 37.0
+        },
+        "Formatting Errors": {
+          "precision": 0.415929203539823,
+          "recall": 1.0,
+          "f1": 0.5875,
+          "support": 47.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 0.45132743362831856,
+          "recall": 1.0,
+          "f1": 0.6219512195121951,
+          "support": 51.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.02654867256637168,
+          "recall": 1.0,
+          "f1": 0.05172413793103448,
+          "support": 3.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.07079646017699115,
+          "recall": 1.0,
+          "f1": 0.13223140495867766,
+          "support": 8.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.04424778761061947,
+          "recall": 1.0,
+          "f1": 0.0847457627118644,
+          "support": 5.0
+        },
+        "Service Errors": {
+          "precision": 0.017699115044247787,
+          "recall": 1.0,
+          "f1": 0.034782608695652174,
+          "support": 2.0
+        },
+        "Resource Not Found": {
+          "precision": 0.035398230088495575,
+          "recall": 1.0,
+          "f1": 0.06837606837606837,
+          "support": 4.0
+        },
+        "Resource Exhaustion": {
+          "precision": 0.017699115044247787,
+          "recall": 1.0,
+          "f1": 0.034782608695652174,
+          "support": 2.0
+        },
+        "Timeout Issues": {
+          "precision": 0.017699115044247787,
+          "recall": 1.0,
+          "f1": 0.034782608695652174,
+          "support": 2.0
+        },
+        "Context Handling Failures": {
+          "precision": 0.18584070796460178,
+          "recall": 1.0,
+          "f1": 0.31343283582089554,
+          "support": 21.0
+        },
+        "Resource Abuse": {
+          "precision": 0.25663716814159293,
+          "recall": 1.0,
+          "f1": 0.4084507042253521,
+          "support": 29.0
+        },
+        "Goal Deviation": {
+          "precision": 0.5398230088495575,
+          "recall": 1.0,
+          "f1": 0.7011494252873562,
+          "support": 61.0
+        },
+        "Task Orchestration": {
+          "precision": 0.30973451327433627,
+          "recall": 1.0,
+          "f1": 0.4729729729729729,
+          "support": 35.0
+        }
+      }
+    },
+    {
+      "split": "GAIA",
+      "predictor": "all-spans-all-categories",
+      "joint_accuracy": 0.973354232,
+      "location_accuracy": 0.974137931,
+      "weighted_f1": 0.4725428164,
+      "files_scored": 116,
+      "categories_with_support": 19,
+      "categories_at_full_recall": 19,
+      "per_category": {
+        "Language-only": {
+          "precision": 0.33620689655172414,
+          "recall": 1.0,
+          "f1": 0.5032258064516129,
+          "support": 39.0
+        },
+        "Tool-related": {
+          "precision": 0.3103448275862069,
+          "recall": 1.0,
+          "f1": 0.4736842105263158,
+          "support": 36.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 0.1724137931034483,
+          "recall": 1.0,
+          "f1": 0.29411764705882354,
+          "support": 20.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 0.11206896551724138,
+          "recall": 1.0,
+          "f1": 0.20155038759689925,
+          "support": 13.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 0.1206896551724138,
+          "recall": 1.0,
+          "f1": 0.21538461538461542,
+          "support": 14.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.31896551724137934,
+          "recall": 1.0,
+          "f1": 0.48366013071895425,
+          "support": 37.0
+        },
+        "Formatting Errors": {
+          "precision": 0.4051724137931034,
+          "recall": 1.0,
+          "f1": 0.5766871165644172,
+          "support": 47.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 0.4396551724137931,
+          "recall": 1.0,
+          "f1": 0.6107784431137724,
+          "support": 51.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.02586206896551724,
+          "recall": 1.0,
+          "f1": 0.050420168067226885,
+          "support": 3.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.06896551724137931,
+          "recall": 1.0,
+          "f1": 0.12903225806451613,
+          "support": 8.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.04310344827586207,
+          "recall": 1.0,
+          "f1": 0.08264462809917356,
+          "support": 5.0
+        },
+        "Service Errors": {
+          "precision": 0.017241379310344827,
+          "recall": 1.0,
+          "f1": 0.03389830508474576,
+          "support": 2.0
+        },
+        "Resource Not Found": {
+          "precision": 0.034482758620689655,
+          "recall": 1.0,
+          "f1": 0.06666666666666667,
+          "support": 4.0
+        },
+        "Resource Exhaustion": {
+          "precision": 0.017241379310344827,
+          "recall": 1.0,
+          "f1": 0.03389830508474576,
+          "support": 2.0
+        },
+        "Timeout Issues": {
+          "precision": 0.017241379310344827,
+          "recall": 1.0,
+          "f1": 0.03389830508474576,
+          "support": 2.0
+        },
+        "Context Handling Failures": {
+          "precision": 0.1810344827586207,
+          "recall": 1.0,
+          "f1": 0.3065693430656934,
+          "support": 21.0
+        },
+        "Resource Abuse": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "f1": 0.4,
+          "support": 29.0
+        },
+        "Goal Deviation": {
+          "precision": 0.5258620689655172,
+          "recall": 1.0,
+          "f1": 0.6892655367231638,
+          "support": 61.0
+        },
+        "Task Orchestration": {
+          "precision": 0.3017241379310345,
+          "recall": 1.0,
+          "f1": 0.46357615894039733,
+          "support": 35.0
+        }
+      }
+    },
+    {
+      "split": "GAIA",
+      "predictor": "one-span-all-categories",
+      "joint_accuracy": 0.0,
+      "location_accuracy": 0.0,
+      "weighted_f1": 0.4725428164,
+      "files_scored": 116,
+      "categories_with_support": 19,
+      "categories_at_full_recall": 19,
+      "per_category": {
+        "Language-only": {
+          "precision": 0.33620689655172414,
+          "recall": 1.0,
+          "f1": 0.5032258064516129,
+          "support": 39.0
+        },
+        "Tool-related": {
+          "precision": 0.3103448275862069,
+          "recall": 1.0,
+          "f1": 0.4736842105263158,
+          "support": 36.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 0.1724137931034483,
+          "recall": 1.0,
+          "f1": 0.29411764705882354,
+          "support": 20.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 0.11206896551724138,
+          "recall": 1.0,
+          "f1": 0.20155038759689925,
+          "support": 13.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 0.1206896551724138,
+          "recall": 1.0,
+          "f1": 0.21538461538461542,
+          "support": 14.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.31896551724137934,
+          "recall": 1.0,
+          "f1": 0.48366013071895425,
+          "support": 37.0
+        },
+        "Formatting Errors": {
+          "precision": 0.4051724137931034,
+          "recall": 1.0,
+          "f1": 0.5766871165644172,
+          "support": 47.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 0.4396551724137931,
+          "recall": 1.0,
+          "f1": 0.6107784431137724,
+          "support": 51.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.02586206896551724,
+          "recall": 1.0,
+          "f1": 0.050420168067226885,
+          "support": 3.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.06896551724137931,
+          "recall": 1.0,
+          "f1": 0.12903225806451613,
+          "support": 8.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.04310344827586207,
+          "recall": 1.0,
+          "f1": 0.08264462809917356,
+          "support": 5.0
+        },
+        "Service Errors": {
+          "precision": 0.017241379310344827,
+          "recall": 1.0,
+          "f1": 0.03389830508474576,
+          "support": 2.0
+        },
+        "Resource Not Found": {
+          "precision": 0.034482758620689655,
+          "recall": 1.0,
+          "f1": 0.06666666666666667,
+          "support": 4.0
+        },
+        "Resource Exhaustion": {
+          "precision": 0.017241379310344827,
+          "recall": 1.0,
+          "f1": 0.03389830508474576,
+          "support": 2.0
+        },
+        "Timeout Issues": {
+          "precision": 0.017241379310344827,
+          "recall": 1.0,
+          "f1": 0.03389830508474576,
+          "support": 2.0
+        },
+        "Context Handling Failures": {
+          "precision": 0.1810344827586207,
+          "recall": 1.0,
+          "f1": 0.3065693430656934,
+          "support": 21.0
+        },
+        "Resource Abuse": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "f1": 0.4,
+          "support": 29.0
+        },
+        "Goal Deviation": {
+          "precision": 0.5258620689655172,
+          "recall": 1.0,
+          "f1": 0.6892655367231638,
+          "support": 61.0
+        },
+        "Task Orchestration": {
+          "precision": 0.3017241379310345,
+          "recall": 1.0,
+          "f1": 0.46357615894039733,
+          "support": 35.0
+        }
+      }
+    },
+    {
+      "split": "SWE Bench",
+      "predictor": "gold-exact",
+      "joint_accuracy": 0.9677419355,
+      "location_accuracy": 0.9677419355,
+      "weighted_f1": 1.0,
+      "files_scored": 31,
+      "categories_with_support": 13,
+      "categories_at_full_recall": 13,
+      "per_category": {
+        "Language-only": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 10.0
+        },
+        "Tool-related": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 6.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Formatting Errors": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 27.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 26.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Service Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Not Found": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Exhaustion": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1.0
+        },
+        "Timeout Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Context Handling Failures": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 23.0
+        },
+        "Resource Abuse": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 13.0
+        },
+        "Goal Deviation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2.0
+        },
+        "Task Orchestration": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2.0
+        }
+      }
+    },
+    {
+      "split": "SWE Bench",
+      "predictor": "gold-spans-all-categories",
+      "joint_accuracy": 0.9600634133,
+      "location_accuracy": 0.9677419355,
+      "weighted_f1": 0.720463239,
+      "files_scored": 31,
+      "categories_with_support": 13,
+      "categories_at_full_recall": 13,
+      "per_category": {
+        "Language-only": {
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "f1": 0.5,
+          "support": 10.0
+        },
+        "Tool-related": {
+          "precision": 0.1,
+          "recall": 1.0,
+          "f1": 0.18181818181818182,
+          "support": 3.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 0.26666666666666666,
+          "recall": 1.0,
+          "f1": 0.4210526315789474,
+          "support": 8.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.06666666666666667,
+          "recall": 1.0,
+          "f1": 0.125,
+          "support": 2.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 0.03333333333333333,
+          "recall": 1.0,
+          "f1": 0.06451612903225806,
+          "support": 1.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 0.2,
+          "recall": 1.0,
+          "f1": 0.33333333333333337,
+          "support": 6.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Formatting Errors": {
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9473684210526316,
+          "support": 27.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 0.8666666666666667,
+          "recall": 1.0,
+          "f1": 0.9285714285714286,
+          "support": 26.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Service Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Not Found": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Exhaustion": {
+          "precision": 0.03333333333333333,
+          "recall": 1.0,
+          "f1": 0.06451612903225806,
+          "support": 1.0
+        },
+        "Timeout Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Context Handling Failures": {
+          "precision": 0.7666666666666667,
+          "recall": 1.0,
+          "f1": 0.8679245283018869,
+          "support": 23.0
+        },
+        "Resource Abuse": {
+          "precision": 0.43333333333333335,
+          "recall": 1.0,
+          "f1": 0.6046511627906976,
+          "support": 13.0
+        },
+        "Goal Deviation": {
+          "precision": 0.06666666666666667,
+          "recall": 1.0,
+          "f1": 0.125,
+          "support": 2.0
+        },
+        "Task Orchestration": {
+          "precision": 0.06666666666666667,
+          "recall": 1.0,
+          "f1": 0.125,
+          "support": 2.0
+        }
+      }
+    },
+    {
+      "split": "SWE Bench",
+      "predictor": "all-spans-all-categories",
+      "joint_accuracy": 0.9577592658,
+      "location_accuracy": 0.9612251548,
+      "weighted_f1": 0.7066078271,
+      "files_scored": 31,
+      "categories_with_support": 13,
+      "categories_at_full_recall": 13,
+      "per_category": {
+        "Language-only": {
+          "precision": 0.3225806451612903,
+          "recall": 1.0,
+          "f1": 0.4878048780487805,
+          "support": 10.0
+        },
+        "Tool-related": {
+          "precision": 0.0967741935483871,
+          "recall": 1.0,
+          "f1": 0.17647058823529413,
+          "support": 3.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 0.25806451612903225,
+          "recall": 1.0,
+          "f1": 0.41025641025641024,
+          "support": 8.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.06451612903225806,
+          "recall": 1.0,
+          "f1": 0.12121212121212122,
+          "support": 2.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 0.03225806451612903,
+          "recall": 1.0,
+          "f1": 0.0625,
+          "support": 1.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 0.1935483870967742,
+          "recall": 1.0,
+          "f1": 0.3243243243243243,
+          "support": 6.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Formatting Errors": {
+          "precision": 0.8709677419354839,
+          "recall": 1.0,
+          "f1": 0.9310344827586207,
+          "support": 27.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 0.8387096774193549,
+          "recall": 1.0,
+          "f1": 0.9122807017543859,
+          "support": 26.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Service Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Not Found": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Exhaustion": {
+          "precision": 0.03225806451612903,
+          "recall": 1.0,
+          "f1": 0.0625,
+          "support": 1.0
+        },
+        "Timeout Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Context Handling Failures": {
+          "precision": 0.7419354838709677,
+          "recall": 1.0,
+          "f1": 0.8518518518518519,
+          "support": 23.0
+        },
+        "Resource Abuse": {
+          "precision": 0.41935483870967744,
+          "recall": 1.0,
+          "f1": 0.5909090909090909,
+          "support": 13.0
+        },
+        "Goal Deviation": {
+          "precision": 0.06451612903225806,
+          "recall": 1.0,
+          "f1": 0.12121212121212122,
+          "support": 2.0
+        },
+        "Task Orchestration": {
+          "precision": 0.06451612903225806,
+          "recall": 1.0,
+          "f1": 0.12121212121212122,
+          "support": 2.0
+        }
+      }
+    },
+    {
+      "split": "SWE Bench",
+      "predictor": "one-span-all-categories",
+      "joint_accuracy": 0.0,
+      "location_accuracy": 0.0,
+      "weighted_f1": 0.7066078271,
+      "files_scored": 31,
+      "categories_with_support": 13,
+      "categories_at_full_recall": 13,
+      "per_category": {
+        "Language-only": {
+          "precision": 0.3225806451612903,
+          "recall": 1.0,
+          "f1": 0.4878048780487805,
+          "support": 10.0
+        },
+        "Tool-related": {
+          "precision": 0.0967741935483871,
+          "recall": 1.0,
+          "f1": 0.17647058823529413,
+          "support": 3.0
+        },
+        "Poor Information Retrieval": {
+          "precision": 0.25806451612903225,
+          "recall": 1.0,
+          "f1": 0.41025641025641024,
+          "support": 8.0
+        },
+        "Incorrect Memory Usage": {
+          "precision": 0.06451612903225806,
+          "recall": 1.0,
+          "f1": 0.12121212121212122,
+          "support": 2.0
+        },
+        "Tool Output Misinterpretation": {
+          "precision": 0.03225806451612903,
+          "recall": 1.0,
+          "f1": 0.0625,
+          "support": 1.0
+        },
+        "Incorrect Problem Identification": {
+          "precision": 0.1935483870967742,
+          "recall": 1.0,
+          "f1": 0.3243243243243243,
+          "support": 6.0
+        },
+        "Tool Selection Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Formatting Errors": {
+          "precision": 0.8709677419354839,
+          "recall": 1.0,
+          "f1": 0.9310344827586207,
+          "support": 27.0
+        },
+        "Instruction Non-compliance": {
+          "precision": 0.8387096774193549,
+          "recall": 1.0,
+          "f1": 0.9122807017543859,
+          "support": 26.0
+        },
+        "Tool Definition Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Environment Setup Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Rate Limiting": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Authentication Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Service Errors": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Not Found": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Resource Exhaustion": {
+          "precision": 0.03225806451612903,
+          "recall": 1.0,
+          "f1": 0.0625,
+          "support": 1.0
+        },
+        "Timeout Issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0.0
+        },
+        "Context Handling Failures": {
+          "precision": 0.7419354838709677,
+          "recall": 1.0,
+          "f1": 0.8518518518518519,
+          "support": 23.0
+        },
+        "Resource Abuse": {
+          "precision": 0.41935483870967744,
+          "recall": 1.0,
+          "f1": 0.5909090909090909,
+          "support": 13.0
+        },
+        "Goal Deviation": {
+          "precision": 0.06451612903225806,
+          "recall": 1.0,
+          "f1": 0.12121212121212122,
+          "support": 2.0
+        },
+        "Task Orchestration": {
+          "precision": 0.06451612903225806,
+          "recall": 1.0,
+          "f1": 0.12121212121212122,
+          "support": 2.0
+        }
+      }
+    }
+  ]
+}

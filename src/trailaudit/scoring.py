@@ -179,6 +179,51 @@ def score_split(
     predictor: Predictor,
     workspace: Path,
 ) -> Scores:
+    run = drive(scorer, gold_dir, cases, annotations, predictor, workspace)
+
+    measured = [
+        both_ways(annotations[trace], run.emitted[trace], normalise) for trace in run.scored
+    ]
+    mine = _averages(measured, run.files_processed)
+    _confirm(mine, run.returned, predictor.name, gold_dir)
+
+    return Scores(
+        joint_accuracy=round(run.returned["joint_accuracy"], PLACES),
+        location_accuracy=round(run.returned["location_accuracy"], PLACES),
+        joint_precision=round(mine["joint_precision"], PLACES),
+        location_precision=round(mine["location_precision"], PLACES),
+        files_globbed=run.files_globbed,
+        files_processed=run.files_processed,
+        predicted_errors=sum(len(run.emitted[trace]) for trace in run.scored),
+        gold_errors=sum(len(annotations[trace].categories) for trace in run.scored),
+        skipped=run.skipped,
+    )
+
+
+@dataclass(frozen=True)
+class Driven:
+    """One call into `calculate_scores.main()`, before anything is read out of it.
+
+    `returned` is upstream's dict whole, so a caller wanting the per-category
+    block at lines 297 to 314 gets it without a second run over the same files.
+    """
+
+    returned: dict
+    emitted: dict[str, list[Error]]
+    skipped: tuple[Skip, ...]
+    files_globbed: int
+    files_processed: int
+    scored: tuple[str, ...]
+
+
+def drive(
+    scorer: ModuleType,
+    gold_dir: Path,
+    cases: dict[str, Case],
+    annotations: dict[str, Annotation],
+    predictor: Predictor,
+    workspace: Path,
+) -> Driven:
     emitted = write_predictions(predictor, cases, workspace)
 
     printed = io.StringIO()
@@ -189,28 +234,20 @@ def score_split(
     globbed = len(list(gold_dir.glob("*.json")))
     processed = globbed - len(skipped)
     walked_past = {one.trace for one in skipped}
-    scored = [trace for trace in annotations if trace not in walked_past]
+    scored = tuple(trace for trace in annotations if trace not in walked_past)
     if len(scored) != processed:
         raise DiagnosticDrifted(
             f"{predictor.name} on {gold_dir.name}: the scorer walked past {len(skipped)} of "
             f"{globbed} gold files, leaving {processed}, and this repository can account for "
             f"{len(scored)} of them. A message format at line 154 or 243 has changed."
         )
-
-    measured = [both_ways(annotations[trace], emitted[trace], normalise) for trace in scored]
-    mine = _averages(measured, processed)
-    _confirm(mine, returned, predictor.name, gold_dir)
-
-    return Scores(
-        joint_accuracy=round(returned["joint_accuracy"], PLACES),
-        location_accuracy=round(returned["location_accuracy"], PLACES),
-        joint_precision=round(mine["joint_precision"], PLACES),
-        location_precision=round(mine["location_precision"], PLACES),
+    return Driven(
+        returned=returned,
+        emitted=emitted,
+        skipped=tuple(skipped),
         files_globbed=globbed,
         files_processed=processed,
-        predicted_errors=sum(len(emitted[trace]) for trace in scored),
-        gold_errors=sum(len(annotations[trace].categories) for trace in scored),
-        skipped=tuple(skipped),
+        scored=scored,
     )
 
 

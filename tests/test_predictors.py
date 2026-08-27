@@ -148,3 +148,32 @@ def test_every_predictor_name_is_distinct_and_shell_safe() -> None:
     names = [one.name for one in predictors.PREDICTORS]
     assert len(set(names)) == len(names)
     assert all(name.replace("-", "").isalnum() for name in names)
+
+
+def test_one_span_puts_the_whole_taxonomy_on_the_first_identifier(case: Case) -> None:
+    emitted = predictors.one_span_all_categories(case)
+    assert {one["location"] for one in emitted} == {SPANS[0]}
+    assert [one["category"] for one in emitted] == list(TAXONOMY)
+
+
+def test_one_span_emits_nothing_for_a_trace_with_no_spans() -> None:
+    """No trace in the index is empty, and a crash here would be a poor way to find out."""
+    assert predictors.one_span_all_categories(Case((), TAXONOMY, ())) == []
+
+
+def test_one_span_is_gold_blind_like_the_rest_of_its_side(case: Case) -> None:
+    lied_to = Case(span_ids=case.span_ids, taxonomy=case.taxonomy, gold=NONSENSE)
+    assert predictors.ONE_SPAN.knows_gold is False
+    assert predictors.ONE_SPAN.emit(case) == predictors.ONE_SPAN.emit(lied_to)
+
+
+def test_one_span_is_deliberately_not_in_the_adversarial_lineup() -> None:
+    """results/adversarial.json is keyed on PREDICTORS, and this one has nothing to say there.
+
+    The adversarial table reports joint, location and volume. This predictor's
+    finding is in the per-category block, which that table does not carry, and
+    adding it would move an artifact slice 2 published.
+    """
+    assert predictors.ONE_SPAN not in predictors.PREDICTORS
+    with pytest.raises(KeyError):
+        predictors.by_name(predictors.ONE_SPAN.name)

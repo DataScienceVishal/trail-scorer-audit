@@ -105,6 +105,23 @@ def all_spans_all_categories(case: Case) -> list[Error]:
     ]
 
 
+def one_span_all_categories(case: Case) -> list[Error]:
+    """The whole taxonomy at the first span identifier in the file, and nowhere else.
+
+    The span is arbitrary and the choice is visible: first in document order,
+    which for these traces is the root. It cannot matter to the per-category
+    vectors at lines 61 to 70, which are set from the categories alone and never
+    see a location, and it decides location accuracy almost entirely. That gap is
+    P7, and it is why this predictor is not in PREDICTORS: the adversarial table
+    reports joint, location and volume, and none of those is where this one has
+    something to say.
+    """
+    spans = once_each(case.span_ids)
+    if not spans:
+        return []
+    return [{"location": spans[0], "category": label} for label in case.taxonomy]
+
+
 @dataclass(frozen=True)
 class Predictor:
     name: str
@@ -150,6 +167,17 @@ PREDICTORS = (
         blurb="every span identifier crossed with the taxonomy",
         emit=all_spans_all_categories,
     ),
+)
+
+
+# Not in PREDICTORS, and `by_name` does not find it. It exists for `trailaudit
+# catf1`, where the question is what the per-category block does with a judge
+# that names every category in a trace without locating any of them.
+ONE_SPAN = Predictor(
+    "one-span-all-categories",
+    knows_gold=False,
+    blurb="the whole taxonomy at the first span identifier",
+    emit=one_span_all_categories,
 )
 
 

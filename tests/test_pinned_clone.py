@@ -14,7 +14,7 @@ from collections import Counter
 
 import pytest
 
-from trailaudit import adversarial, artifacts, gold, normaliser, spans, upstream
+from trailaudit import adversarial, artifacts, catf1, gold, normaliser, spans, upstream
 from trailaudit.datacheck import VIOLATED
 
 pytestmark = pytest.mark.upstream
@@ -243,3 +243,77 @@ def test_the_shuffled_rescore_reproduces_what_main_returned_under_the_pinned_ord
     for one in study.rescored:
         row = published[one.split]["predictors"][one.predictor]
         assert one.pinned == (row["joint_accuracy"], row["location_accuracy"]), one.predictor
+
+
+@pytest.fixture(scope="module")
+def categories(clone: pathlib.Path, repo_root: pathlib.Path) -> tuple[catf1.Row, ...]:
+    return catf1.run(clone, spans.load(repo_root / spans.COMMITTED))
+
+
+def test_p7_location_never_reaches_the_per_category_block(
+    categories: tuple[catf1.Row, ...],
+) -> None:
+    """The two predictors differ only in where they put 21 categories, and score the same.
+
+    all-spans-all-categories reaches 0.974 location accuracy on GAIA and
+    one-span-all-categories reaches 0.000, because no gold error in either split
+    is annotated at the first span identifier in its trace. Every one of the 21
+    per-category columns is identical between them, and so is the weighted F1.
+    """
+    for split in ("GAIA", "SWE Bench"):
+        located, blind = catf1.paired(categories, split)
+        assert located.per_category == blind.per_category
+        assert located.weighted_f1 == blind.weighted_f1
+        assert blind.location_accuracy == 0.0
+        assert blind.joint_accuracy == 0.0
+        assert located.location_accuracy > 0.95
+    assert catf1.p7(categories).verdict == VIOLATED
+
+
+def test_p7_recall_is_one_in_every_supported_column_and_precision_is_support_over_traces(
+    categories: tuple[catf1.Row, ...],
+) -> None:
+    """Both numbers fall out of arithmetic that never opens a trace.
+
+    A predictor naming all 21 categories sets every bit of y_pred in every trace,
+    so it recalls everything and its false positives are however many traces did
+    not carry that category.
+    """
+    supported = {}
+    for split in ("GAIA", "SWE Bench"):
+        _, blind = catf1.paired(categories, split)
+        supported[split] = len(blind.supported)
+        assert len(blind.at_full_recall) == len(blind.supported)
+        for label in blind.supported:
+            scored = blind.per_category[label]
+            assert scored["recall"] == 1.0
+            assert scored["precision"] == pytest.approx(scored["support"] / blind.files_scored)
+    assert supported == {"GAIA": 19, "SWE Bench": 13}
+
+
+def test_the_only_row_whose_block_moves_is_the_one_that_stays_silent_on_empty_gold(
+    categories: tuple[catf1.Row, ...],
+) -> None:
+    """gold-spans-all-categories differs, and not because it knows where anything is.
+
+    It emits nothing at all in a trace whose gold carries no errors, so it sets
+    no bits there and picks up fewer false positives. Reading that difference as
+    evidence that the block sees locations would have been the wrong conclusion
+    from the right table.
+    """
+    for split in ("GAIA", "SWE Bench"):
+        oracle = next(
+            one
+            for one in categories
+            if one.split == split and one.predictor == adversarial.CEILING.name
+        )
+        located, _ = catf1.paired(categories, split)
+        assert oracle.per_category != located.per_category
+        assert oracle.location_accuracy >= located.location_accuracy
+
+
+def test_p7_reproduces_from_a_fresh_run(
+    categories: tuple[catf1.Row, ...], repo_root: pathlib.Path
+) -> None:
+    committed = catf1.load(repo_root / catf1.COMMITTED)
+    assert artifacts.differences(committed, catf1.artifact(categories)) == []
