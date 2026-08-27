@@ -560,11 +560,12 @@ def rescored_table(rescored: Sequence[Rescored]) -> list[str]:
     return rows
 
 
-def artifact(done: Study) -> dict:
+def artifact(done: Study, index_sha256: str) -> dict:
     labels = list(done.taxonomy)
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "index_sha256": index_sha256,
         "properties": verdicts([p6(done.shortest, done.taxonomy, done.drifted), p5(done)]),
         "labels": len(done.taxonomy),
         "shortest_label_squashed": min(len(squash(label)) for label in done.taxonomy),

@@ -28,6 +28,7 @@ two numbers measure it. That is the narrower claim and the more useful one.
 commit  0ffbed9db859b4a66250dc783fa4dccf86869595
 scorer  ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2  benchmarking/calculate_scores.py
 corpus  e27721ffd74bef970daa02a91e9a2362d87dd8f956a2e4ec49cf5c8c088781e5  296 files, 186.4 MB
+index   4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928  index/spans.json
 ```
 <!-- /trailaudit:pin -->
 
@@ -353,6 +354,7 @@ gitignored, and its size is in the pin block at the top:
 
 ```bash
 uv run trailaudit fetch
+uv run trailaudit index --check
 uv run trailaudit data-check
 uv run trailaudit adversarial
 uv run trailaudit normaliser
@@ -363,6 +365,17 @@ uv run trailaudit pairing
 Each of those writes its artifact under `results/`. Pass `--check` instead and
 it reruns the measurement, diffs against what is committed leaf by leaf, and
 exits 1 naming the figure that moved.
+
+`index --check` is second in that list because everything after it is scored
+against `index/spans.json`, and the predictor the whole claim rests on is handed
+nothing else. It rebuilds the index from the traces on disk and exits 1 naming
+the trace that moved. The same file is the one input `--index` can be pointed
+somewhere else, so every artifact records the sha256 of the index its run read,
+each command prints that digest before it starts, and `report --check` refuses
+an artifact whose index digest is not the committed one. An index of fabricated
+traces makes P9 hold and an index built from the gold locations turns the
+gold-blind predictor into an oracle, and neither can be committed here without
+the digest saying so.
 
 `fetch` verifies three things and refuses to go on if any of them fails: that
 `HEAD` is the pinned commit, that `calculate_scores.py` hashes to the recorded
@@ -486,10 +499,10 @@ them is counted on every run rather than asserted once:
 | file | bytes | distinct strings | identifiers | TRAIL's own words | longer than three words |
 |---|---|---|---|---|---|
 | `index/spans.json` | 99,308 | 4,782 | 4,774 | 0 | 0 |
-| `results/datacheck.json` | 2,208 | 54 | 4 | 0 | 7 |
-| `results/adversarial.json` | 5,953 | 54 | 5 | 1 | 7 |
-| `results/normaliser.json` | 47,394 | 371 | 2 | 32 | 4 |
-| `results/catf1.json` | 30,287 | 55 | 2 | 21 | 2 |
+| `results/datacheck.json` | 2,294 | 56 | 5 | 0 | 7 |
+| `results/adversarial.json` | 6,039 | 56 | 6 | 1 | 7 |
+| `results/normaliser.json` | 47,480 | 373 | 3 | 32 | 4 |
+| `results/catf1.json` | 30,373 | 57 | 3 | 21 | 2 |
 | `results/pairing.json` | 1,544 | 35 | 2 | 2 | 5 |
 <!-- /trailaudit:committed-files -->
 

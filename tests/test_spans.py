@@ -8,6 +8,8 @@ import pytest
 from trailaudit import spans, upstream
 from trailaudit.spans import IndexInconsistent
 
+BOTH_SPLITS = {"GAIA": {"t1": ["a", "b"]}, "SWE Bench": {"t2": ["c"]}}
+
 NESTED = {
     "trace_id": "t1",
     "spans": [
@@ -54,7 +56,7 @@ def test_a_span_with_no_identifier_contributes_nothing_but_its_children() -> Non
 
 
 def test_render_and_load_round_trip(tmp_path: pathlib.Path) -> None:
-    built = {"GAIA": {"t1": ["a", "b"]}, "SWE Bench": {"t2": ["c"]}}
+    built = BOTH_SPLITS
     path = tmp_path / "spans.json"
     path.write_text(spans.render(built), encoding="utf-8")
     assert spans.load(path) == built
@@ -64,7 +66,7 @@ def test_load_rejects_a_summary_that_disagrees_with_its_own_lists(
     tmp_path: pathlib.Path,
 ) -> None:
     path = tmp_path / "spans.json"
-    path.write_text(spans.render({"GAIA": {"t1": ["a", "b"]}}), encoding="utf-8")
+    path.write_text(spans.render(BOTH_SPLITS), encoding="utf-8")
     document = json.loads(path.read_text())
     document["summary"]["GAIA"]["spans"] = 99
     path.write_text(json.dumps(document), encoding="utf-8")
@@ -74,7 +76,7 @@ def test_load_rejects_a_summary_that_disagrees_with_its_own_lists(
 
 def test_load_rejects_an_index_built_at_another_commit(tmp_path: pathlib.Path) -> None:
     path = tmp_path / "spans.json"
-    path.write_text(spans.render({"GAIA": {"t1": ["a"]}}), encoding="utf-8")
+    path.write_text(spans.render(BOTH_SPLITS), encoding="utf-8")
     document = json.loads(path.read_text())
     document["pinned_commit"] = "0" * 40
     path.write_text(json.dumps(document), encoding="utf-8")
@@ -95,3 +97,41 @@ def test_differences_names_the_trace_that_moved() -> None:
 def test_build_says_what_to_run_when_the_clone_is_absent(tmp_path: pathlib.Path) -> None:
     with pytest.raises(upstream.MissingClone, match="trailaudit fetch"):
         spans.build(tmp_path / "nothing")
+
+
+def test_load_refuses_an_index_that_is_missing_a_split(tmp_path: pathlib.Path) -> None:
+    """`--index` can point anywhere, and datacheck.measure indexes both splits by name.
+
+    An index carrying only GAIA used to reach `index["SWE Bench"]` and come back
+    as a bare KeyError traceback, which exits 1 by accident rather than by
+    contract.
+    """
+    path = tmp_path / "spans.json"
+    path.write_text(spans.render({"GAIA": {"t1": ["a"]}}), encoding="utf-8")
+    with pytest.raises(IndexInconsistent, match="SWE Bench"):
+        spans.load(path)
+
+
+def test_the_digest_moves_with_one_identifier_and_not_with_the_layout(
+    tmp_path: pathlib.Path,
+) -> None:
+    """What every artifact records about the index its run read.
+
+    Over the parsed structure, so a reindented file hashes the same and a
+    swapped identifier does not. Without that an artifact says which scorer
+    produced it and nothing about which input, and `--index doctored.json`
+    writing to the default `--out` is invisible afterwards.
+    """
+    path = tmp_path / "spans.json"
+    path.write_text(spans.render(BOTH_SPLITS), encoding="utf-8")
+    plain = tmp_path / "compact.json"
+    plain.write_text(
+        json.dumps({"pinned_commit": upstream.PINNED_COMMIT,
+                    "summary": spans.summarise(BOTH_SPLITS),
+                    "splits": BOTH_SPLITS}),
+        encoding="utf-8",
+    )
+    assert spans.digest(spans.load(path)) == spans.digest(spans.load(plain))
+
+    swapped = {"GAIA": {"t1": ["a", "z"]}, "SWE Bench": {"t2": ["c"]}}
+    assert spans.digest(swapped) != spans.digest(BOTH_SPLITS)

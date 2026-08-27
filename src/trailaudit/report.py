@@ -80,6 +80,22 @@ class Sources:
     index: dict
 
 
+# The four artifacts whose command takes --index. `pairing` is not one of them:
+# its trace is constructed and it reads the gold directly, so there is no index
+# behind it to record. Naming the four rather than checking whichever files
+# happen to carry the key means an artifact that stopped carrying it fails the
+# comparison instead of skipping it.
+FROM_THE_INDEX = frozenset(
+    str(one)
+    for one in (
+        datacheck.COMMITTED,
+        adversarial.COMMITTED,
+        normaliser.COMMITTED,
+        catf1.COMMITTED,
+    )
+)
+
+
 def load(root: Path = Path(".")) -> Sources:
     loaded = Sources(
         root=root,
@@ -90,12 +106,19 @@ def load(root: Path = Path(".")) -> Sources:
         pairing=pairing.load(root / pairing.COMMITTED),
         index=spans.load(root / spans.COMMITTED),
     )
+    committed_index = spans.digest(loaded.index)
     for name, artifact in every_artifact(loaded):
         if artifact["scorer_sha256"] != upstream.SCORER_SHA256:
             raise Stale(
                 f"{name} was produced against a scorer hashing to "
                 f"{artifact['scorer_sha256']}, and the audit is pinned to "
                 f"{upstream.SCORER_SHA256}"
+            )
+        if name in FROM_THE_INDEX and artifact.get("index_sha256") != committed_index:
+            raise Stale(
+                f"{name} was produced against a span index hashing to "
+                f"{artifact.get('index_sha256')}, and {spans.COMMITTED} hashes to "
+                f"{committed_index}. Rerun it against the committed index"
             )
     return loaded
 
@@ -152,12 +175,20 @@ def megabytes(size: int) -> str:
 
 
 def pin(src: Sources) -> list[str]:
+    """The four digests a reader can check the audit against, including its own input.
+
+    The index line is the only one of the four that covers something this
+    repository wrote. It is here because every artifact records the same digest,
+    so a reader can tell that the run behind a figure read the index that is
+    committed and not one built for the occasion.
+    """
     corpus = src.datacheck["corpus"]
     return [
         "```",
         f"commit  {upstream.PINNED_COMMIT}",
         f"scorer  {upstream.SCORER_SHA256}  {upstream.SCORER}",
         f"corpus  {corpus['sha256']}  {corpus['files']} files, {megabytes(corpus['bytes'])}",
+        f"index   {spans.digest(src.index)}  {spans.COMMITTED}",
         "```",
     ]
 

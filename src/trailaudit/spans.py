@@ -15,6 +15,7 @@ the mistake this module exists to not make.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -58,6 +59,20 @@ def build(clone: Path) -> dict[str, dict[str, list[str]]]:
             for path in sorted(here.glob("*.json"), key=lambda p: p.stem)
         }
     return by_split
+
+
+def digest(by_split: dict[str, dict[str, list[str]]]) -> str:
+    """One hash over the index a run actually read, for that run's artifact to record.
+
+    Over the parsed structure rather than the file's bytes, so reindenting the
+    JSON does not move it and one changed identifier does. This is the index's
+    half of what SCORER_SHA256 does for the scorer. Without it an artifact
+    records which scorer produced it and not which input, and `--index
+    something-else.json` writing to the default `--out` leaves a committed file
+    that nothing downstream can tell apart from the real run.
+    """
+    canonical = json.dumps(by_split, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def summarise(by_split: dict[str, dict[str, list[str]]]) -> dict[str, dict[str, int]]:
@@ -108,6 +123,12 @@ def load(path: Path = COMMITTED) -> dict[str, dict[str, list[str]]]:
             f"{upstream.PINNED_COMMIT}. Rebuild it with `trailaudit index`."
         )
     by_split = document["splits"]
+    absent = [split.name for split in SPLITS if split.name not in by_split]
+    if absent:
+        raise IndexInconsistent(
+            f"{path} has no entry for {', '.join(absent)}, and every command that reads it "
+            f"expects one per split. Rebuild it with `trailaudit index`."
+        )
     derived = summarise(by_split)
     if derived != document.get("summary"):
         raise IndexInconsistent(

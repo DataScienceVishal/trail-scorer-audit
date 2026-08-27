@@ -356,7 +356,7 @@ def report(runs: list[SplitRun]) -> tuple[list[str], bool]:
     return lines, any(finding.verdict == VIOLATED for finding in findings)
 
 
-def artifact(runs: list[SplitRun]) -> dict:
+def artifact(runs: list[SplitRun], index_sha256: str) -> dict:
     """Every figure the prose is allowed to quote, in one committed file.
 
     Skip reasons are recorded as their kind and not as the decoder's wording,
@@ -366,6 +366,7 @@ def artifact(runs: list[SplitRun]) -> dict:
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "index_sha256": index_sha256,
         "table_1": paper.TABLE_1_CITATION,
         "properties": verdicts([p1(runs), p2(runs)]),
         "splits": {

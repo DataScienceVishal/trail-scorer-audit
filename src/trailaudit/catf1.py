@@ -251,10 +251,11 @@ def report(rows: tuple[Row, ...]) -> tuple[list[str], bool]:
     return lines, finding.verdict == VIOLATED
 
 
-def artifact(rows: tuple[Row, ...]) -> dict:
+def artifact(rows: tuple[Row, ...], index_sha256: str) -> dict:
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "index_sha256": index_sha256,
         "properties": verdicts([p7(rows)]),
         "identical_per_category_block": [
             split for split in splits_of(rows) if indistinguishable(rows, split)

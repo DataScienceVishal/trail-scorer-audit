@@ -70,26 +70,53 @@ def test_two_commands_deciding_the_same_property_are_refused(src: Sources) -> No
         report.properties(twice)
 
 
-def test_an_artifact_from_a_different_scorer_is_refused(
-    repo_root: pathlib.Path, tmp_path: pathlib.Path
-) -> None:
+@pytest.fixture
+def copied(repo_root: pathlib.Path, tmp_path: pathlib.Path) -> pathlib.Path:
+    """The committed index and the five artifacts, somewhere they can be doctored."""
+    for name in ("index", "results"):
+        (tmp_path / name).mkdir()
+    committed = [one for one, _ in report.every_artifact(report.load(repo_root))]
+    for path in [str(spans.COMMITTED), *committed]:
+        (tmp_path / path).write_text((repo_root / path).read_text(encoding="utf-8"), "utf-8")
+    return tmp_path
+
+
+def test_an_artifact_from_a_different_scorer_is_refused(copied: pathlib.Path) -> None:
     """The pin is checked on load; this is the half of it that is not the commit SHA.
 
     An artifact produced before a re-pin carries figures measured against
     different bytes, and every one of them would render into the README without
     complaint if only the commit were compared.
     """
-    for name in ("index", "results"):
-        (tmp_path / name).mkdir()
-    committed = [one for one, _ in report.every_artifact(report.load(repo_root))]
-    for path in [str(spans.COMMITTED), *committed]:
-        (tmp_path / path).write_text((repo_root / path).read_text(encoding="utf-8"), "utf-8")
-    tampered = json.loads((tmp_path / "results/catf1.json").read_text(encoding="utf-8"))
+    tampered = json.loads((copied / "results/catf1.json").read_text(encoding="utf-8"))
     tampered["scorer_sha256"] = "0" * 64
-    (tmp_path / "results/catf1.json").write_text(json.dumps(tampered), encoding="utf-8")
+    (copied / "results/catf1.json").write_text(json.dumps(tampered), encoding="utf-8")
 
     with pytest.raises(Stale, match="catf1"):
-        report.load(tmp_path)
+        report.load(copied)
+
+
+def test_an_artifact_produced_against_another_span_index_is_refused(
+    copied: pathlib.Path,
+) -> None:
+    """`--index` is the flag that can make a finding disappear, so the digest is recorded.
+
+    An index of fabricated traces matching Table 5 makes P9 hold. One built from
+    the gold locations makes the gold-blind predictor an oracle at the headline
+    figure while its row still reads "spans". Neither touches the scorer digest,
+    so the check above sees nothing, and both write to results/ under the
+    default --out.
+    """
+    assert report.load(copied).index, "the copy has to load before anything is doctored"
+
+    document = json.loads((copied / spans.COMMITTED).read_text(encoding="utf-8"))
+    trace = next(iter(document["splits"]["GAIA"]))
+    document["splits"]["GAIA"][trace].append("0123456789abcdef")
+    document["summary"] = spans.summarise(document["splits"])
+    (copied / spans.COMMITTED).write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(Stale, match="span index"):
+        report.load(copied)
 
 
 def test_the_scan_finds_a_marker_no_generator_has_ever_heard_of() -> None:

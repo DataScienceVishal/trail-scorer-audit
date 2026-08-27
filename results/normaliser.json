@@ -1,6 +1,7 @@
 {
   "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
   "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "index_sha256": "4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928",
   "properties": {
     "P6": {
       "claim": "no string shorter than the shortest taxonomy label normalises to a taxonomy label",

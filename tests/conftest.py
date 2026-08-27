@@ -4,7 +4,7 @@ import pathlib
 
 import pytest
 
-from trailaudit import upstream
+from trailaudit import spans, upstream
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -32,3 +32,9 @@ def clone() -> pathlib.Path:
 @pytest.fixture(scope="session")
 def annotations() -> pathlib.Path:
     return REPO_ROOT / "tests" / "fixtures" / "annotations"
+
+
+@pytest.fixture(scope="session")
+def index_sha256() -> str:
+    """The digest of the committed span index, which every artifact records."""
+    return spans.digest(spans.load(REPO_ROOT / spans.COMMITTED))

@@ -381,7 +381,7 @@ def verdicts(findings: Iterable[Finding]) -> dict:
     }
 
 
-def artifact(checked: Checked) -> dict:
+def artifact(checked: Checked, index_sha256: str) -> dict:
     """P3, P4 and P9 as figures, so the README can quote them without the 186 MB."""
     annotated = checked.annotated
     if annotated is None or checked.corpus is None:
@@ -396,6 +396,7 @@ def artifact(checked: Checked) -> dict:
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "index_sha256": index_sha256,
         "table_5": paper.CITATION,
         "properties": verdicts(findings_for(checked)),
         "corpus": {"sha256": upstream.CORPUS_SHA256, "files": files, "bytes": size},

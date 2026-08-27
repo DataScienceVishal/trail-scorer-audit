@@ -96,6 +96,15 @@ def _data_check(args: argparse.Namespace) -> int:
     lets a caller choose the exit code is a flag that lets a caller make a
     finding disappear, and `|| true` already exists for anyone who wants that
     and is willing to write it down.
+
+    `--index` is the one flag that can still change a verdict, and saying it
+    plainly is better than the sentence above pretending otherwise: an index of
+    fabricated traces matching Table 5 makes P9 hold, and one built from the gold
+    locations makes the gold-blind predictor an oracle. What stops that being
+    invisible is provenance rather than a refusal. Every artifact records the
+    sha256 of the index its run read, `trailaudit report --check` refuses one
+    that is not the committed index, and each of these commands prints the
+    digest it is working from.
     """
     if args.no_clone and args.check:
         print(
@@ -106,6 +115,7 @@ def _data_check(args: argparse.Namespace) -> int:
         return 2
 
     index = spans.load(args.index)
+    _announce_index(args.index, index)
     clone = None if args.no_clone else args.into
     if clone is not None and not upstream.scorer_path(clone).is_file():
         print(
@@ -123,11 +133,12 @@ def _data_check(args: argparse.Namespace) -> int:
     if clone is None:
         print(f"\n{datacheck.COMMITTED} untouched: one of its three properties was measured")
         return 3 if violated else 0
-    return _settle(args, datacheck.artifact(checked), datacheck.load, violated)
+    return _settle(
+        args, datacheck.artifact(checked, spans.digest(index)), datacheck.load, violated
+    )
 
 
 def _adversarial(args: argparse.Namespace) -> int:
-    index = spans.load(args.index)
     if not upstream.scorer_path(args.into).is_file():
         print(
             f"trailaudit: no clone at {args.into}. The predictors are scored by TRAIL's own "
@@ -138,8 +149,10 @@ def _adversarial(args: argparse.Namespace) -> int:
         return 2
     upstream.verify_corpus(args.into)
 
+    index = spans.load(args.index)
+    _announce_index(args.index, index)
     runs = adversarial.run(args.into, index)
-    built = adversarial.artifact(runs)
+    built = adversarial.artifact(runs, spans.digest(index))
     lines, violated = adversarial.report(runs)
     print("\n".join(lines))
     return _settle(args, built, adversarial.load, violated)
@@ -156,8 +169,10 @@ def _normaliser(args: argparse.Namespace) -> int:
         return 2
     upstream.verify_corpus(args.into)
 
-    done = normaliser.study(args.into, spans.load(args.index))
-    built = normaliser.artifact(done)
+    index = spans.load(args.index)
+    _announce_index(args.index, index)
+    done = normaliser.study(args.into, index)
+    built = normaliser.artifact(done, spans.digest(index))
     lines, violated = normaliser.report(done)
     print("\n".join(lines))
     return _settle(args, built, normaliser.load, violated)
@@ -174,8 +189,10 @@ def _catf1(args: argparse.Namespace) -> int:
         return 2
     upstream.verify_corpus(args.into)
 
-    rows = catf1.run(args.into, spans.load(args.index))
-    built = catf1.artifact(rows)
+    index = spans.load(args.index)
+    _announce_index(args.index, index)
+    rows = catf1.run(args.into, index)
+    built = catf1.artifact(rows, spans.digest(index))
     lines, violated = catf1.report(rows)
     print("\n".join(lines))
     return _settle(args, built, catf1.load, violated)
@@ -198,6 +215,17 @@ def _pairing(args: argparse.Namespace) -> int:
     lines, violated = pairing.report(scored, counted, taxonomy)
     print("\n".join(lines))
     return _settle(args, built, pairing.load, violated)
+
+
+def _announce_index(path: Path, index: dict[str, dict[str, list[str]]]) -> None:
+    """Name the index a run read, since --index can point at any file on disk.
+
+    The digest goes into the artifact as well. This line is for the case where
+    no artifact is written, which is `data-check --no-clone`: without it a run
+    against a fabricated index prints a page of findings and says nothing about
+    where they came from.
+    """
+    print(f"span index {path}, sha256 {spans.digest(index)}\n")
 
 
 def _report(args: argparse.Namespace) -> int:

@@ -107,7 +107,8 @@ def test_p3_p4_and_p9_reproduce_from_a_fresh_run(
     index = spans.load(repo_root / spans.COMMITTED)
     checked = datacheck.inspect(clone, index)
     committed = datacheck.load(repo_root / datacheck.COMMITTED)
-    assert artifacts.differences(committed, datacheck.artifact(checked)) == []
+    fresh = datacheck.artifact(checked, spans.digest(index))
+    assert artifacts.differences(committed, fresh) == []
     assert [one.verdict for one in datacheck.findings_for(checked)] == [VIOLATED] * 3
 
 
@@ -117,9 +118,10 @@ def test_the_artifact_refuses_to_be_written_without_the_gold(repo_root: pathlib.
     Not a clone test at heart, but it belongs next to the one above: the pair of
     them is what stops results/datacheck.json ever holding a partial run.
     """
-    checked = datacheck.inspect(None, spans.load(repo_root / spans.COMMITTED))
+    index = spans.load(repo_root / spans.COMMITTED)
+    checked = datacheck.inspect(None, index)
     with pytest.raises(upstream.MissingClone):
-        datacheck.artifact(checked)
+        datacheck.artifact(checked, spans.digest(index))
 
 
 def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pathlib.Path) -> None:
@@ -132,7 +134,7 @@ def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pa
     index = spans.load(repo_root / spans.COMMITTED)
     runs = adversarial.run(clone, index)
     committed = adversarial.load(repo_root / adversarial.COMMITTED)
-    assert artifacts.differences(committed, adversarial.artifact(runs)) == []
+    assert artifacts.differences(committed, adversarial.artifact(runs, spans.digest(index))) == []
 
     assert adversarial.p1(runs).verdict == VIOLATED
     assert adversarial.p2(runs).verdict == VIOLATED
@@ -251,10 +253,10 @@ def test_p5_the_taxonomy_order_decides_237_strings_and_no_gold_spelling(
 
 
 def test_p5_and_p6_reproduce_from_a_fresh_run(
-    study: normaliser.Study, repo_root: pathlib.Path
+    study: normaliser.Study, repo_root: pathlib.Path, index_sha256: str
 ) -> None:
     committed = normaliser.load(repo_root / normaliser.COMMITTED)
-    assert artifacts.differences(committed, normaliser.artifact(study)) == []
+    assert artifacts.differences(committed, normaliser.artifact(study, index_sha256)) == []
     _, violated = normaliser.report(study)
     assert violated
     assert normaliser.p5(study).verdict == VIOLATED
@@ -344,10 +346,10 @@ def test_the_only_row_whose_block_moves_is_the_one_that_stays_silent_on_empty_go
 
 
 def test_p7_reproduces_from_a_fresh_run(
-    categories: tuple[catf1.Row, ...], repo_root: pathlib.Path
+    categories: tuple[catf1.Row, ...], repo_root: pathlib.Path, index_sha256: str
 ) -> None:
     committed = catf1.load(repo_root / catf1.COMMITTED)
-    assert artifacts.differences(committed, catf1.artifact(categories)) == []
+    assert artifacts.differences(committed, catf1.artifact(categories, index_sha256)) == []
 
 
 def test_p8_one_null_category_costs_a_correct_judge_every_pair(clone: pathlib.Path) -> None:
