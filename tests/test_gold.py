@@ -12,20 +12,9 @@ import pathlib
 
 import pytest
 
+from stand_ins import TAXONOMY, strip_only
 from trailaudit import gold
 from trailaudit.upstream import MissingClone
-
-TAXONOMY = ("Widget Errors", "Sprocket-only", "Gasket Handling Failures", "Flange Misuse")
-
-
-def strip_only(spelling: str) -> str:
-    """A stand-in normaliser, deliberately not a copy of upstream's.
-
-    Matching on strip() alone is enough to tell a spelling the real normaliser
-    would rescue from one it drops, without this repository keeping a second
-    implementation of the function it is auditing.
-    """
-    return spelling.strip()
 
 
 @pytest.fixture

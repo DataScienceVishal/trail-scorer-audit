@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from trailaudit import spans, upstream
+from trailaudit import datacheck, spans, upstream
 from trailaudit.spans import IndexInconsistent
 from trailaudit.upstream import DEFAULT_CLONE, MissingClone, PinMismatch
 
@@ -68,6 +68,38 @@ def _print_summary(by_split: dict[str, dict[str, list[str]]]) -> None:
         print(f"  {name:<10} {counted['traces']:>4} traces  {counted['spans']:>5} spans{note}")
 
 
+def _data_check(args: argparse.Namespace) -> int:
+    """A violated property exits 3, which is the good outcome here, and is why it is not 1.
+
+    1 means the audit could not trust its input: the scorer has been edited, or
+    the index does not describe the tree. 3 means the audit ran and a
+    pre-registered property came back violated, which is the whole point of
+    pointing it at somebody else's scorer. Folding the two into one integer
+    would make "TRAIL has a trailing comma" and "your copy of TRAIL is not the
+    pinned one" the same event to anything reading the code.
+
+    There is deliberately no flag that turns a violation into 0. A flag that
+    lets a caller choose the exit code is a flag that lets a caller make a
+    finding disappear, and `|| true` already exists for anyone who wants that
+    and is willing to write it down.
+    """
+    index = spans.load(args.index)
+    clone = None if args.no_clone else args.into
+    if clone is not None and not upstream.scorer_path(clone).is_file():
+        print(
+            f"trailaudit: no clone at {clone}, so P3 and P4 cannot be measured. "
+            f"Run `trailaudit fetch`, or pass --no-clone to accept that.",
+            file=sys.stderr,
+        )
+        return 2
+    if clone is not None:
+        upstream.verify_scorer(clone)
+
+    lines, violated = datacheck.report(clone, index)
+    print("\n".join(lines))
+    return 3 if violated else 0
+
+
 def _already_pinned(clone: Path) -> bool:
     try:
         return upstream.head_commit(clone) == upstream.PINNED_COMMIT
@@ -79,8 +111,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="trailaudit",
         description="Audit the scoring code behind the TRAIL agent-trace benchmark.",
-        epilog="Exit codes: 0 the check passed, 1 what is on disk does not match the pin, "
-        "2 there is nothing on disk to check.",
+        epilog="Exit codes: 0 nothing to report, 1 what is on disk does not match the pin, "
+        "2 there is nothing on disk to check, 3 data-check found a pre-registered property "
+        "violated. 3 is the good outcome and it is deliberately not 1: 1 says the audit could "
+        "not trust its own input, 3 says the audit ran and TRAIL's scorer did the thing the "
+        "property was written to catch.",
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
@@ -119,12 +154,32 @@ def build_parser() -> argparse.ArgumentParser:
         help="rebuild from the clone and diff against the committed index instead of "
         "overwriting it. Exit 1 if they disagree",
     )
+
+    check = commands.add_parser(
+        "data-check",
+        help="report P3, P4 and P9 against the pinned tree: what fails to parse, what the "
+        "scorer actually loads, where the gold vocabulary has drifted, what the normaliser "
+        "drops, and the split counts against the paper's Table 5",
+    )
+    check.add_argument("--into", type=Path, default=DEFAULT_CLONE, help="where the clone is")
+    check.add_argument(
+        "--index",
+        type=Path,
+        default=spans.COMMITTED,
+        help=f"the committed span index, which carries P9 on its own (default {spans.COMMITTED})",
+    )
+    check.add_argument(
+        "--no-clone",
+        action="store_true",
+        help="report only what the committed index supports, and say that P3 and P4 were not "
+        "measured rather than reporting them as held",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    routes = {"fetch": _fetch, "index": _index}
+    routes = {"fetch": _fetch, "index": _index, "data-check": _data_check}
     try:
         return routes[args.command](args)
     except (PinMismatch, IndexInconsistent) as exc:
