@@ -142,6 +142,11 @@ spec before the repository existed. Six had a known direction from a first-hand
 read of the scorer; what pre-registration buys is the magnitude and the
 contingency, not the direction. P2, P5 and P6 were open in direction as well.
 
+The section of the spec that fixed them is committed as
+[docs/pre-registration.md](docs/pre-registration.md), verbatim apart from one
+declared edit, with its own note on what a reader can check from inside this
+repository and what they cannot.
+
 Note the inversion, because it is what makes a pre-registration worth less than
 it looks if nobody says it: here the object under test is somebody else's code,
 so a violation is a result and a clean sweep would have meant there was nothing

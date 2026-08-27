@@ -68,6 +68,22 @@ def test_the_headline_in_the_opening_is_the_transcribed_one(markdown: str) -> No
     assert f"{paper.COMBINED_JOINT_PROSE:.0%}".replace("%", " percent") in opening
 
 
+def test_the_pre_registration_is_committed_linked_and_carries_the_nine(
+    markdown: str, repo_root: pathlib.Path
+) -> None:
+    """The README asserts four times over that the nine were fixed before any code existed.
+
+    The spec they came from is a private working document covering a portfolio
+    of unrelated projects, so what is committed is that one section, with its own
+    note on what a reader can and cannot check. A claim about a document nobody
+    can read is worth less than the document.
+    """
+    spec = (repo_root / "docs" / "pre-registration.md").read_text(encoding="utf-8")
+    assert "docs/pre-registration.md" in markdown
+    for name in report.PROPERTIES:
+        assert f"**{name}**" in spec, name
+
+
 def test_nothing_is_left_to_be_written(markdown: str) -> None:
     for placeholder in ("TODO", "FIXME", "coming soon", "lorem ipsum"):
         assert placeholder.lower() not in markdown.lower()
