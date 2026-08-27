@@ -18,6 +18,7 @@ from trailaudit import (
     adversarial,
     artifacts,
     catf1,
+    datacheck,
     gold,
     normaliser,
     pairing,
@@ -98,6 +99,27 @@ def test_the_normaliser_drops_four_gold_errors(clone: pathlib.Path) -> None:
         "Task Orchestration Error": 1,
         "Task Orchestration Errors": 2,
     }
+
+
+def test_p3_p4_and_p9_reproduce_from_a_fresh_run(
+    clone: pathlib.Path, repo_root: pathlib.Path
+) -> None:
+    index = spans.load(repo_root / spans.COMMITTED)
+    checked = datacheck.inspect(clone, index)
+    committed = datacheck.load(repo_root / datacheck.COMMITTED)
+    assert artifacts.differences(committed, datacheck.artifact(checked)) == []
+    assert [one.verdict for one in datacheck.findings_for(checked)] == [VIOLATED] * 3
+
+
+def test_the_artifact_refuses_to_be_written_without_the_gold(repo_root: pathlib.Path) -> None:
+    """--no-clone measures P9 and nothing else, and a file saying so would overwrite the real one.
+
+    Not a clone test at heart, but it belongs next to the one above: the pair of
+    them is what stops results/datacheck.json ever holding a partial run.
+    """
+    checked = datacheck.inspect(None, spans.load(repo_root / spans.COMMITTED))
+    with pytest.raises(upstream.MissingClone):
+        datacheck.artifact(checked)
 
 
 def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pathlib.Path) -> None:

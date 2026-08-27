@@ -1,0 +1,87 @@
+{
+  "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
+  "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "table_5": "arXiv:2505.08638v3, Table 5, page 16",
+  "properties": {
+    "P3": {
+      "claim": "every gold annotation file parses as JSON",
+      "verdict": "VIOLATED",
+      "magnitude": "147 of 148 gold files parse, so every published average divides by 147"
+    },
+    "P4": {
+      "claim": "every gold category string is one of the taxonomy labels",
+      "verdict": "VIOLATED",
+      "magnitude": "11 of 31 gold spellings are not a label, covering 19 of 836 errors"
+    },
+    "P9": {
+      "claim": "the repository's split sizes match the paper's Table 5",
+      "verdict": "VIOLATED",
+      "magnitude": "8 of the 10 Table 5 cells this repository can compare disagree with the tree at 0ffbed9db859"
+    }
+  },
+  "corpus": {
+    "sha256": "e27721ffd74bef970daa02a91e9a2362d87dd8f956a2e4ec49cf5c8c088781e5",
+    "files": 296,
+    "bytes": 186421678
+  },
+  "gold_files": {
+    "on_disk": 148,
+    "parsed": 147
+  },
+  "unreadable": [
+    {
+      "split": "GAIA",
+      "trace": "a96c6811716c0473b86a23321db79c34",
+      "line": 38,
+      "column": 10,
+      "character": ","
+    }
+  ],
+  "vocabulary": {
+    "labels": 21,
+    "spellings": 31,
+    "errors": 836,
+    "off_taxonomy": 11,
+    "errors_off_taxonomy": 19,
+    "dropped_spellings": 3,
+    "dropped_errors": 4
+  },
+  "splits": {
+    "GAIA": {
+      "here": {
+        "traces": 117,
+        "spans": 3579,
+        "errors": 580,
+        "unique_error_spans": 384,
+        "traces_with_errors": 113
+      },
+      "paper": {
+        "traces": 118,
+        "spans": 977,
+        "errors": 579,
+        "unique_error_spans": 383,
+        "traces_with_errors": 115
+      }
+    },
+    "SWE Bench": {
+      "here": {
+        "traces": 31,
+        "spans": 1047,
+        "errors": 256,
+        "unique_error_spans": 191,
+        "traces_with_errors": 30
+      },
+      "paper": {
+        "traces": 31,
+        "spans": 1010,
+        "errors": 256,
+        "unique_error_spans": 192,
+        "traces_with_errors": 31
+      }
+    }
+  },
+  "paper_prose": {
+    "traces": 148,
+    "errors": 841
+  }
+}

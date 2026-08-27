@@ -102,7 +102,7 @@ def test_the_distribution_marks_a_row_the_normaliser_left_outside(annotated: Gol
 def test_report_without_a_clone_still_finds_p9(repo_root: pathlib.Path) -> None:
     """`data-check --no-clone` on a fresh clone, which is what CI would run."""
     index = spans.load(repo_root / spans.COMMITTED)
-    lines, violated = datacheck.report(None, index)
+    lines, violated = datacheck.report(datacheck.inspect(None, index))
     rendered = "\n".join(lines)
     assert violated
     p9_line = next(line for line in rendered.splitlines() if line.startswith("P9  "))

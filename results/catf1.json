@@ -1,6 +1,13 @@
 {
   "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
   "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "properties": {
+    "P7": {
+      "claim": "per-category F1 separates naming a category at the right span from naming it anywhere",
+      "verdict": "VIOLATED",
+      "magnitude": "GAIA scores the same 21 columns for a predictor at 0.974 location accuracy and one at 0.000; SWE Bench scores the same 21 columns for a predictor at 0.961 location accuracy and one at 0.000"
+    }
+  },
   "identical_per_category_block": [
     "GAIA",
     "SWE Bench"

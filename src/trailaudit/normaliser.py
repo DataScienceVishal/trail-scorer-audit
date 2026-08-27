@@ -33,7 +33,7 @@ from pathlib import Path
 from types import ModuleType
 
 from trailaudit import adversarial, artifacts, gold, predictors, scoring, upstream
-from trailaudit.datacheck import HELD, VIOLATED, Finding, wrapped
+from trailaudit.datacheck import HELD, VIOLATED, Finding, verdicts, wrapped
 
 COMMITTED = Path("results/normaliser.json")
 
@@ -232,7 +232,13 @@ def p6(
     at_one = sum(1 for one in reached if one.length == 1)
 
     if shortest_hit >= floor:
-        return Finding("P6", claim, HELD, [f"nothing under {floor} characters reaches a label"])
+        return Finding(
+            "P6",
+            claim,
+            HELD,
+            f"nothing under {floor} characters reaches a label",
+            [f"nothing under {floor} characters reaches a label"],
+        )
 
     promoted = [one for one in drifted if one.loop == FALLBACK]
     fell_through = [one for one in drifted if one.loop == NEITHER]
@@ -256,7 +262,14 @@ def p6(
             f"{plural(sum(one.errors for one in fell_through), 'error')} reach no label at all."
         ),
     ]
-    return Finding("P6", claim, VIOLATED, lines)
+    return Finding(
+        "P6",
+        claim,
+        VIOLATED,
+        f"the shortest label is {floor} characters and every one of the {len(taxonomy)} is "
+        f"reached by {hardest} characters or fewer, {at_one} of them by one",
+        lines,
+    )
 
 
 def plural(count: int, noun: str) -> str:
@@ -427,7 +440,11 @@ def p5(done: Study) -> Finding:
     ambiguous = [one for one in done.reaches if one.order_dependent]
     if not ambiguous:
         return Finding(
-            "P5", claim, HELD, [f"no string among {len(done.reaches)} reaches two labels"]
+            "P5",
+            claim,
+            HELD,
+            f"no string among {len(done.reaches):,} reaches two labels",
+            [f"no string among {len(done.reaches)} reaches two labels"],
         )
 
     widest = max(ambiguous, key=lambda one: len(one.matched))
@@ -469,7 +486,15 @@ def p5(done: Study) -> Finding:
             "take the list as a parameter, and are the reusable part of this file."
         ),
     ]
-    return Finding("P5", claim, VIOLATED, lines)
+    return Finding(
+        "P5",
+        claim,
+        VIOLATED,
+        f"{len(ambiguous)} of {len(done.reaches):,} strings change label under a shuffled "
+        f"taxonomy, {elsewhere} of them under seed {SEED}, and {moved} of the {figures} scores "
+        f"in slice 2 move as a result",
+        lines,
+    )
 
 
 def report(done: Study) -> tuple[list[str], bool]:
@@ -525,6 +550,7 @@ def artifact(done: Study) -> dict:
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "properties": verdicts([p6(done.shortest, done.taxonomy, done.drifted), p5(done)]),
         "labels": len(done.taxonomy),
         "shortest_label_squashed": min(len(squash(label)) for label in done.taxonomy),
         "substrings_enumerated": len(done.reaches),

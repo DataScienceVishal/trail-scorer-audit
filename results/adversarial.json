@@ -2,6 +2,18 @@
   "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
   "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
   "table_1": "arXiv:2505.08638v3, Table 1, page 7",
+  "properties": {
+    "P1": {
+      "claim": "all-spans-all-categories scores no better than a published judge",
+      "verdict": "VIOLATED",
+      "magnitude": "the gold-blind predictor beats the best published row: GAIA joint 0.973 against 0.183, location 0.974 against 0.546; SWE Bench joint 0.958 against 0.050, location 0.961 against 0.238"
+    },
+    "P2": {
+      "claim": "every gold error location is a span identifier in its own trace",
+      "verdict": "VIOLATED",
+      "magnitude": "2 of 836 gold locations are not a span in the trace they annotate. All of them are the literal 'Span ID not found for this shard'"
+    }
+  },
   "splits": {
     "GAIA": {
       "gold_files": 117,

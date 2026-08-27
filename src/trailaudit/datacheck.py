@@ -9,6 +9,12 @@ P9 is the only one of the three that runs without the clone, off the committed
 span index. P3 and P4 read the gold annotations, which this repository does not
 commit, so without a clone they say they were not measured. A property that
 quietly reports HELD because it could not look is worse than one that admits it.
+
+The run also writes `results/datacheck.json`, which is what the README's tables
+are rendered from. Slices 2 and 3 committed an artifact each and this one did
+not, because slice 1 printed its findings and stopped. That left the three
+oldest findings as the only ones a reader had to take on trust, and the report
+command in slice 4 needs them in the same form as the rest.
 """
 
 from __future__ import annotations
@@ -19,14 +25,19 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from trailaudit import gold, paper, upstream
+from trailaudit import artifacts, gold, paper, upstream
 from trailaudit.gold import Annotation, ParseFailure
+from trailaudit.upstream import MissingClone
 
 HELD = "HELD"
 VIOLATED = "VIOLATED"
 UNMEASURED = "not measured"
 
+_NOT_MEASURED = "nothing looked, so nothing is claimed"
+
 WIDTH = 96
+
+COMMITTED = Path("results/datacheck.json")
 
 
 @dataclass(frozen=True)
@@ -40,9 +51,20 @@ class Gold:
 
 @dataclass(frozen=True)
 class Finding:
+    """One pre-registered property, decided.
+
+    `magnitude` is one line and it is what the README's conditions table prints.
+    The pre-registration promised a direction for six of the nine and a size for
+    none of them, so the size is the part that had to come out of a run, and
+    keeping it here means the table and the terminal report cannot disagree
+    about it. `lines` is the terminal evidence under the verdict and is free to
+    be as long as it needs.
+    """
+
     name: str
     claim: str
     verdict: str
+    magnitude: str
     lines: list[str]
 
     def render(self) -> str:
@@ -73,16 +95,20 @@ def read_gold(clone: Path) -> Gold:
 def p3(annotated: Gold | None) -> Finding:
     claim = "every gold annotation file parses as JSON"
     if annotated is None:
-        return Finding("P3", claim, UNMEASURED, [_needs_clone()])
+        return Finding("P3", claim, UNMEASURED, _NOT_MEASURED, [_needs_clone()])
     parsed = len(annotated.annotations)
     refused = len(annotated.failures)
     if not refused:
-        return Finding("P3", claim, HELD, [f"{parsed} files, all of them parse"])
+        return Finding(
+            "P3", claim, HELD, f"{parsed} files, all of them parse", [f"{parsed} files parse"]
+        )
     verb = "does not" if refused == 1 else "do not"
     return Finding(
         "P3",
         claim,
         VIOLATED,
+        f"{parsed} of {parsed + refused} gold files parse, so every published average "
+        f"divides by {parsed}",
         [
             f"{parsed + refused} files on disk, {parsed} parse, {refused} {verb}",
             *(str(one) for one in annotated.failures),
@@ -97,16 +123,25 @@ def p3(annotated: Gold | None) -> Finding:
 def p4(annotated: Gold | None) -> Finding:
     claim = "every gold category string is one of the taxonomy labels"
     if annotated is None:
-        return Finding("P4", claim, UNMEASURED, [_needs_clone()])
+        return Finding("P4", claim, UNMEASURED, _NOT_MEASURED, [_needs_clone()])
     labels = list(annotated.taxonomy)
     off = gold.off_taxonomy(annotated.vocabulary, labels)
     errors = sum(annotated.vocabulary.values())
+    spellings = len(annotated.vocabulary)
     if not off:
-        return Finding("P4", claim, HELD, [f"{len(annotated.vocabulary)} spellings, all labels"])
+        return Finding(
+            "P4",
+            claim,
+            HELD,
+            f"{spellings} spellings, all labels",
+            [f"{spellings} spellings, all labels"],
+        )
     return Finding(
         "P4",
         claim,
         VIOLATED,
+        f"{len(off)} of {spellings} gold spellings are not a label, covering "
+        f"{sum(annotated.vocabulary[one] for one in off)} of {errors} errors",
         [
             f"{len(annotated.vocabulary)} distinct spellings over {errors} errors, "
             f"against {len(labels)} labels",
@@ -118,15 +153,13 @@ def p4(annotated: Gold | None) -> Finding:
 
 def p9(measured: dict[str, dict[str, int]]) -> Finding:
     claim = "the repository's split sizes match the paper's Table 5"
-    disagreeing = [
-        split.name
-        for split in upstream.SPLITS
-        if paper.published_for(split.name).traces != measured[split.name]["traces"]
-    ]
+    comparable, disagreeing = cells(measured)
     return Finding(
         "P9",
         claim,
         VIOLATED if disagreeing else HELD,
+        f"{len(disagreeing)} of the {comparable} Table 5 cells this repository can compare "
+        f"disagree with the tree at {upstream.PINNED_COMMIT[:12]}",
         [
             f"{paper.CITATION}, against the tree at {upstream.PINNED_COMMIT[:12]}",
             *table_5_rows(measured),
@@ -143,6 +176,28 @@ def p9(measured: dict[str, dict[str, int]]) -> Finding:
             ),
         ],
     )
+
+
+def cells(measured: dict[str, dict[str, int]]) -> tuple[int, list[str]]:
+    """How many of Table 5's ten cells can be compared, and which of those disagree.
+
+    Three of the five rows need the gold annotations, so without a clone only
+    four cells are comparable and the verdict rests on those. Counting a row
+    nobody measured as agreeing is the failure mode this whole file is written
+    against.
+    """
+    comparable = 0
+    disagreeing = []
+    for split in upstream.SPLITS:
+        published = paper.published_for(split.name)
+        for row in paper.ROWS:
+            here = measured[split.name].get(row)
+            if here is None:
+                continue
+            comparable += 1
+            if here != getattr(published, row):
+                disagreeing.append(f"{split.name} {paper.LABELS[row]}")
+    return comparable, disagreeing
 
 
 def _needs_clone() -> str:
@@ -249,10 +304,37 @@ def measure(
     return counted
 
 
-def report(clone: Path | None, index: dict[str, dict[str, list[str]]]) -> tuple[list[str], bool]:
+@dataclass(frozen=True)
+class Checked:
+    """One pass over the pinned tree, shared by the printed report and the artifact.
+
+    `annotated` and `corpus` are None when the command was told there is no
+    clone, which is the only supported way to run this offline. The artifact
+    cannot be written in that state and says so rather than committing a file
+    with three of Table 5's rows missing.
+    """
+
+    annotated: Gold | None
+    measured: dict[str, dict[str, int]]
+    corpus: tuple[int, int] | None
+
+
+def inspect(clone: Path | None, index: dict[str, dict[str, list[str]]]) -> Checked:
+    return Checked(
+        annotated=read_gold(clone) if clone is not None else None,
+        measured=measure(clone, index),
+        corpus=upstream.corpus_size(clone) if clone is not None else None,
+    )
+
+
+def findings_for(checked: Checked) -> list[Finding]:
+    return [p3(checked.annotated), p4(checked.annotated), p9(checked.measured)]
+
+
+def report(checked: Checked) -> tuple[list[str], bool]:
     """Everything data-check prints, and whether any property came back VIOLATED."""
-    annotated = read_gold(clone) if clone is not None else None
-    findings = [p3(annotated), p4(annotated), p9(measure(clone, index))]
+    annotated = checked.annotated
+    findings = findings_for(checked)
 
     lines: list[str] = []
     for finding in findings:
@@ -284,3 +366,72 @@ def report(clone: Path | None, index: dict[str, dict[str, list[str]]]) -> tuple[
         ]
 
     return lines, any(finding.verdict == VIOLATED for finding in findings)
+
+def verdicts(findings: Iterable[Finding]) -> dict:
+    """The properties block every committed artifact carries.
+
+    Written by the command that decided them rather than derived a second time
+    from the numbers in the file. The README's conditions table reads this, so a
+    verdict in the prose and a verdict in the terminal are the same string, and
+    `--check` catches a flip the way it catches a moved figure.
+    """
+    return {
+        one.name: {"claim": one.claim, "verdict": one.verdict, "magnitude": one.magnitude}
+        for one in findings
+    }
+
+
+def artifact(checked: Checked) -> dict:
+    """P3, P4 and P9 as figures, so the README can quote them without the 186 MB."""
+    annotated = checked.annotated
+    if annotated is None or checked.corpus is None:
+        raise MissingClone(
+            "data-check --no-clone cannot write the artifact: P3 and P4 were not measured and "
+            "three of Table 5's five rows are missing. Run `trailaudit fetch` first"
+        )
+    labels = list(annotated.taxonomy)
+    off = gold.off_taxonomy(annotated.vocabulary, labels)
+    lost = gold.dropped(annotated.vocabulary, labels, annotated.normalise)
+    files, size = checked.corpus
+    return {
+        "pinned_commit": upstream.PINNED_COMMIT,
+        "scorer_sha256": upstream.SCORER_SHA256,
+        "table_5": paper.CITATION,
+        "properties": verdicts(findings_for(checked)),
+        "corpus": {"sha256": upstream.CORPUS_SHA256, "files": files, "bytes": size},
+        "gold_files": {
+            "on_disk": len(annotated.annotations) + len(annotated.failures),
+            "parsed": len(annotated.annotations),
+        },
+        "unreadable": [
+            {
+                "split": one.split,
+                "trace": one.trace,
+                "line": one.line,
+                "column": one.column,
+                "character": one.character,
+            }
+            for one in annotated.failures
+        ],
+        "vocabulary": {
+            "labels": len(labels),
+            "spellings": len(annotated.vocabulary),
+            "errors": sum(annotated.vocabulary.values()),
+            "off_taxonomy": len(off),
+            "errors_off_taxonomy": sum(annotated.vocabulary[one] for one in off),
+            "dropped_spellings": len(lost),
+            "dropped_errors": sum(lost.values()),
+        },
+        "splits": {
+            split.name: {
+                "here": checked.measured[split.name],
+                "paper": {row: getattr(paper.published_for(split.name), row) for row in paper.ROWS},
+            }
+            for split in upstream.SPLITS
+        },
+        "paper_prose": {"traces": paper.ABSTRACT_TRACES, "errors": paper.ABSTRACT_ERRORS},
+    }
+
+
+def load(path: Path = COMMITTED) -> dict:
+    return artifacts.load(path, rerun="trailaudit data-check")

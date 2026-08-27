@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from trailaudit import adversarial, artifacts, gold, predictors, scoring, upstream
-from trailaudit.datacheck import HELD, VIOLATED, Finding, wrapped
+from trailaudit.datacheck import HELD, VIOLATED, Finding, verdicts, wrapped
 
 COMMITTED = Path("results/catf1.json")
 
@@ -148,7 +148,13 @@ def p7(rows: tuple[Row, ...]) -> Finding:
     claim = "per-category F1 separates naming a category at the right span from naming it anywhere"
     same = [split for split in splits_of(rows) if indistinguishable(rows, split)]
     if not same:
-        return Finding("P7", claim, HELD, ["the per-category block moved with the locations"])
+        return Finding(
+            "P7",
+            claim,
+            HELD,
+            "the per-category block moved when the locations did",
+            ["the per-category block moved with the locations"],
+        )
 
     lines = []
     for split in same:
@@ -169,7 +175,22 @@ def p7(rows: tuple[Row, ...]) -> Finding:
             f"support, and precision in each is that column's support over the "
             f"{blind.files_scored} scored traces. Neither number reads a trace."
         )
-    return Finding("P7", claim, VIOLATED, lines)
+    return Finding(
+        "P7",
+        claim,
+        VIOLATED,
+        "; ".join(_p7_magnitude(rows, split) for split in same),
+        lines,
+    )
+
+
+def _p7_magnitude(rows: tuple[Row, ...], split: str) -> str:
+    located, blind = paired(rows, split)
+    return (
+        f"{split} scores the same {len(blind.per_category)} columns for a predictor at "
+        f"{located.location_accuracy:.3f} location accuracy and one at "
+        f"{blind.location_accuracy:.3f}"
+    )
 
 
 def lineup_table(rows: tuple[Row, ...], split: str) -> list[str]:
@@ -234,6 +255,7 @@ def artifact(rows: tuple[Row, ...]) -> dict:
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "properties": verdicts([p7(rows)]),
         "identical_per_category_block": [
             split for split in splits_of(rows) if indistinguishable(rows, split)
         ],

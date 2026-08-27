@@ -23,7 +23,7 @@ from pathlib import Path
 from types import ModuleType
 
 from trailaudit import artifacts, gold, paper, predictors, scoring, spans, upstream
-from trailaudit.datacheck import HELD, VIOLATED, WIDTH, Finding, wrapped
+from trailaudit.datacheck import HELD, VIOLATED, WIDTH, Finding, verdicts, wrapped
 from trailaudit.gold import Annotation
 from trailaudit.predictors import Case, Predictor
 from trailaudit.scoring import Scores
@@ -179,7 +179,27 @@ def p1(runs: list[SplitRun]) -> Finding:
             f"there."
         ),
     ]
-    return Finding("P1", claim, VIOLATED if beaten else HELD, lines)
+    return Finding(
+        "P1",
+        claim,
+        VIOLATED if beaten else HELD,
+        _p1_magnitude(runs, beaten),
+        lines,
+    )
+
+
+def _p1_magnitude(runs: list[SplitRun], beaten: bool) -> str:
+    per_split = []
+    for one in runs:
+        mine = one.scored[HEADLINE.name]
+        cells = ", ".join(
+            f"{label} {getattr(mine, metric):.3f} against "
+            f"{getattr(paper.best_published(one.split, metric), metric):.3f}"
+            for metric, label in (("joint_accuracy", "joint"), ("location_accuracy", "location"))
+        )
+        per_split.append(f"{one.split} {cells}")
+    verb = "beats" if beaten else "stays under"
+    return f"the gold-blind predictor {verb} the best published row: " + "; ".join(per_split)
 
 
 def p2(runs: list[SplitRun]) -> Finding:
@@ -187,7 +207,13 @@ def p2(runs: list[SplitRun]) -> Finding:
     absent = sum(len(one) for run_ in runs for one in run_.absent_locations.values())
     errors = sum(one.gold_errors for one in runs)
     if not absent:
-        return Finding("P2", claim, HELD, [f"{errors} gold errors, every location indexed"])
+        return Finding(
+            "P2",
+            claim,
+            HELD,
+            f"{errors} gold errors, every location a span in its own trace",
+            [f"{errors} gold errors, every location indexed"],
+        )
 
     named = []
     every: set[str] = set()
@@ -210,7 +236,13 @@ def p2(runs: list[SplitRun]) -> Finding:
         ),
         *(f"  {line}" for line in _ceiling_gaps(runs)),
     ]
-    return Finding("P2", claim, VIOLATED, lines)
+    return Finding(
+        "P2",
+        claim,
+        VIOLATED,
+        f"{absent} of {errors} gold locations are not a span in the trace they annotate{shared}",
+        lines,
+    )
 
 
 def _ceiling_gaps(runs: list[SplitRun]) -> list[str]:
@@ -335,6 +367,7 @@ def artifact(runs: list[SplitRun]) -> dict:
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
         "table_1": paper.TABLE_1_CITATION,
+        "properties": verdicts([p1(runs), p2(runs)]),
         "splits": {
             one.split: {
                 "gold_files": one.gold_files,

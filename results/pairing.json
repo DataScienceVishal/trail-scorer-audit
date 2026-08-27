@@ -1,6 +1,13 @@
 {
   "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
   "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "properties": {
+    "P8": {
+      "claim": "the scorer pairs each predicted location with the category predicted for it",
+      "verdict": "VIOLATED",
+      "magnitude": "one null category takes a correct judge from 1.000 joint to 0.000 on the constructed trace, and 0 of 836 real gold errors carry one"
+    }
+  },
   "constructed_trace": {
     "errors": [
       {

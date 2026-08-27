@@ -1,6 +1,18 @@
 {
   "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
   "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "properties": {
+    "P6": {
+      "claim": "no string shorter than the shortest taxonomy label normalises to a taxonomy label",
+      "verdict": "VIOLATED",
+      "magnitude": "the shortest label is 12 characters and every one of the 21 is reached by 2 characters or fewer, 8 of them by one"
+    },
+    "P5": {
+      "claim": "the normaliser's output depends on its input alone, not on the taxonomy order",
+      "verdict": "VIOLATED",
+      "magnitude": "237 of 3,205 strings change label under a shuffled taxonomy, 115 of them under seed 20260827, and 0 of the 24 scores in slice 2 move as a result"
+    }
+  },
   "labels": 21,
   "shortest_label_squashed": 12,
   "substrings_enumerated": 3205,

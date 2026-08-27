@@ -38,7 +38,7 @@ from pathlib import Path
 from types import ModuleType
 
 from trailaudit import artifacts, gold, upstream
-from trailaudit.datacheck import HELD, VIOLATED, Finding, wrapped
+from trailaudit.datacheck import HELD, VIOLATED, Finding, verdicts, wrapped
 from trailaudit.gold import Annotation
 
 COMMITTED = Path("results/pairing.json")
@@ -170,7 +170,11 @@ def p8(scored: tuple[Run, ...], counted: Latent) -> Finding:
     ]
     if not broken:
         return Finding(
-            "P8", claim, HELD, ["one null category changed no score on the constructed trace"]
+            "P8",
+            claim,
+            HELD,
+            "one null category changed no score on the constructed trace",
+            ["one null category changed no score on the constructed trace"],
         )
 
     lines = [
@@ -199,7 +203,15 @@ def p8(scored: tuple[Run, ...], counted: Latent) -> Finding:
             f"the leaderboard, and the README says so in those words."
         ),
     ]
-    return Finding("P8", claim, VIOLATED, lines)
+    return Finding(
+        "P8",
+        claim,
+        VIOLATED,
+        f"one null category takes a correct judge from {clean.joint_accuracy:.3f} joint to "
+        f"{misjudged.joint_accuracy:.3f} on the constructed trace, and "
+        f"{counted.falsy_categories} of {counted.gold_errors} real gold errors carry one",
+        lines,
+    )
 
 
 def table(scored: tuple[Run, ...]) -> list[str]:
@@ -232,6 +244,7 @@ def artifact(scored: tuple[Run, ...], counted: Latent, taxonomy: tuple[str, ...]
     return {
         "pinned_commit": upstream.PINNED_COMMIT,
         "scorer_sha256": upstream.SCORER_SHA256,
+        "properties": verdicts([p8(scored, counted)]),
         "constructed_trace": {"errors": errors(taxonomy, True)},
         "runs": [
             {

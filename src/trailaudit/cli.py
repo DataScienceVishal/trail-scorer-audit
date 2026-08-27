@@ -95,6 +95,14 @@ def _data_check(args: argparse.Namespace) -> int:
     finding disappear, and `|| true` already exists for anyone who wants that
     and is willing to write it down.
     """
+    if args.no_clone and args.check:
+        print(
+            "trailaudit: --no-clone cannot check results/datacheck.json. P3 and P4 are two "
+            "thirds of what is in it and both need the gold annotations.",
+            file=sys.stderr,
+        )
+        return 2
+
     index = spans.load(args.index)
     clone = None if args.no_clone else args.into
     if clone is not None and not upstream.scorer_path(clone).is_file():
@@ -107,9 +115,13 @@ def _data_check(args: argparse.Namespace) -> int:
     if clone is not None:
         upstream.verify_scorer(clone)
 
-    lines, violated = datacheck.report(clone, index)
+    checked = datacheck.inspect(clone, index)
+    lines, violated = datacheck.report(checked)
     print("\n".join(lines))
-    return 3 if violated else 0
+    if clone is None:
+        print(f"\n{datacheck.COMMITTED} untouched: one of its three properties was measured")
+        return 3 if violated else 0
+    return _settle(args, datacheck.artifact(checked), datacheck.load, violated)
 
 
 def _adversarial(args: argparse.Namespace) -> int:
@@ -288,6 +300,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="report only what the committed index supports, and say that P3 and P4 were not "
         "measured rather than reporting them as held",
+    )
+    check.add_argument(
+        "--out",
+        type=Path,
+        default=datacheck.COMMITTED,
+        help=f"where the run artifact is written and read (default {datacheck.COMMITTED})",
+    )
+    check.add_argument(
+        "--check",
+        action="store_true",
+        help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
+        "if any figure moved",
     )
 
     predictors = commands.add_parser(

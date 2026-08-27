@@ -117,6 +117,26 @@ def corpus_digest(clone: Path) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def corpus_size(clone: Path) -> tuple[int, int]:
+    """(files, bytes) over the same paths the digest covers, by stat rather than by read.
+
+    The README quotes the download size, and a size quoted from memory is the
+    figure most likely to be wrong by the time anyone checks it. This walks the
+    three corpus directories without opening anything, so it costs nothing next
+    to the digest.
+    """
+    files = 0
+    total = 0
+    for directory in CORPUS_DIRS:
+        here = clone / directory
+        if not here.is_dir():
+            raise MissingClone(f"{here} is not a directory. Run `trailaudit fetch` first")
+        for path in here.rglob("*.json"):
+            files += 1
+            total += path.stat().st_size
+    return files, total
+
+
 def scorer_path(clone: Path) -> Path:
     return clone / SCORER
 
