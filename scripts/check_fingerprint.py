@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail a commit that contains the tells listed in BANNED.md.
+"""Fail a commit that contains the tells listed in scripts/style-words.md.
 
 Two modes. `--staged` checks what git is about to commit, which is what the
 pre-commit hook uses. Passing paths (or nothing, meaning the whole tree) checks
@@ -78,7 +78,7 @@ class Finding:
 
 
 def parse_banned(md: Path) -> Rules:
-    """Pull the fenced blocks out of BANNED.md so the list has exactly one home."""
+    """Pull the fenced blocks out of the word list so it has exactly one home."""
     blocks: dict[str, list[str]] = {}
     current: str | None = None
     for raw in md.read_text(encoding="utf-8").splitlines():
@@ -264,7 +264,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*", type=Path)
     parser.add_argument("--staged", action="store_true", help="check the git index, not the tree")
-    parser.add_argument("--banned", type=Path, help="path to BANNED.md, otherwise discovered")
+    parser.add_argument("--banned", type=Path, help="path to the word list, otherwise discovered")
     args = parser.parse_args()
 
     root = Path.cwd()
