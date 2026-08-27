@@ -324,11 +324,11 @@ def shuffle(src: Sources) -> list[str]:
         f"{ambiguous['count']} of those {src.normaliser['substrings_enumerated']:,} strings "
         f"match more than one label, so list position decides which one they get, and "
         f"{ambiguous['moved_under_the_shuffle']} of them land somewhere else once the "
-        f"taxonomy is reordered under seed {shuffled['seed']}. "
-        f"{len(shuffled['ambiguous_gold_spellings'])} of the "
-        f"{src.datacheck['vocabulary']['spellings']} spellings TRAIL's gold actually uses are "
-        f"ambiguous, so rescoring every predictor on both splits under the shuffled order "
-        f"moved {moved} of the {figures} figures it produces."
+        f"taxonomy is reordered under seed {shuffled['seed']}. Of the "
+        f"{src.datacheck['vocabulary']['spellings']} spellings TRAIL's gold actually uses, "
+        f"{len(shuffled['ambiguous_gold_spellings'])} are ambiguous, so rescoring every "
+        f"predictor on both splits under the shuffled order moved {moved} of the {figures} "
+        f"figures it produces."
     )
 
 
@@ -366,8 +366,8 @@ def null_category(src: Sources) -> list[str]:
         ),
         "",
         *paragraph(
-            f"{latent['falsy_categories']} of the {latent['gold_errors']} real gold errors "
-            f"carry a category that is null or empty, so "
+            f"Of the {latent['gold_errors']} real gold errors, "
+            f"{latent['falsy_categories']} carry a category that is null or empty, so "
             f"{latent['traces_that_would_mispair']} files mispair and "
             f"{latent['traces_that_would_lose_a_pair']} lose a pair. No published number moves "
             f"because of this one."
