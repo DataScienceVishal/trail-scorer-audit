@@ -4,7 +4,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from trailaudit import datacheck, spans, upstream
+from trailaudit import adversarial, datacheck, spans, upstream
+from trailaudit.scoring import DiagnosticDrifted
 from trailaudit.spans import IndexInconsistent
 from trailaudit.upstream import DEFAULT_CLONE, MissingClone, PinMismatch
 
@@ -100,6 +101,39 @@ def _data_check(args: argparse.Namespace) -> int:
     return 3 if violated else 0
 
 
+def _adversarial(args: argparse.Namespace) -> int:
+    index = spans.load(args.index)
+    if not upstream.scorer_path(args.into).is_file():
+        print(
+            f"trailaudit: no clone at {args.into}. The predictors are scored by TRAIL's own "
+            f"calculate_scores.py against TRAIL's own gold, so both have to be on disk. "
+            f"Run `trailaudit fetch`.",
+            file=sys.stderr,
+        )
+        return 2
+    upstream.verify_corpus(args.into)
+
+    runs = adversarial.run(args.into, index)
+    built = adversarial.artifact(runs)
+    lines, violated = adversarial.report(runs)
+    print("\n".join(lines))
+
+    if args.check:
+        drifted = adversarial.differences(adversarial.load(args.out), built)
+        if drifted:
+            print(f"\ntrailaudit: {args.out} and this run disagree:", file=sys.stderr)
+            for line in drifted[:20]:
+                print(f"  {line}", file=sys.stderr)
+            return 1
+        print(f"\n{args.out} matches this run")
+        return 3 if violated else 0
+
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(adversarial.render(built), encoding="utf-8")
+    print(f"\nwrote {args.out}")
+    return 3 if violated else 0
+
+
 def _already_pinned(clone: Path) -> bool:
     try:
         return upstream.head_commit(clone) == upstream.PINNED_COMMIT
@@ -174,15 +208,46 @@ def build_parser() -> argparse.ArgumentParser:
         help="report only what the committed index supports, and say that P3 and P4 were not "
         "measured rather than reporting them as held",
     )
+
+    predictors = commands.add_parser(
+        "adversarial",
+        help="score six predictors through the pinned unmodified scorer and report P1 and P2: "
+        "joint accuracy, location accuracy, and how many errors each one emitted per gold error",
+    )
+    predictors.add_argument("--into", type=Path, default=DEFAULT_CLONE, help="where the clone is")
+    predictors.add_argument(
+        "--index",
+        type=Path,
+        default=spans.COMMITTED,
+        help=f"the committed span index, which is the whole input to the predictor the claim "
+        f"rests on (default {spans.COMMITTED})",
+    )
+    predictors.add_argument(
+        "--out",
+        type=Path,
+        default=adversarial.COMMITTED,
+        help=f"where the run artifact is written and read (default {adversarial.COMMITTED})",
+    )
+    predictors.add_argument(
+        "--check",
+        action="store_true",
+        help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
+        "if any figure moved",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    routes = {"fetch": _fetch, "index": _index, "data-check": _data_check}
+    routes = {
+        "fetch": _fetch,
+        "index": _index,
+        "data-check": _data_check,
+        "adversarial": _adversarial,
+    }
     try:
         return routes[args.command](args)
-    except (PinMismatch, IndexInconsistent) as exc:
+    except (PinMismatch, IndexInconsistent, DiagnosticDrifted) as exc:
         print(f"trailaudit: {exc}", file=sys.stderr)
         return 1
     except (MissingClone, FileNotFoundError) as exc:

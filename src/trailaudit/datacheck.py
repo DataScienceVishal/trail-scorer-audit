@@ -79,7 +79,7 @@ def p3(annotated: Gold | None) -> Finding:
         [
             f"{parsed + refused} files on disk, {parsed} parse, {refused} {verb}",
             *(str(one) for one in annotated.failures),
-            *_wrapped(
+            *wrapped(
                 f"the scorer catches that at line 242 and continues, so every published "
                 f"average divides by {parsed}"
             ),
@@ -124,13 +124,13 @@ def p9(measured: dict[str, dict[str, int]]) -> Finding:
             f"{paper.CITATION}, against the tree at {upstream.PINNED_COMMIT[:12]}",
             *table_5_rows(measured),
             "",
-            *_wrapped(
+            *wrapped(
                 f"the paper's prose says {paper.ABSTRACT_TRACES} traces and "
                 f"{paper.ABSTRACT_ERRORS} errors, and Table 5's own rows sum to "
                 f"{sum(row.traces for row in paper.TABLE_5)} and "
                 f"{sum(row.errors for row in paper.TABLE_5)}"
             ),
-            *_wrapped(
+            *wrapped(
                 "the last three rows are counted over the gold files that parse, so GAIA's "
                 "leaves out the errors in the one that does not"
             ),
@@ -142,7 +142,7 @@ def _needs_clone() -> str:
     return "needs the gold annotations. Run `trailaudit fetch`"
 
 
-def _wrapped(sentence: str) -> list[str]:
+def wrapped(sentence: str) -> list[str]:
     """Findings indent their lines by four, so the wrap has to leave room for that."""
     return textwrap.wrap(sentence, WIDTH - 4)
 

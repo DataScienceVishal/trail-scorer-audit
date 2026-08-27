@@ -13,7 +13,8 @@ import pathlib
 
 import pytest
 
-from trailaudit import gold, spans, upstream
+from trailaudit import adversarial, gold, spans, upstream
+from trailaudit.datacheck import VIOLATED
 
 pytestmark = pytest.mark.upstream
 
@@ -87,3 +88,37 @@ def test_the_normaliser_drops_four_gold_errors(clone: pathlib.Path) -> None:
         "Task Orchestration Error": 1,
         "Task Orchestration Errors": 2,
     }
+
+
+def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pathlib.Path) -> None:
+    """The whole of slice 2, rerun against the real scorer and diffed leaf by leaf.
+
+    Every figure the README quotes comes out of results/adversarial.json, and
+    nothing offline can tell whether that file describes a real run. This is what
+    can, and it is the reason `trailaudit adversarial --check` exists as well.
+    """
+    index = spans.load(repo_root / spans.COMMITTED)
+    runs = adversarial.run(clone, index)
+    committed = adversarial.load(repo_root / adversarial.COMMITTED)
+    assert adversarial.differences(committed, adversarial.artifact(runs)) == []
+
+    assert adversarial.p1(runs).verdict == VIOLATED
+    assert adversarial.p2(runs).verdict == VIOLATED
+
+
+def test_the_maximal_predictor_reads_no_span_contents_and_still_beats_every_model(
+    clone: pathlib.Path, repo_root: pathlib.Path
+) -> None:
+    """The claim, measured rather than quoted, against Table 1 on page 7.
+
+    Gemini-2.5-Pro is the best of eight on all four columns. The predictor here
+    is a for loop over the committed span index crossed with the taxonomy, and
+    the numbers it beats them by are the ones the README leads with.
+    """
+    index = spans.load(repo_root / spans.COMMITTED)
+    runs = {one.split: one for one in adversarial.run(clone, index)}
+    for split, joint, location in (("GAIA", 0.183, 0.546), ("SWE Bench", 0.050, 0.238)):
+        mine = runs[split].scored[adversarial.HEADLINE.name]
+        assert mine.joint_accuracy > joint
+        assert mine.location_accuracy > location
+        assert mine.volume_ratio > 80

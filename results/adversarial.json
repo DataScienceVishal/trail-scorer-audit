@@ -1,0 +1,169 @@
+{
+  "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
+  "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "table_1": "arXiv:2505.08638v3, Table 1, page 7",
+  "splits": {
+    "GAIA": {
+      "gold_files": 117,
+      "gold_files_scored": 116,
+      "gold_errors": 580,
+      "traces_with_gold_errors": 113,
+      "reachable_ceiling": 0.974137931,
+      "walked_past": [
+        {
+          "trace": "a96c6811716c0473b86a23321db79c34",
+          "why": "gold file did not parse"
+        }
+      ],
+      "locations_off_the_index": {},
+      "best_published": {
+        "joint_accuracy": {
+          "model": "Gemini-2.5-Pro-Preview-05-06",
+          "value": 0.183
+        },
+        "location_accuracy": {
+          "model": "Gemini-2.5-Pro-Preview-05-06",
+          "value": 0.546
+        }
+      },
+      "predictors": {
+        "silent": {
+          "reads": "spans",
+          "joint_accuracy": 0.0,
+          "location_accuracy": 0.0,
+          "joint_precision": 0.0,
+          "location_precision": 0.0,
+          "predicted_errors": 0,
+          "volume_ratio": 0.0
+        },
+        "gold-exact": {
+          "reads": "gold",
+          "joint_accuracy": 0.974137931,
+          "location_accuracy": 0.974137931,
+          "joint_precision": 0.974137931,
+          "location_precision": 0.974137931,
+          "predicted_errors": 580,
+          "volume_ratio": 1.0
+        },
+        "gold-mispaired": {
+          "reads": "gold",
+          "joint_accuracy": 0.5529898263,
+          "location_accuracy": 0.974137931,
+          "joint_precision": 0.5593027184,
+          "location_precision": 0.974137931,
+          "predicted_errors": 580,
+          "volume_ratio": 1.0
+        },
+        "every-span-once": {
+          "reads": "spans",
+          "joint_accuracy": 0.0877907772,
+          "location_accuracy": 0.974137931,
+          "joint_precision": 0.0229713473,
+          "location_precision": 0.1297111225,
+          "predicted_errors": 3565,
+          "volume_ratio": 6.1465517241
+        },
+        "gold-spans-all-categories": {
+          "reads": "gold",
+          "joint_accuracy": 0.973354232,
+          "location_accuracy": 0.974137931,
+          "joint_precision": 0.0828123778,
+          "location_precision": 0.974137931,
+          "predicted_errors": 8064,
+          "volume_ratio": 13.9034482759
+        },
+        "all-spans-all-categories": {
+          "reads": "spans",
+          "joint_accuracy": 0.973354232,
+          "location_accuracy": 0.974137931,
+          "joint_precision": 0.0109001366,
+          "location_precision": 0.1297111225,
+          "predicted_errors": 74865,
+          "volume_ratio": 129.0775862069
+        }
+      }
+    },
+    "SWE Bench": {
+      "gold_files": 31,
+      "gold_files_scored": 31,
+      "gold_errors": 256,
+      "traces_with_gold_errors": 30,
+      "reachable_ceiling": 0.9677419355,
+      "walked_past": [],
+      "locations_off_the_index": {
+        "e7bdf7bbf6b931c3be95afe323704041": [
+          "Span ID not found for this shard"
+        ],
+        "e88b6bbc943971964ce88bf46c5cf76f": [
+          "Span ID not found for this shard"
+        ]
+      },
+      "best_published": {
+        "joint_accuracy": {
+          "model": "Gemini-2.5-Pro-Preview-05-06",
+          "value": 0.05
+        },
+        "location_accuracy": {
+          "model": "Gemini-2.5-Pro-Preview-05-06",
+          "value": 0.238
+        }
+      },
+      "predictors": {
+        "silent": {
+          "reads": "spans",
+          "joint_accuracy": 0.0,
+          "location_accuracy": 0.0,
+          "joint_precision": 0.0,
+          "location_precision": 0.0,
+          "predicted_errors": 0,
+          "volume_ratio": 0.0
+        },
+        "gold-exact": {
+          "reads": "gold",
+          "joint_accuracy": 0.9677419355,
+          "location_accuracy": 0.9677419355,
+          "joint_precision": 0.9677419355,
+          "location_precision": 0.9677419355,
+          "predicted_errors": 256,
+          "volume_ratio": 1.0
+        },
+        "gold-mispaired": {
+          "reads": "gold",
+          "joint_accuracy": 0.5382090132,
+          "location_accuracy": 0.9677419355,
+          "joint_precision": 0.5550001969,
+          "location_precision": 0.9677419355,
+          "predicted_errors": 256,
+          "volume_ratio": 1.0
+        },
+        "every-span-once": {
+          "reads": "spans",
+          "joint_accuracy": 0.0395289299,
+          "location_accuracy": 0.9612251548,
+          "joint_precision": 0.0142522229,
+          "location_precision": 0.1913124189,
+          "predicted_errors": 1046,
+          "volume_ratio": 4.0859375
+        },
+        "gold-spans-all-categories": {
+          "reads": "gold",
+          "joint_accuracy": 0.9600634133,
+          "location_accuracy": 0.9677419355,
+          "joint_precision": 0.0622864036,
+          "location_precision": 0.9677419355,
+          "predicted_errors": 4032,
+          "volume_ratio": 15.75
+        },
+        "all-spans-all-categories": {
+          "reads": "spans",
+          "joint_accuracy": 0.9577592658,
+          "location_accuracy": 0.9612251548,
+          "joint_precision": 0.0125947126,
+          "location_precision": 0.1913124189,
+          "predicted_errors": 21966,
+          "volume_ratio": 85.8046875
+        }
+      }
+    }
+  }
+}

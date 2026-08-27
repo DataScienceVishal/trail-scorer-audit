@@ -47,3 +47,23 @@ def test_data_check_asks_for_the_clone_rather_than_reporting_two_held(
     printed = capsys.readouterr()
     assert "--no-clone" in printed.err
     assert "HELD" not in printed.out
+
+
+def test_adversarial_asks_for_the_clone_rather_than_scoring_against_nothing(
+    tmp_path: pathlib.Path, repo_root: pathlib.Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """No --no-clone here, unlike data-check.
+
+    data-check can report P9 off the committed span index alone. P1 and P2 need
+    TRAIL's scorer and TRAIL's gold, and a flag that let this run without them
+    would only be able to produce a number that came from somewhere else.
+    """
+    argv = [
+        "adversarial",
+        "--into",
+        str(tmp_path / "no-clone-here"),
+        "--index",
+        str(repo_root / spans.COMMITTED),
+    ]
+    assert main(argv) == 2
+    assert "trailaudit fetch" in capsys.readouterr().err
