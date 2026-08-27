@@ -326,5 +326,1607 @@
       "loop": "fallback",
       "labels_inside_it": []
     }
-  ]
+  ],
+  "order_dependent": {
+    "count": 237,
+    "moved_under_the_shuffle": 115,
+    "strings": [
+      {
+        "string": "e",
+        "labels": 21,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "o",
+        "labels": 20,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "t",
+        "labels": 18,
+        "pinned": "Tool-related",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "i",
+        "labels": 17,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "n",
+        "labels": 17,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "r",
+        "labels": 17,
+        "pinned": "Tool-related",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "a",
+        "labels": 15,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "s",
+        "labels": 15,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "on",
+        "labels": 13,
+        "pinned": "Language-only",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "ti",
+        "labels": 13,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "u",
+        "labels": 12,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "c",
+        "labels": 11,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "l",
+        "labels": 11,
+        "pinned": "Language-only",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "io",
+        "labels": 10,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ion",
+        "labels": 10,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "tio",
+        "labels": 10,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "tion",
+        "labels": 10,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "at",
+        "labels": 9,
+        "pinned": "Tool-related",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "in",
+        "labels": 9,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "m",
+        "labels": 9,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "or",
+        "labels": 9,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "re",
+        "labels": 9,
+        "pinned": "Tool-related",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "es",
+        "labels": 7,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "rr",
+        "labels": 7,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ati",
+        "labels": 6,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "atio",
+        "labels": 6,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ation",
+        "labels": 6,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "d",
+        "labels": 6,
+        "pinned": "Tool-related",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "er",
+        "labels": 6,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "f",
+        "labels": 6,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "g",
+        "labels": 6,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ro",
+        "labels": 6,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ce",
+        "labels": 5,
+        "pinned": "Instruction Non-compliance",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "err",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "erro",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "error",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "errors",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "nt",
+        "labels": 5,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "oo",
+        "labels": 5,
+        "pinned": "Tool-related",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ors",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ou",
+        "labels": 5,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "p",
+        "labels": 5,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ror",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "rors",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "rro",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "rror",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "rrors",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "rs",
+        "labels": 5,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "co",
+        "labels": 4,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ct",
+        "labels": 4,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "en",
+        "labels": 4,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "h",
+        "labels": 4,
+        "pinned": "Authentication Errors",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "ng",
+        "labels": 4,
+        "pinned": "Language-only",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "ol",
+        "labels": 4,
+        "pinned": "Tool-related",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ool",
+        "labels": 4,
+        "pinned": "Tool-related",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "rc",
+        "labels": 4,
+        "pinned": "Resource Not Found",
+        "shuffled": "Task Orchestration"
+      },
+      {
+        "string": "res",
+        "labels": 4,
+        "pinned": "Resource Not Found",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "se",
+        "labels": 4,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Tool Selection Errors"
+      },
+      {
+        "string": "te",
+        "labels": 4,
+        "pinned": "Tool-related",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "to",
+        "labels": 4,
+        "pinned": "Tool-related",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "too",
+        "labels": 4,
+        "pinned": "Tool-related",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "tool",
+        "labels": 4,
+        "pinned": "Tool-related",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ur",
+        "labels": 4,
+        "pinned": "Resource Not Found",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "v",
+        "labels": 4,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "-",
+        "labels": 3,
+        "pinned": "Language-only",
+        "shuffled": "Tool-related"
+      },
+      {
+        "string": "an",
+        "labels": 3,
+        "pinned": "Language-only",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "de",
+        "labels": 3,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ec",
+        "labels": 3,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ect",
+        "labels": 3,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "el",
+        "labels": 3,
+        "pinned": "Tool-related",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "ent",
+        "labels": 3,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "eso",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "esou",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "esour",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "esourc",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "esource",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "et",
+        "labels": 3,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "fo",
+        "labels": 3,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "ge",
+        "labels": 3,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ic",
+        "labels": 3,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ing",
+        "labels": 3,
+        "pinned": "Formatting Errors",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "is",
+        "labels": 3,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "li",
+        "labels": 3,
+        "pinned": "Instruction Non-compliance",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "me",
+        "labels": 3,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "mi",
+        "labels": 3,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "nc",
+        "labels": 3,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "our",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "ourc",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "ource",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "rce",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "reso",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "resou",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "resour",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "resourc",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "resource",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "so",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "sou",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "sour",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "sourc",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "source",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "st",
+        "labels": 3,
+        "pinned": "Instruction Non-compliance",
+        "shuffled": "Task Orchestration"
+      },
+      {
+        "string": "tr",
+        "labels": 3,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Task Orchestration"
+      },
+      {
+        "string": "urc",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "urce",
+        "labels": 3,
+        "pinned": "Resource Not Found",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "us",
+        "labels": 3,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ut",
+        "labels": 3,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "vi",
+        "labels": 3,
+        "pinned": "Environment Setup Errors",
+        "shuffled": "Goal Deviation"
+      },
+      {
+        "string": "ag",
+        "labels": 2,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "age",
+        "labels": 2,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "al",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "ate",
+        "labels": 2,
+        "pinned": "Tool-related",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "au",
+        "labels": 2,
+        "pinned": "Authentication Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "b",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ca",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "cat",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "cati",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "catio",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "cation",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "cee",
+        "labels": 2,
+        "pinned": "Service Errors",
+        "shuffled": "Resource Exhaustion"
+      },
+      {
+        "string": "cor",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "corr",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "corre",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "correc",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "correct",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "cti",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Tool Selection Errors"
+      },
+      {
+        "string": "ctio",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Tool Selection Errors"
+      },
+      {
+        "string": "ction",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Tool Selection Errors"
+      },
+      {
+        "string": "ee",
+        "labels": 2,
+        "pinned": "Service Errors",
+        "shuffled": "Resource Exhaustion"
+      },
+      {
+        "string": "em",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "enti",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ev",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "ex",
+        "labels": 2,
+        "pinned": "Resource Exhaustion",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "fi",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "for",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "form",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "forma",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "format",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "ha",
+        "labels": 2,
+        "pinned": "Resource Exhaustion",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "he",
+        "labels": 2,
+        "pinned": "Authentication Errors",
+        "shuffled": "Task Orchestration"
+      },
+      {
+        "string": "ia",
+        "labels": 2,
+        "pinned": "Instruction Non-compliance",
+        "shuffled": "Goal Deviation"
+      },
+      {
+        "string": "ica",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "icat",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "icati",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "icatio",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ication",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "im",
+        "labels": 2,
+        "pinned": "Rate Limiting",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "inc",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "inco",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "incor",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "incorr",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "incorre",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "incorrec",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "incorrect",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ione",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ioner",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ionerr",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ionerro",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ionerror",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ionerrors",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "iss",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "issu",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "issue",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "issues",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "it",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "iti",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "la",
+        "labels": 2,
+        "pinned": "Language-only",
+        "shuffled": "Tool-related"
+      },
+      {
+        "string": "ld",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "lde",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "le",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ma",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "mat",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "nco",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ncor",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ncorr",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ncorre",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ncorrec",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ncorrect",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "nd",
+        "labels": 2,
+        "pinned": "Resource Not Found",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "ne",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "ner",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "nerr",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "nerro",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "nerror",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "nerrors",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "no",
+        "labels": 2,
+        "pinned": "Instruction Non-compliance",
+        "shuffled": "Resource Not Found"
+      },
+      {
+        "string": "nte",
+        "labels": 2,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "nti",
+        "labels": 2,
+        "pinned": "Incorrect Problem Identification",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "one",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "oner",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "onerr",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "onerro",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "onerror",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "onerrors",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "orm",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "orma",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "ormat",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "orr",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "orre",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "orrec",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "orrect",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "out",
+        "labels": 2,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Tool Output Misinterpretation"
+      },
+      {
+        "string": "pr",
+        "labels": 2,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ra",
+        "labels": 2,
+        "pinned": "Rate Limiting",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "rat",
+        "labels": 2,
+        "pinned": "Rate Limiting",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "rec",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "rect",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ret",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "rm",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "rma",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "rmat",
+        "labels": 2,
+        "pinned": "Poor Information Retrieval",
+        "shuffled": "Poor Information Retrieval"
+      },
+      {
+        "string": "rre",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "rrec",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "rrect",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "ss",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ssu",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ssue",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ssues",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "str",
+        "labels": 2,
+        "pinned": "Instruction Non-compliance",
+        "shuffled": "Task Orchestration"
+      },
+      {
+        "string": "su",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "sue",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "sues",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ta",
+        "labels": 2,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Task Orchestration"
+      },
+      {
+        "string": "th",
+        "labels": 2,
+        "pinned": "Authentication Errors",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "tin",
+        "labels": 2,
+        "pinned": "Formatting Errors",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "ting",
+        "labels": 2,
+        "pinned": "Formatting Errors",
+        "shuffled": "Rate Limiting"
+      },
+      {
+        "string": "tione",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "tioner",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "tionerr",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "tionerro",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "tionerror",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "tionerrors",
+        "labels": 2,
+        "pinned": "Tool Selection Errors",
+        "shuffled": "Authentication Errors"
+      },
+      {
+        "string": "tm",
+        "labels": 2,
+        "pinned": "Incorrect Memory Usage",
+        "shuffled": "Incorrect Memory Usage"
+      },
+      {
+        "string": "tp",
+        "labels": 2,
+        "pinned": "Tool Output Misinterpretation",
+        "shuffled": "Incorrect Problem Identification"
+      },
+      {
+        "string": "ue",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "ues",
+        "labels": 2,
+        "pinned": "Tool Definition Issues",
+        "shuffled": "Tool Definition Issues"
+      },
+      {
+        "string": "x",
+        "labels": 2,
+        "pinned": "Resource Exhaustion",
+        "shuffled": "Context Handling Failures"
+      },
+      {
+        "string": "y",
+        "labels": 2,
+        "pinned": "Language-only",
+        "shuffled": "Incorrect Memory Usage"
+      }
+    ]
+  },
+  "shuffle": {
+    "seed": 20260827,
+    "taxonomy": [
+      "Incorrect Memory Usage",
+      "Context Handling Failures",
+      "Tool Definition Issues",
+      "Incorrect Problem Identification",
+      "Rate Limiting",
+      "Task Orchestration",
+      "Tool-related",
+      "Poor Information Retrieval",
+      "Goal Deviation",
+      "Resource Not Found",
+      "Authentication Errors",
+      "Resource Exhaustion",
+      "Tool Selection Errors",
+      "Environment Setup Errors",
+      "Instruction Non-compliance",
+      "Language-only",
+      "Service Errors",
+      "Formatting Errors",
+      "Resource Abuse",
+      "Tool Output Misinterpretation",
+      "Timeout Issues"
+    ],
+    "ambiguous_gold_spellings": [],
+    "scores_that_moved": [],
+    "scores": [
+      {
+        "split": "GAIA",
+        "predictor": "silent",
+        "joint_accuracy": {
+          "pinned": 0.0,
+          "shuffled": 0.0
+        },
+        "location_accuracy": {
+          "pinned": 0.0,
+          "shuffled": 0.0
+        }
+      },
+      {
+        "split": "GAIA",
+        "predictor": "gold-exact",
+        "joint_accuracy": {
+          "pinned": 0.974137931,
+          "shuffled": 0.974137931
+        },
+        "location_accuracy": {
+          "pinned": 0.974137931,
+          "shuffled": 0.974137931
+        }
+      },
+      {
+        "split": "GAIA",
+        "predictor": "gold-mispaired",
+        "joint_accuracy": {
+          "pinned": 0.5529898263,
+          "shuffled": 0.5529898263
+        },
+        "location_accuracy": {
+          "pinned": 0.974137931,
+          "shuffled": 0.974137931
+        }
+      },
+      {
+        "split": "GAIA",
+        "predictor": "every-span-once",
+        "joint_accuracy": {
+          "pinned": 0.0877907772,
+          "shuffled": 0.0877907772
+        },
+        "location_accuracy": {
+          "pinned": 0.974137931,
+          "shuffled": 0.974137931
+        }
+      },
+      {
+        "split": "GAIA",
+        "predictor": "gold-spans-all-categories",
+        "joint_accuracy": {
+          "pinned": 0.973354232,
+          "shuffled": 0.973354232
+        },
+        "location_accuracy": {
+          "pinned": 0.974137931,
+          "shuffled": 0.974137931
+        }
+      },
+      {
+        "split": "GAIA",
+        "predictor": "all-spans-all-categories",
+        "joint_accuracy": {
+          "pinned": 0.973354232,
+          "shuffled": 0.973354232
+        },
+        "location_accuracy": {
+          "pinned": 0.974137931,
+          "shuffled": 0.974137931
+        }
+      },
+      {
+        "split": "SWE Bench",
+        "predictor": "silent",
+        "joint_accuracy": {
+          "pinned": 0.0,
+          "shuffled": 0.0
+        },
+        "location_accuracy": {
+          "pinned": 0.0,
+          "shuffled": 0.0
+        }
+      },
+      {
+        "split": "SWE Bench",
+        "predictor": "gold-exact",
+        "joint_accuracy": {
+          "pinned": 0.9677419355,
+          "shuffled": 0.9677419355
+        },
+        "location_accuracy": {
+          "pinned": 0.9677419355,
+          "shuffled": 0.9677419355
+        }
+      },
+      {
+        "split": "SWE Bench",
+        "predictor": "gold-mispaired",
+        "joint_accuracy": {
+          "pinned": 0.5382090132,
+          "shuffled": 0.5382090132
+        },
+        "location_accuracy": {
+          "pinned": 0.9677419355,
+          "shuffled": 0.9677419355
+        }
+      },
+      {
+        "split": "SWE Bench",
+        "predictor": "every-span-once",
+        "joint_accuracy": {
+          "pinned": 0.0395289299,
+          "shuffled": 0.0395289299
+        },
+        "location_accuracy": {
+          "pinned": 0.9612251548,
+          "shuffled": 0.9612251548
+        }
+      },
+      {
+        "split": "SWE Bench",
+        "predictor": "gold-spans-all-categories",
+        "joint_accuracy": {
+          "pinned": 0.9600634133,
+          "shuffled": 0.9600634133
+        },
+        "location_accuracy": {
+          "pinned": 0.9677419355,
+          "shuffled": 0.9677419355
+        }
+      },
+      {
+        "split": "SWE Bench",
+        "predictor": "all-spans-all-categories",
+        "joint_accuracy": {
+          "pinned": 0.9577592658,
+          "shuffled": 0.9577592658
+        },
+        "location_accuracy": {
+          "pinned": 0.9612251548,
+          "shuffled": 0.9612251548
+        }
+      }
+    ]
+  }
 }

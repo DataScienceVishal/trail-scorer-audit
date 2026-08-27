@@ -226,3 +226,61 @@ def test_a_whitespace_category_survives_because_line_45_filters_before_normalisi
         ("one", ""),
         ("two", "Flange Misuse"),
     }
+
+
+def test_as_document_rebuilds_a_gold_annotation_in_the_order_it_was_read() -> None:
+    """Lines 45 to 49 pair locations against categories by position, so order is the content.
+
+    An Annotation holds the two as parallel tuples. Rebuilding them into the
+    wrong fields, or into the wrong order, would change what the scorer thinks
+    the gold says while leaving every count in this audit identical.
+    """
+    annotation = Annotation(
+        split="fixture",
+        trace="alpha",
+        categories=("Widget Errors", "Flange Misuse"),
+        locations=("aaaa000000000001", "aaaa000000000002"),
+    )
+    assert scoring.as_document(annotation) == {
+        "errors": [
+            {"location": "aaaa000000000001", "category": "Widget Errors"},
+            {"location": "aaaa000000000002", "category": "Flange Misuse"},
+        ]
+    }
+
+
+def test_as_document_carries_no_scores_key() -> None:
+    """The gold files have one. It feeds main()'s Pearson block and nothing this audit reads."""
+    empty = Annotation(split="fixture", trace="alpha", categories=(), locations=())
+    assert scoring.as_document(empty) == {"errors": []}
+
+
+def test_averaged_under_divides_by_the_annotations_it_was_given() -> None:
+    """Not by the files on disk. The gold file that will not parse is not in this dict."""
+    module = ModuleType("stand_in_metrics")
+    module.calculate_metrics = lambda ground_truth, generated, categories: {
+        "joint_accuracy": 1.0 if generated["errors"] else 0.0,
+        "location_accuracy": 0.5,
+    }
+    annotations = {
+        trace: Annotation(split="fixture", trace=trace, categories=(), locations=())
+        for trace in ("alpha", "beta", "gamma", "delta")
+    }
+    emitted = {"alpha": [ONE_ERROR], "beta": [], "gamma": [], "delta": []}
+    assert scoring.averaged_under(module, annotations, emitted, TAXONOMY) == (0.25, 0.5)
+
+
+def test_averaged_under_hands_the_taxonomy_it_was_given_to_the_scorer() -> None:
+    """The whole point of it. main() cannot be asked to use a different order."""
+    seen = []
+    module = ModuleType("stand_in_metrics")
+
+    def calculate_metrics(ground_truth, generated, categories):
+        seen.append(tuple(categories))
+        return {"joint_accuracy": 0.0, "location_accuracy": 0.0}
+
+    module.calculate_metrics = calculate_metrics
+    annotations = {"alpha": Annotation("fixture", "alpha", (), ())}
+    reordered = tuple(reversed(TAXONOMY))
+    scoring.averaged_under(module, annotations, {"alpha": []}, reordered)
+    assert seen == [reordered]

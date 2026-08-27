@@ -126,8 +126,8 @@ def test_the_maximal_predictor_reads_no_span_contents_and_still_beats_every_mode
 
 
 @pytest.fixture(scope="module")
-def study(clone: pathlib.Path) -> normaliser.Study:
-    return normaliser.study(clone)
+def study(clone: pathlib.Path, repo_root: pathlib.Path) -> normaliser.Study:
+    return normaliser.study(clone, spans.load(repo_root / spans.COMMITTED))
 
 
 def test_p6_every_one_of_the_21_labels_is_reachable_from_two_characters(
@@ -184,8 +184,62 @@ def test_the_eleven_drifted_gold_spellings_split_five_three_and_three(
     ]
 
 
-def test_p6_reproduces_from_a_fresh_run(study: normaliser.Study, repo_root: pathlib.Path) -> None:
+def test_no_taxonomy_label_sits_inside_another_one(study: normaliser.Study) -> None:
+    """The precondition behind reading two matches as decided by list position.
+
+    A string that matches label A exactly and label B loosely is not order
+    dependent, because the exact loop at line 21 runs the whole list first. That
+    can only happen if A's squashed form is inside B's, and none of the 21 is.
+    """
+    squashed = [normaliser.squash(label) for label in study.taxonomy]
+    nested = [
+        (inner, outer)
+        for inner in squashed
+        for outer in squashed
+        if inner != outer and inner in outer
+    ]
+    assert nested == []
+
+
+def test_p5_the_taxonomy_order_decides_237_strings_and_no_gold_spelling(
+    study: normaliser.Study,
+) -> None:
+    """P5's magnitude, and the reason it does not reach a published number.
+
+    237 of the 3,205 enumerated strings are settled by list position, and 'e' is
+    accepted by all 21 labels. None of the 31 gold spellings is among them, so
+    shuffling the taxonomy leaves all 24 figures of the slice 2 measurement
+    exactly where they were.
+    """
+    ambiguous = [one for one in study.reaches if one.order_dependent]
+    assert len(ambiguous) == 237
+    assert max(len(one.matched) for one in ambiguous) == len(study.taxonomy) == 21
+    assert study.ambiguous_gold() == []
+    assert [one for one in study.rescored if one.moved] == []
+    assert len(study.rescored) == 12
+
+
+def test_p5_and_p6_reproduce_from_a_fresh_run(
+    study: normaliser.Study, repo_root: pathlib.Path
+) -> None:
     committed = normaliser.load(repo_root / normaliser.COMMITTED)
     assert artifacts.differences(committed, normaliser.artifact(study)) == []
     _, violated = normaliser.report(study)
     assert violated
+    assert normaliser.p5(study).verdict == VIOLATED
+
+
+def test_the_shuffled_rescore_reproduces_what_main_returned_under_the_pinned_order(
+    study: normaliser.Study, repo_root: pathlib.Path
+) -> None:
+    """The control that makes a null result mean something.
+
+    rescore() averages calculate_metrics itself, because main() takes the
+    taxonomy from a literal it owns. If that averaging were wrong the shuffled
+    column would be meaningless and would still print zeros. Every pinned figure
+    here has to equal the one results/adversarial.json carries from main().
+    """
+    published = adversarial.load(repo_root / adversarial.COMMITTED)["splits"]
+    for one in study.rescored:
+        row = published[one.split]["predictors"][one.predictor]
+        assert one.pinned == (row["joint_accuracy"], row["location_accuracy"]), one.predictor

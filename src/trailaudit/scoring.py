@@ -214,6 +214,49 @@ def score_split(
     )
 
 
+def as_document(annotation: Annotation) -> dict[str, list[Error]]:
+    """One gold annotation rebuilt into the shape `calculate_metrics` reads at lines 33 to 36.
+
+    Order is kept, because lines 45 to 49 pair locations against categories
+    positionally. The `scores` key is left out: it feeds the Pearson block in
+    `main()`, and `calculate_metrics` only passes it through.
+    """
+    return {
+        "errors": [
+            {"location": location, "category": category}
+            for location, category in zip(
+                annotation.locations, annotation.categories, strict=True
+            )
+        ]
+    }
+
+
+def averaged_under(
+    scorer: ModuleType,
+    annotations: dict[str, Annotation],
+    emitted: dict[str, list[Error]],
+    categories: Sequence[str],
+) -> tuple[float, float]:
+    """Joint and location accuracy for one predictor, with the taxonomy handed in.
+
+    `main()` takes `all_categories` from a literal inside itself at line 115, so
+    the only way to score the same predictions under a different category order
+    is to call the function underneath it and average here. That makes this the
+    one place in the audit where the aggregation is this repository's rather than
+    upstream's, which is why the caller scores the pinned order through here too
+    and stops if it does not reproduce what `main()` returned.
+    """
+    joint = location = 0.0
+    for trace, annotation in annotations.items():
+        measured = scorer.calculate_metrics(
+            as_document(annotation), document(emitted[trace]), list(categories)
+        )
+        joint += measured["joint_accuracy"]
+        location += measured["location_accuracy"]
+    scored = len(annotations)
+    return joint / scored, location / scored
+
+
 def _averages(measured: Sequence[BothWays], processed: int) -> dict[str, float]:
     if processed <= 0:
         return dict.fromkeys(

@@ -24,15 +24,22 @@ way with the two arguments swapped.
 
 from __future__ import annotations
 
+import random
+import tempfile
 from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from types import ModuleType
 
-from trailaudit import artifacts, gold, upstream
+from trailaudit import adversarial, artifacts, gold, predictors, scoring, upstream
 from trailaudit.datacheck import HELD, VIOLATED, Finding, wrapped
 
 COMMITTED = Path("results/normaliser.json")
+
+# The date the audit was run. Any fixed integer would do; what matters is that
+# the shuffled order is written into the artifact so a reader can rebuild it.
+SEED = 20260827
 
 Normalise = Callable[[str, list[str]], str]
 
@@ -113,11 +120,32 @@ def which_loop(normalise: Normalise, candidate: str, label: str) -> str:
 class Reach:
     candidate: str
     lands: str
+    matched: tuple[str, ...]
+
+    @property
+    def order_dependent(self) -> bool:
+        """Two labels will take this string, and only list position decides which.
+
+        This reads two matches as decided by position, which is right as long as
+        neither of them is an exact match: the exact loop at line 21 runs the
+        whole list before the fallback does, so an exact hit wins from anywhere.
+        A candidate could only be both if one label's squashed form sat inside
+        another's, and none of TRAIL's 21 does. test_pinned_clone.py holds that
+        precondition rather than leaving it as an assumption here.
+        """
+        return len(self.matched) > 1
 
 
 def probe(taxonomy: Sequence[str], normalise: Normalise) -> tuple[Reach, ...]:
     labels = list(taxonomy)
-    return tuple(Reach(one, normalise(one, labels)) for one in candidates(taxonomy))
+    return tuple(
+        Reach(
+            candidate=one,
+            lands=normalise(one, labels),
+            matched=tuple(label for label in labels if accepts(normalise, one, label)),
+        )
+        for one in candidates(taxonomy)
+    )
 
 
 @dataclass(frozen=True)
@@ -235,6 +263,102 @@ def plural(count: int, noun: str) -> str:
     return f"{count} {noun}" if count == 1 else f"{count} {noun}s"
 
 
+def shuffled(taxonomy: Sequence[str], seed: int = SEED) -> tuple[str, ...]:
+    """The same 21 labels in a different order, fixed so the run reproduces."""
+    reordered = list(taxonomy)
+    random.Random(seed).shuffle(reordered)
+    return tuple(reordered)
+
+
+@dataclass(frozen=True)
+class Rescored:
+    """One predictor on one split, averaged under the pinned order and under the shuffle."""
+
+    split: str
+    predictor: str
+    pinned: tuple[float, float]
+    reordered: tuple[float, float]
+
+    @property
+    def moved(self) -> bool:
+        return self.pinned != self.reordered
+
+
+def rescore(
+    scorer: ModuleType,
+    clone: Path,
+    index: dict[str, dict[str, list[str]]],
+    taxonomy: Sequence[str],
+) -> tuple[Rescored, ...]:
+    """The whole slice 2 measurement again, with a shuffled taxonomy and the same predictions.
+
+    Only the list handed to `calculate_metrics` moves. The predictions are built
+    once from the pinned order and reused, because `every-span-once` picks
+    `taxonomy[0]` and would otherwise change its own answer for a reason that has
+    nothing to do with the normaliser. What is left is a clean question: does the
+    same input score differently because the labels were listed in another order?
+
+    Every row is scored a third time, through `main()` under the pinned order, and
+    the run stops unless that reproduces the pinned figures here. Without it a
+    shuffle that moved nothing would be indistinguishable from an aggregation
+    that measured nothing.
+    """
+    other = shuffled(taxonomy)
+    bound = gold.binder(scorer.normalize_category, taxonomy)
+    rows = []
+    with tempfile.TemporaryDirectory(prefix="trailaudit-shuffle-") as workspace:
+        for split in upstream.SPLITS:
+            loaded, _ = gold.read_directory(clone / split.annotations, split.name)
+            annotations = {one.trace: one for one in loaded}
+            cases = adversarial.cases_for(split, index[split.name], annotations, taxonomy)
+            for predictor in predictors.PREDICTORS:
+                through_main = scoring.score_split(
+                    scorer=scorer,
+                    gold_dir=clone / split.annotations,
+                    cases=cases,
+                    annotations=annotations,
+                    normalise=bound,
+                    predictor=predictor,
+                    workspace=Path(workspace) / predictor.name / split.name,
+                )
+                emitted = {trace: predictor.emit(case) for trace, case in cases.items()}
+                pinned = scoring.averaged_under(scorer, annotations, emitted, taxonomy)
+                _confirm_reproduces(pinned, through_main, predictor.name, split.name)
+                rows.append(
+                    Rescored(
+                        split=split.name,
+                        predictor=predictor.name,
+                        pinned=_rounded(pinned),
+                        reordered=_rounded(
+                            scoring.averaged_under(scorer, annotations, emitted, other)
+                        ),
+                    )
+                )
+    return tuple(rows)
+
+
+def _rounded(pair: tuple[float, float]) -> tuple[float, float]:
+    return (round(pair[0], scoring.PLACES), round(pair[1], scoring.PLACES))
+
+
+def _confirm_reproduces(
+    pinned: tuple[float, float], through_main: scoring.Scores, predictor: str, split: str
+) -> None:
+    both = ((pinned[0], through_main.joint_accuracy, "joint"), (
+        pinned[1],
+        through_main.location_accuracy,
+        "location",
+    ))
+    for mine, theirs, metric in both:
+        if abs(mine - theirs) > scoring.AGREEMENT:
+            raise scoring.DiagnosticDrifted(
+                f"{predictor} on {split}: calculate_scores.main() returned {metric} accuracy "
+                f"{theirs!r} and averaging calculate_metrics under the same taxonomy order "
+                f"gives {mine!r}. The shuffled figures beside it would mean nothing while "
+                f"these two disagree, so the run stops here."
+            )
+
+
 def shortest_table(shortest: Sequence[Shortest]) -> list[str]:
     rows = [f"{'label':<34}{'shortest':>9}{'reaching':>10}  strings of that length"]
     for one in shortest:
@@ -268,32 +392,97 @@ class Study:
     normalise: Normalise
     reaches: tuple[Reach, ...]
     shortest: tuple[Shortest, ...]
+    vocabulary: Counter[str]
     drifted: tuple[Drifted, ...]
+    rescored: tuple[Rescored, ...]
+
+    def ambiguous_gold(self) -> list[str]:
+        """Gold spellings that more than one label will take, which is what the shuffle needs."""
+        return sorted(
+            spelling
+            for spelling in self.vocabulary
+            if sum(1 for label in self.taxonomy if accepts(self.normalise, spelling, label)) > 1
+        )
 
 
-def study(clone: Path) -> Study:
+def study(clone: Path, index: dict[str, dict[str, list[str]]]) -> Study:
+    scorer = upstream.load_scorer(clone)
     taxonomy = upstream.taxonomy(clone)
-    normalise = upstream.load_scorer(clone).normalize_category
-    reaches = probe(taxonomy, normalise)
+    reaches = probe(taxonomy, scorer.normalize_category)
     loaded, _ = gold.read_all(clone)
+    counted = gold.vocabulary(loaded)
     return Study(
         taxonomy=taxonomy,
-        normalise=normalise,
+        normalise=scorer.normalize_category,
         reaches=reaches,
         shortest=shortest_reaching(reaches, taxonomy),
-        drifted=drift(gold.vocabulary(loaded), taxonomy, normalise),
+        vocabulary=counted,
+        drifted=drift(counted, taxonomy, scorer.normalize_category),
+        rescored=rescore(scorer, clone, index, taxonomy),
     )
 
 
+def p5(done: Study) -> Finding:
+    claim = "the normaliser's output depends on its input alone, not on the taxonomy order"
+    ambiguous = [one for one in done.reaches if one.order_dependent]
+    if not ambiguous:
+        return Finding(
+            "P5", claim, HELD, [f"no string among {len(done.reaches)} reaches two labels"]
+        )
+
+    widest = max(ambiguous, key=lambda one: len(one.matched))
+    other = list(shuffled(done.taxonomy))
+    elsewhere = sum(
+        1 for one in ambiguous if done.normalise(one.candidate, other) != one.lands
+    )
+    figures = len(done.rescored) * 2
+    moved = sum(1 for one in done.rescored if one.moved)
+    in_the_gold = done.ambiguous_gold()
+
+    lines = [
+        *wrapped(
+            f"{len(ambiguous)} of the {len(done.reaches):,} enumerated strings match more than "
+            f"one label, so list position decides which one they get. {widest.candidate!r} "
+            f"matches all {len(widest.matched)} and lands on {widest.lands!r} because that "
+            f"label is listed first."
+        ),
+        *wrapped(
+            f"reordering the taxonomy under seed {SEED} sends {elsewhere} of those "
+            f"{len(ambiguous)} to a different label"
+        ),
+        "",
+        *wrapped(
+            f"{len(in_the_gold)} of the {len(done.vocabulary)} gold spellings are among them, "
+            f"and no prediction is either, because the predictors emit the labels themselves "
+            f"and an exact match is settled before the fallback runs. So rescoring the whole of "
+            f"slice 2 under the shuffled order moves {moved} of the {figures} figures it "
+            f"produces, over {len(done.rescored)} predictor and split pairs with joint and "
+            f"location accuracy each, to {scoring.PLACES} decimal places."
+        ),
+        "",
+        *wrapped(
+            "which is worth being plain about: the consequence this property was written to "
+            "catch, two people scoring the same data and getting different numbers, does not "
+            "follow here. `all_categories` is a literal inside `main()` at line 115, so nobody "
+            "running calculate_scores.py gets a different order by accident. The exposure is "
+            "`calculate_metrics` and `normalize_category` themselves, which are importable, "
+            "take the list as a parameter, and are the reusable part of this file."
+        ),
+    ]
+    return Finding("P5", claim, VIOLATED, lines)
+
+
 def report(done: Study) -> tuple[list[str], bool]:
-    finding = p6(done.shortest, done.taxonomy, done.drifted)
+    findings = [p6(done.shortest, done.taxonomy, done.drifted), p5(done)]
     rescued = [one for one in done.drifted if one.loop != NEITHER]
     reversible = [one for one in done.drifted if one.loop == NEITHER and one.would_contain]
 
     lines = [
-        finding.render(),
+        findings[0].render(),
         "",
-        f"{len(done.reaches)} distinct substrings of the {len(done.taxonomy)} labels, and "
+        findings[1].render(),
+        "",
+        f"{len(done.reaches):,} distinct substrings of the {len(done.taxonomy)} labels, and "
         f"where each one lands",
         *(f"  {row}".rstrip() for row in shortest_table(done.shortest)),
         "",
@@ -313,8 +502,22 @@ def report(done: Study) -> tuple[list[str], bool]:
             f"would catch those if it asked the containment the other way round. The rest are "
             f"misspellings no substring rule reaches."
         ),
+        "",
+        f"the same {len(done.rescored) * 2} figures under the pinned order and under seed {SEED}",
+        *(f"  {row}".rstrip() for row in rescored_table(done.rescored)),
     ]
-    return lines, finding.verdict == VIOLATED
+    return lines, any(one.verdict == VIOLATED for one in findings)
+
+
+def rescored_table(rescored: Sequence[Rescored]) -> list[str]:
+    head = f"{'split':<11}{'predictor':<27}{'joint':>9}{'shuffled':>10}{'location':>10}"
+    rows = [f"{head}{'shuffled':>10}"]
+    for one in rescored:
+        rows.append(
+            f"{one.split:<11}{one.predictor:<27}{one.pinned[0]:>9.6f}{one.reordered[0]:>10.6f}"
+            f"{one.pinned[1]:>10.6f}{one.reordered[1]:>10.6f}"
+        )
+    return rows
 
 
 def artifact(done: Study) -> dict:
@@ -347,6 +550,53 @@ def artifact(done: Study) -> dict:
                 "labels_inside_it": list(one.would_contain),
             }
             for one in done.drifted
+        ],
+        "order_dependent": _order_dependent(done),
+        "shuffle": {
+            "seed": SEED,
+            "taxonomy": list(shuffled(done.taxonomy)),
+            "ambiguous_gold_spellings": done.ambiguous_gold(),
+            "scores_that_moved": [
+                f"{one.split}/{one.predictor}" for one in done.rescored if one.moved
+            ],
+            "scores": [
+                {
+                    "split": one.split,
+                    "predictor": one.predictor,
+                    "joint_accuracy": {"pinned": one.pinned[0], "shuffled": one.reordered[0]},
+                    "location_accuracy": {"pinned": one.pinned[1], "shuffled": one.reordered[1]},
+                }
+                for one in done.rescored
+            ],
+        },
+    }
+
+
+def _order_dependent(done: Study) -> dict:
+    """Every string whose label is decided by list position, with where each order sends it.
+
+    All of them rather than a chosen few. Which ones look interesting is exactly
+    the judgement an audit should not be making on the reader's behalf, and 237
+    short strings cost less to commit than the argument would.
+    """
+    other = list(shuffled(done.taxonomy))
+    ambiguous = sorted(
+        (one for one in done.reaches if one.order_dependent),
+        key=lambda one: (-len(one.matched), one.candidate),
+    )
+    return {
+        "count": len(ambiguous),
+        "moved_under_the_shuffle": sum(
+            1 for one in ambiguous if done.normalise(one.candidate, other) != one.lands
+        ),
+        "strings": [
+            {
+                "string": one.candidate,
+                "labels": len(one.matched),
+                "pinned": one.lands,
+                "shuffled": done.normalise(one.candidate, other),
+            }
+            for one in ambiguous
         ],
     }
 

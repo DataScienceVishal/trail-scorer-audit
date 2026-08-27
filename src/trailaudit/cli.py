@@ -133,7 +133,7 @@ def _normaliser(args: argparse.Namespace) -> int:
         return 2
     upstream.verify_corpus(args.into)
 
-    done = normaliser.study(args.into)
+    done = normaliser.study(args.into, spans.load(args.index))
     built = normaliser.artifact(done)
     lines, violated = normaliser.report(done)
     print("\n".join(lines))
@@ -276,6 +276,13 @@ def build_parser() -> argparse.ArgumentParser:
         "spellings that are not labels end up",
     )
     fallback.add_argument("--into", type=Path, default=DEFAULT_CLONE, help="where the clone is")
+    fallback.add_argument(
+        "--index",
+        type=Path,
+        default=spans.COMMITTED,
+        help=f"the committed span index, which the shuffled rescore needs because it runs the "
+        f"slice 2 predictors again (default {spans.COMMITTED})",
+    )
     fallback.add_argument(
         "--out",
         type=Path,

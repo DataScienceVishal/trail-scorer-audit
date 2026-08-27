@@ -151,3 +151,82 @@ def test_the_drift_table_names_the_spelling_the_count_and_the_loop() -> None:
     assert "'Widget'" in rows[1]
     assert "fallback" in rows[1]
     assert "Widget Errors" in rows[1]
+
+
+def rescored(*rows: tuple[str, str, float, float]) -> tuple[normaliser.Rescored, ...]:
+    return tuple(
+        normaliser.Rescored(split, name, pinned=(pinned, pinned), reordered=(moved, moved))
+        for split, name, pinned, moved in rows
+    )
+
+
+def hand_built(reaches, drifted=(), vocabulary=None, rows=()) -> normaliser.Study:
+    return normaliser.Study(
+        taxonomy=TAXONOMY,
+        normalise=first_prefix,
+        reaches=reaches,
+        shortest=normaliser.shortest_reaching(reaches, TAXONOMY),
+        vocabulary=Counter(vocabulary or {}),
+        drifted=drifted,
+        rescored=rows,
+    )
+
+
+def test_a_string_two_labels_will_take_is_marked_order_dependent() -> None:
+    reaches = {one.candidate: one for one in normaliser.probe(TAXONOMY, first_prefix)}
+    assert reaches["widget"].matched == ("Widget Errors", "Widget Failures")
+    assert reaches["widget"].order_dependent
+    assert not reaches["sprocket"].order_dependent
+
+
+def test_the_shuffle_is_a_permutation_and_the_seed_decides_it() -> None:
+    once = normaliser.shuffled(TAXONOMY)
+    assert sorted(once) == sorted(TAXONOMY)
+    assert once == normaliser.shuffled(TAXONOMY)
+    assert once != normaliser.shuffled(TAXONOMY, seed=normaliser.SEED + 1)
+
+
+def test_p5_is_violated_by_a_string_that_two_labels_will_take() -> None:
+    """Six strings here, the prefixes of `widget` that both Widget labels accept."""
+    finding = normaliser.p5(hand_built(normaliser.probe(TAXONOMY, first_prefix)))
+    assert finding.verdict == VIOLATED
+    rendered = flat(finding.render())
+    assert "6 of the 502 enumerated strings match more than one label" in rendered
+    assert "'w' matches all 2 and lands on 'Widget Errors'" in rendered
+
+
+def test_p5_holds_against_a_normaliser_nothing_is_ambiguous_under() -> None:
+    """`strip_only` matches whole strings, so no candidate reaches two labels.
+
+    Without this the finding could have been wired to VIOLATED unconditionally,
+    and the 237 would look like a measurement rather than a constant.
+    """
+    only_whole = normaliser.probe(TAXONOMY, lambda spelling, labels: spelling.strip())
+    assert normaliser.p5(hand_built(only_whole)).verdict == HELD
+
+
+def test_p5_counts_the_scores_that_moved_rather_than_assuming_none_did() -> None:
+    """The real run moves nothing, so the branch that reports movement never fires there.
+
+    A P5 that printed "moves 0 of the 24" from a hard-coded zero would look
+    identical on the real data and would be wrong the moment a gold spelling
+    drifted onto an ambiguous string.
+    """
+    done = hand_built(
+        normaliser.probe(TAXONOMY, first_prefix),
+        rows=rescored(("GAIA", "silent", 0.5, 0.5), ("GAIA", "gold-exact", 0.9, 0.4)),
+    )
+    rendered = flat(normaliser.p5(done).render())
+    assert "moves 1 of the 4 figures" in rendered
+
+
+def test_a_rescored_row_moved_when_either_metric_moved() -> None:
+    (still,) = rescored(("GAIA", "silent", 0.5, 0.5))
+    assert not still.moved
+    (shifted,) = rescored(("GAIA", "silent", 0.5, 0.6))
+    assert shifted.moved
+
+
+def test_the_rescored_table_puts_the_two_orders_side_by_side() -> None:
+    rows = normaliser.rescored_table(rescored(("GAIA", "silent", 0.25, 0.75)))
+    assert "0.250000  0.750000" in rows[1]
