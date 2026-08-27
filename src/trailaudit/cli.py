@@ -5,7 +5,16 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from trailaudit import adversarial, artifacts, catf1, datacheck, normaliser, spans, upstream
+from trailaudit import (
+    adversarial,
+    artifacts,
+    catf1,
+    datacheck,
+    normaliser,
+    pairing,
+    spans,
+    upstream,
+)
 from trailaudit.artifacts import Stale
 from trailaudit.scoring import DiagnosticDrifted
 from trailaudit.spans import IndexInconsistent
@@ -156,6 +165,25 @@ def _catf1(args: argparse.Namespace) -> int:
     lines, violated = catf1.report(rows)
     print("\n".join(lines))
     return _settle(args, built, catf1.load, violated)
+
+
+def _pairing(args: argparse.Namespace) -> int:
+    if not upstream.scorer_path(args.into).is_file():
+        print(
+            f"trailaudit: no clone at {args.into}. The constructed trace is scored by TRAIL's "
+            f"own calculate_scores.py, and the count of real gold files it would affect comes "
+            f"from TRAIL's own gold. Run `trailaudit fetch`.",
+            file=sys.stderr,
+        )
+        return 2
+    upstream.verify_corpus(args.into)
+
+    scored, counted = pairing.run(args.into)
+    taxonomy = upstream.taxonomy(args.into)
+    built = pairing.artifact(scored, counted, taxonomy)
+    lines, violated = pairing.report(scored, counted, taxonomy)
+    print("\n".join(lines))
+    return _settle(args, built, pairing.load, violated)
 
 
 def _settle(
@@ -338,6 +366,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
         "if any figure moved",
     )
+
+    zipped = commands.add_parser(
+        "pairing",
+        help="report P8: a constructed trace with one null category, scored by the pinned "
+        "scorer, plus how many real gold files the defect would affect",
+    )
+    zipped.add_argument("--into", type=Path, default=DEFAULT_CLONE, help="where the clone is")
+    zipped.add_argument(
+        "--out",
+        type=Path,
+        default=pairing.COMMITTED,
+        help=f"where the run artifact is written and read (default {pairing.COMMITTED})",
+    )
+    zipped.add_argument(
+        "--check",
+        action="store_true",
+        help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
+        "if any figure moved",
+    )
     return parser
 
 
@@ -350,6 +397,7 @@ def main(argv: list[str] | None = None) -> int:
         "adversarial": _adversarial,
         "normaliser": _normaliser,
         "catf1": _catf1,
+        "pairing": _pairing,
     }
     try:
         return routes[args.command](args)

@@ -1,0 +1,49 @@
+{
+  "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
+  "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "constructed_trace": {
+    "errors": [
+      {
+        "location": "span-one",
+        "category": null
+      },
+      {
+        "location": "span-two",
+        "category": "Language-only"
+      },
+      {
+        "location": "span-three",
+        "category": "Tool-related"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "label": "gold carries a null first, prediction correct",
+      "gold_has_null": true,
+      "prediction_has_null": false,
+      "joint_accuracy": 0.0,
+      "location_accuracy": 0.6666666666666666
+    },
+    {
+      "label": "both clean, which is the control",
+      "gold_has_null": false,
+      "prediction_has_null": false,
+      "joint_accuracy": 1.0,
+      "location_accuracy": 1.0
+    },
+    {
+      "label": "gold clean, prediction carries a null first",
+      "gold_has_null": false,
+      "prediction_has_null": true,
+      "joint_accuracy": 0.0,
+      "location_accuracy": 1.0
+    }
+  ],
+  "on_the_real_gold": {
+    "gold_errors": 836,
+    "falsy_categories": 0,
+    "traces_that_would_mispair": 0,
+    "traces_that_would_lose_a_pair": 0
+  }
+}

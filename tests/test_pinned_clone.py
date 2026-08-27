@@ -14,7 +14,16 @@ from collections import Counter
 
 import pytest
 
-from trailaudit import adversarial, artifacts, catf1, gold, normaliser, spans, upstream
+from trailaudit import (
+    adversarial,
+    artifacts,
+    catf1,
+    gold,
+    normaliser,
+    pairing,
+    spans,
+    upstream,
+)
 from trailaudit.datacheck import VIOLATED
 
 pytestmark = pytest.mark.upstream
@@ -317,3 +326,35 @@ def test_p7_reproduces_from_a_fresh_run(
 ) -> None:
     committed = catf1.load(repo_root / catf1.COMMITTED)
     assert artifacts.differences(committed, catf1.artifact(categories)) == []
+
+
+def test_p8_one_null_category_costs_a_correct_judge_every_pair(clone: pathlib.Path) -> None:
+    """The constructed trace through TRAIL's own main(), three times.
+
+    Same two real errors in every run. Clean scores 1.000 joint. A null category
+    on the gold side takes it to 0.000, and so does a null on the judge's side,
+    where the judge named both real spans and got both categories right.
+    """
+    scored, counted = pairing.run(clone)
+    by_case = {(one.gold_has_null, one.prediction_has_null): one for one in scored}
+    assert by_case[(False, False)].joint_accuracy == 1.0
+    assert by_case[(True, False)].joint_accuracy == 0.0
+    assert by_case[(False, True)].joint_accuracy == 0.0
+    assert by_case[(False, True)].location_accuracy == 1.0
+    assert pairing.p8(scored, counted).verdict == VIOLATED
+
+
+def test_p8_never_fires_on_the_real_gold(clone: pathlib.Path) -> None:
+    """Which is why it is demonstrated rather than found, and the README must say so."""
+    _, counted = pairing.run(clone)
+    assert counted.gold_errors == 836
+    assert counted.falsy_categories == 0
+    assert counted.traces_that_would_mispair == 0
+    assert counted.traces_that_would_lose_a_pair == 0
+
+
+def test_p8_reproduces_from_a_fresh_run(clone: pathlib.Path, repo_root: pathlib.Path) -> None:
+    scored, counted = pairing.run(clone)
+    committed = pairing.load(repo_root / pairing.COMMITTED)
+    fresh = pairing.artifact(scored, counted, upstream.taxonomy(clone))
+    assert artifacts.differences(committed, fresh) == []
