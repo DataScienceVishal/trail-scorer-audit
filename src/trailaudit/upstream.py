@@ -148,17 +148,20 @@ def head_commit(clone: Path) -> str:
     return done.stdout.strip()
 
 
-def locally_modified(clone: Path) -> list[str]:
-    """Paths git says differ from the checked-out commit.
+def locally_modified(clone: Path) -> list[str] | None:
+    """Paths git says differ from the checked-out commit, or None if git could not say.
 
     This is the answer to "which file broke the corpus digest", and it comes
     from git's object store rather than from a table of hashes committed here.
-    Empty means the digest failed for some other reason, most likely that the
-    checkout is not at the pinned commit.
+    An empty list means git looked and found nothing, which points at the
+    checkout not being the pinned commit. None means `git status` failed, most
+    often because the directory is not a checkout at all, and it used to be
+    returned as the empty list: a failure rendered as the positive claim that
+    nothing had been modified.
     """
     done = _git(clone, "status", "--porcelain", "--untracked-files=all")
     if done.returncode != 0:
-        return []
+        return None
     return sorted(line[3:] for line in done.stdout.splitlines() if line)
 
 
@@ -192,13 +195,20 @@ def verify_scorer(clone: Path) -> str:
 def verify_corpus(clone: Path) -> str:
     found = corpus_digest(clone)
     if found != CORPUS_SHA256:
-        changed = locally_modified(clone)
-        named = ", ".join(changed[:5]) if changed else "git reports no modified paths"
         raise PinMismatch(
             f"the dataset under {clone} rolls up to {found}, not the pinned {CORPUS_SHA256}. "
-            f"git says: {named}"
+            f"{_what_git_says(clone)}"
         )
     return found
+
+
+def _what_git_says(clone: Path) -> str:
+    changed = locally_modified(clone)
+    if changed is None:
+        return "`git status` failed there, so which paths moved is unknown"
+    if not changed:
+        return "git reports no modified paths, so the checkout is probably not the pinned commit"
+    return f"git says: {', '.join(changed[:5])}"
 
 
 def load_scorer(clone: Path) -> ModuleType:

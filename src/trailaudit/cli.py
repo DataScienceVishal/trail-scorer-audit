@@ -533,8 +533,16 @@ def main(argv: list[str] | None = None) -> int:
     except (PinMismatch, IndexInconsistent, Stale, DiagnosticDrifted, MarkerError) as exc:
         print(f"trailaudit: {exc}", file=sys.stderr)
         return 1
-    except (MissingClone, FileNotFoundError) as exc:
+    except MissingClone as exc:
         print(f"trailaudit: {exc}", file=sys.stderr)
+        return 2
+    except FileNotFoundError as exc:
+        # Separate from the line above, which MissingClone subclasses in order
+        # to carry a sentence naming the command that writes the clone. Catching
+        # the two together threw that sentence away for anything else that went
+        # missing and printed the errno string instead, usually for an --out or
+        # an --index that is not there.
+        print(f"trailaudit: no file at {exc.filename}", file=sys.stderr)
         return 2
 
 

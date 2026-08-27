@@ -144,6 +144,29 @@ def test_locally_modified_names_the_file_git_says_changed(tmp_path: pathlib.Path
     assert upstream.locally_modified(repo) == ["kept.json"]
 
 
+def test_a_directory_git_cannot_read_is_not_reported_as_unmodified(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`git status` failing used to come back as [], which verify_corpus printed as a claim.
+
+    The message read "git reports no modified paths" for a directory git had
+    refused to look at, which is the failure this whole repository is about:
+    something that could not be measured, published as a measurement.
+    """
+    not_a_checkout = tmp_path / "loose"
+    (not_a_checkout / upstream.CORPUS_DIRS[0]).mkdir(parents=True)
+    for directory in upstream.CORPUS_DIRS[1:]:
+        (not_a_checkout / directory).mkdir(parents=True)
+    (not_a_checkout / upstream.CORPUS_DIRS[0] / "one.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(upstream, "CORPUS_SHA256", "0" * 64)
+
+    assert upstream.locally_modified(not_a_checkout) is None
+    with pytest.raises(PinMismatch) as raised:
+        upstream.verify_corpus(not_a_checkout)
+    assert "`git status` failed there" in str(raised.value)
+    assert "no modified paths" not in str(raised.value)
+
+
 def plant_bytecode(source: pathlib.Path, other: str) -> pathlib.Path:
     """Write `source`'s __pycache__ entry from different code, stamped to look current.
 

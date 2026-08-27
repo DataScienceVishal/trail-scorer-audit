@@ -116,7 +116,14 @@ def load(path: Path = COMMITTED) -> dict[str, dict[str, list[str]]]:
     of truth. Recomputing it on every load means a hand-edited count is a load
     error instead of a figure that quietly disagrees with the lists below it.
     """
-    document = json.loads(path.read_text(encoding="utf-8"))
+    text = path.read_text(encoding="utf-8")
+    try:
+        document = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise IndexInconsistent(
+            f"{path} is not JSON: {exc.msg} at line {exc.lineno} column {exc.colno}. Rebuild "
+            f"it with `trailaudit index`."
+        ) from exc
     if document.get("pinned_commit") != upstream.PINNED_COMMIT:
         raise IndexInconsistent(
             f"{path} was built at {document.get('pinned_commit')}, and the audit is pinned to "
@@ -151,7 +158,26 @@ def differences(
             elif trace not in now:
                 lines.append(f"{name}/{trace}: in the committed index, not in the clone")
             elif was[trace] != now[trace]:
-                lines.append(
-                    f"{name}/{trace}: {len(was[trace])} spans committed, {len(now[trace])} found"
-                )
+                lines.append(f"{name}/{trace}: {_disagreement(was[trace], now[trace])}")
     return lines
+
+
+def _disagreement(was: list[str], now: list[str]) -> str:
+    """What changed about one trace's spans, without printing the same number twice.
+
+    The list comparison fires on identifiers as well as on counts, and reporting
+    lengths alone rendered a renamed span as "2 spans committed, 2 found", which
+    reads as a broken diff rather than as a finding. Only the differing-length
+    case had a test.
+    """
+    if len(was) != len(now):
+        return f"{len(was)} spans committed, {len(now)} found"
+    at = next(
+        position
+        for position, (before, after) in enumerate(zip(was, now, strict=True))
+        if before != after
+    )
+    return (
+        f"{len(was)} spans in both, differing from position {at}: committed {was[at]!r}, "
+        f"found {now[at]!r}"
+    )

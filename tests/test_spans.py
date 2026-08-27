@@ -94,6 +94,29 @@ def test_differences_names_the_trace_that_moved() -> None:
     ]
 
 
+def test_differences_names_the_identifier_when_the_count_did_not_move() -> None:
+    """A renamed span used to render as "2 spans committed, 2 found".
+
+    The comparison is on the lists, so it fires on identifiers as well as on
+    counts, and the message reported lengths either way. Only the
+    differing-length case had a test, which is how a diff that printed the same
+    number twice went out.
+    """
+    committed = {"GAIA": {"t1": ["a", "b"]}}
+    fresh = {"GAIA": {"t1": ["a", "z"]}}
+    (line,) = spans.differences(committed, fresh)
+    assert line == "GAIA/t1: 2 spans in both, differing from position 1: committed 'b', found 'z'"
+
+
+def test_a_truncated_index_is_reported_rather_than_raised_by_the_decoder(
+    tmp_path: pathlib.Path,
+) -> None:
+    path = tmp_path / "spans.json"
+    path.write_text(spans.render(BOTH_SPLITS)[:80], encoding="utf-8")
+    with pytest.raises(IndexInconsistent, match="trailaudit index"):
+        spans.load(path)
+
+
 def test_build_says_what_to_run_when_the_clone_is_absent(tmp_path: pathlib.Path) -> None:
     with pytest.raises(upstream.MissingClone, match="trailaudit fetch"):
         spans.build(tmp_path / "nothing")

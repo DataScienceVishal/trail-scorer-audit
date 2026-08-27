@@ -367,6 +367,7 @@ def report(checked: Checked) -> tuple[list[str], bool]:
 
     return lines, any(finding.verdict == VIOLATED for finding in findings)
 
+
 def verdicts(findings: Iterable[Finding]) -> dict:
     """The properties block every committed artifact carries.
 

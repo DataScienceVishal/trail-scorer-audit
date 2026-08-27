@@ -410,5 +410,3 @@ def artifact(runs: list[SplitRun], index_sha256: str) -> dict:
 
 def load(path: Path = COMMITTED) -> dict:
     return artifacts.load(path, rerun="trailaudit adversarial")
-
-

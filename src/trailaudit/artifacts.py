@@ -21,7 +21,12 @@ from trailaudit import upstream
 
 
 class Stale(ValueError):
-    """A committed artifact was produced against a different pin than the audit runs at."""
+    """A committed artifact is not something this audit can read as its own output.
+
+    Two ways in: produced against a different pin than the audit runs at, or not
+    readable as JSON at all. Both mean the same thing to a caller, which is that
+    the file on disk cannot be compared against this run, and both exit 1.
+    """
 
 
 def render(built: dict) -> str:
@@ -34,7 +39,13 @@ def write(path: Path, built: dict) -> None:
 
 
 def load(path: Path, rerun: str) -> dict:
-    stored = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        stored = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise Stale(
+            f"{path} is not JSON: {exc.msg} at line {exc.lineno} column {exc.colno}. A "
+            f"truncated artifact used to come back as a decoder traceback. Rerun `{rerun}`."
+        ) from exc
     if stored.get("pinned_commit") != upstream.PINNED_COMMIT:
         raise Stale(
             f"{path} was produced at {stored.get('pinned_commit')} and the audit is pinned to "
