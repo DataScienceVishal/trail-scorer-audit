@@ -14,8 +14,17 @@ this repository's code rather than TRAIL's. It rebuilds the pairs the way lines
 by the prediction count instead of the gold count. That reimplementation could
 drift from the original without anyone noticing, so it computes the recall
 direction as well and `score_split` refuses to return unless its recall figures
-match the ones the scorer handed back. The precision column is only trustworthy
-because the recall column beside it is checked against upstream on every run.
+match the ones the scorer handed back.
+
+What that check covers is narrower than it sounds and worth stating exactly. It
+anchors the pair construction and the intersection, because both directions
+share them. It does not anchor the final division: replacing `joint_precision`
+with a constant leaves every recall figure where it was and the run finishes.
+Nor does it anchor `normalize_category`, which is handed to both sides from the
+same clone, so a poisoned normaliser agrees with itself. Upstream computes no
+precision at all, so there is nothing to compare that last step against, and
+what the column is entitled to claim is that it divides the same intersections
+by the other denominator.
 """
 
 from __future__ import annotations

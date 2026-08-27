@@ -162,19 +162,31 @@ def locally_modified(clone: Path) -> list[str]:
     return sorted(line[3:] for line in done.stdout.splitlines() if line)
 
 
-def verify_scorer(clone: Path) -> str:
-    """Check the one file the central claim rests on, and hand back its digest."""
+def verified_source(clone: Path) -> bytes:
+    """The scorer's bytes, digested before they are handed back to anything.
+
+    One read rather than a check followed by a separate open, so the bytes that
+    were hashed are the bytes the caller gets. `load_scorer` compiles these and
+    `taxonomy` parses these.
+    """
     path = scorer_path(clone)
     if not path.is_file():
         raise MissingClone(f"no scorer at {path}. Run `trailaudit fetch` first")
-    found = sha256_of(path)
+    source = path.read_bytes()
+    found = hashlib.sha256(source).hexdigest()
     if found != SCORER_SHA256:
         raise PinMismatch(
             f"{path} hashes to {found}, not the pinned {SCORER_SHA256}. The audit reports "
             f"numbers produced by an unmodified {SCORER} and will not run against an edited "
             f"one. Delete {clone} and refetch, or move the pin if you meant to."
         )
-    return found
+    return source
+
+
+def verify_scorer(clone: Path) -> str:
+    """Check the one file the central claim rests on, and hand back its digest."""
+    verified_source(clone)
+    return SCORER_SHA256
 
 
 def verify_corpus(clone: Path) -> str:
@@ -190,24 +202,35 @@ def verify_corpus(clone: Path) -> str:
 
 
 def load_scorer(clone: Path) -> ModuleType:
-    """Import benchmarking/calculate_scores.py by path, after checking its digest.
+    """Compile and run the digested bytes of benchmarking/calculate_scores.py.
 
-    Safe to import rather than shell out, which was the open question when this
-    was specced: argparse sits behind an `if __name__ == "__main__"` guard at
-    line 361, and `module_from_spec` sets `__name__` to the spec's name, so
-    nothing parses sys.argv. What does run at module level is `import numpy`,
-    `from sklearn.metrics import f1_score` and `from scipy.stats import
+    Not `spec.loader.exec_module`, which was the first version of this and did
+    not do what the pin says. That loader is a SourceFileLoader, and a
+    SourceFileLoader reuses `__pycache__/calculate_scores.cpython-3xx.pyc`
+    whenever the pyc header's mtime and size match the source file, without
+    reading the source at all. So bytecode compiled from any code at all runs
+    under the pinned file's name while `verify_scorer` goes on printing the
+    pinned digest, and upstream's .gitignore lists `__pycache__/`, so
+    `locally_modified` never names it either. Compiling the bytes that were
+    hashed is what makes the digest a statement about what executed rather than
+    about what is on disk beside it.
+
+    Safe to run in-process rather than shell out, which was the open question
+    when this was specced: argparse sits behind an `if __name__ == "__main__"`
+    guard at line 361, and `module_from_spec` sets `__name__` to the spec's
+    name, so nothing parses sys.argv. What does run at module level is `import
+    numpy`, `from sklearn.metrics import f1_score` and `from scipy.stats import
     pearsonr`, which is why those three are pinned dependencies of a project
     that calls none of them directly.
     """
-    verify_scorer(clone)
+    source = verified_source(clone)
     path = scorer_path(clone)
     spec = importlib.util.spec_from_file_location("trail_benchmark_calculate_scores", path)
-    if spec is None or spec.loader is None:
+    if spec is None:
         raise MissingClone(f"cannot build an import spec for {path}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+    exec(compile(source, str(path), "exec"), module.__dict__)
     return module
 
 
@@ -220,8 +243,7 @@ def taxonomy(clone: Path) -> tuple[str, ...]:
     against are the labels the scorer uses, by construction, and it keeps
     upstream's taxonomy out of a repository that commits no upstream content.
     """
-    verify_scorer(clone)
-    tree = ast.parse(scorer_path(clone).read_text(encoding="utf-8"))
+    tree = ast.parse(verified_source(clone))
     for node in ast.walk(tree):
         if not isinstance(node, ast.Assign):
             continue

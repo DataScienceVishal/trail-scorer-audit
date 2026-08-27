@@ -368,8 +368,18 @@ exits 1 naming the figure that moved.
 `HEAD` is the pinned commit, that `calculate_scores.py` hashes to the recorded
 digest, and that every dataset JSON in the tree rolls up to the corpus digest.
 Append one comment line to the scorer and `trailaudit fetch --check` goes from
-exit 0 to exit 1. That is the whole of what "their unmodified scorer" means
-here, and it is checkable by someone who does not believe it.
+exit 0 to exit 1.
+
+The digest covers the file, and the audit runs the scorer by compiling those
+same bytes rather than by handing the path to Python's import machinery. That
+distinction is the difference between a checkable claim and a decorative one:
+`SourceFileLoader` prefers a `__pycache__` entry whose header carries the
+source's mtime and size, without reading the source, so bytecode compiled from
+anything at all would have run under the pinned file's name while the digest
+went on matching. Upstream's `.gitignore` lists `__pycache__/`, so `git status`
+would not have named it either. What the pin still does not cover is the numpy,
+scikit-learn and scipy that `calculate_scores.py` imports at module level, which
+`pyproject.toml` pins by version and not by digest.
 
 Exit codes: 0 nothing to report, 1 what is on disk does not match the pin or a
 committed artifact, 2 there is nothing on disk to check, 3 a pre-registered

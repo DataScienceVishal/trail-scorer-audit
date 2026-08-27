@@ -8,8 +8,11 @@ tests/test_pinned_clone.py asserts when the clone happens to be present.
 
 from __future__ import annotations
 
+import importlib.util
 import json
+import marshal
 import pathlib
+import struct
 import subprocess
 
 import pytest
@@ -139,3 +142,53 @@ def test_locally_modified_names_the_file_git_says_changed(tmp_path: pathlib.Path
 
     (repo / "kept.json").write_text('{"edited": true}\n')
     assert upstream.locally_modified(repo) == ["kept.json"]
+
+
+def plant_bytecode(source: pathlib.Path, other: str) -> pathlib.Path:
+    """Write `source`'s __pycache__ entry from different code, stamped to look current.
+
+    A timestamp-based pyc header is the magic number, a flags word, the source's
+    mtime and the source's size. SourceFileLoader compares those last two
+    against the file on disk and skips reading it when they agree, so bytecode
+    compiled from anything at all runs under the pinned file's name.
+    """
+    stamp = source.stat()
+    header = importlib.util.MAGIC_NUMBER + struct.pack(
+        "<III", 0, int(stamp.st_mtime) & 0xFFFFFFFF, stamp.st_size & 0xFFFFFFFF
+    )
+    cached = pathlib.Path(importlib.util.cache_from_source(str(source)))
+    cached.parent.mkdir(parents=True, exist_ok=True)
+    cached.write_bytes(header + marshal.dumps(compile(other, str(source), "exec")))
+    return cached
+
+
+def test_the_scorer_that_runs_is_the_scorer_that_was_hashed(
+    pin_to_fake: pathlib.Path,
+) -> None:
+    """The digest covers the source, and the loader is free to run something else.
+
+    `spec.loader.exec_module` goes through SourceFileLoader, which reuses a
+    cached pyc whenever its header matches the source's mtime and size. So a
+    forged pyc executes while verify_scorer goes on reporting the pinned digest,
+    and upstream's own .gitignore lists __pycache__, so `git status` never names
+    it either. load_scorer compiles the bytes it hashed instead.
+    """
+    scorer = upstream.scorer_path(pin_to_fake)
+    forged = plant_bytecode(scorer, SCORER_SOURCE.replace("all_categories\n", '["poisoned"]\n'))
+
+    assert forged.is_file()
+    assert upstream.verify_scorer(pin_to_fake) == upstream.SCORER_SHA256
+    assert upstream.load_scorer(pin_to_fake).main("a", "b") == ["Alpha", "Beta Errors", "Gamma"]
+
+
+def test_the_forged_bytecode_is_what_the_interpreter_would_otherwise_have_run(
+    pin_to_fake: pathlib.Path,
+) -> None:
+    """Otherwise the test above passes because the forgery never took, and proves nothing."""
+    scorer = upstream.scorer_path(pin_to_fake)
+    plant_bytecode(scorer, SCORER_SOURCE.replace("all_categories\n", '["poisoned"]\n'))
+
+    spec = importlib.util.spec_from_file_location("forged_scorer_under_test", scorer)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.main("a", "b") == ["poisoned"]
