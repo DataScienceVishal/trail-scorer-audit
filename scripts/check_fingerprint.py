@@ -30,6 +30,12 @@ CODE_SUFFIXES = {
 SKIP_DIRS = {
     ".git", ".venv", "venv", "node_modules", "__pycache__",
     ".pytest_cache", ".ruff_cache", "dist", "build", ".mypy_cache",
+    # Someone else's repository, fetched by `trailaudit fetch` and gitignored.
+    # Without it this reports a banned phrase in the TRAIL authors' own README,
+    # which is not something this project gets to have an opinion about, and
+    # which would make the check pass or fail depending on whether the reader
+    # had run fetch yet.
+    ".trail",
 }
 # These two quote the banned list in order to define it.
 SKIP_NAMES = {"BANNED.md", "style-words.md", "CLAUDE.md"}
