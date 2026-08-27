@@ -56,6 +56,23 @@ def test_p3_names_the_file_and_the_denominator(annotated: Gold) -> None:
     assert "divides by 2" in rendered
 
 
+def test_p3_prints_the_decoders_own_words_under_the_position_it_publishes(
+    annotated: Gold,
+) -> None:
+    """The terminal gets both, and nothing else in the project gets the second one.
+
+    `culprit()` locates the comma the same way on every interpreter; the decoder
+    blames a different character on 3.12 and 3.13. Printing them together is
+    what makes the gap visible to a person debugging, and keeping the decoder's
+    line out of every artifact is what stops it becoming a published figure.
+    """
+    rendered = datacheck.p3(annotated).render()
+    (failure,) = annotated.failures
+    assert "what this interpreter's json decoder said" in rendered
+    assert failure.decoder in rendered
+    assert failure.decoder != str(failure)
+
+
 def test_p3_holds_when_everything_parses(annotated: Gold) -> None:
     intact = Gold(
         annotations=annotated.annotations,

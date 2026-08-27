@@ -120,7 +120,7 @@ def p3(annotated: Gold | None) -> Finding:
         f"divides by {parsed}",
         [
             f"{parsed + refused} files on disk, {parsed} parse, {refused} {verb}",
-            *(str(one) for one in annotated.failures),
+            *_located(annotated.failures),
             *wrapped(
                 f"the scorer catches that at line 242 and continues, so every published "
                 f"average divides by {parsed}"
@@ -207,6 +207,22 @@ def cells(measured: dict[str, dict[str, int]]) -> tuple[int, list[str]]:
             if here != getattr(published, row):
                 disagreeing.append(f"{split.name} {paper.LABELS[row]}")
     return comparable, disagreeing
+
+
+def _located(failures: Iterable[ParseFailure]) -> list[str]:
+    """Where each file stopped parsing, and under it what the decoder said about the same bytes.
+
+    The second line is the only place the decoder's wording appears anywhere in
+    this project. It is a fact about the reader's interpreter rather than about
+    the file, which is why `culprit()` locates the character independently and
+    why no artifact records it: CPython 3.12 and 3.13 word the same trailing
+    comma differently, and an artifact carrying either would fail its own
+    comparison test on the other.
+    """
+    lines = []
+    for one in failures:
+        lines += [str(one), f"    what this interpreter's json decoder said: {one.decoder}"]
+    return lines
 
 
 def _needs_clone() -> str:

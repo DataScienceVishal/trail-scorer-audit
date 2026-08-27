@@ -23,8 +23,8 @@ from trailaudit.scoring import UNPREDICTED, UNREADABLE, DiagnosticDrifted, Skip
 
 ONE_ERROR = {"location": "aaaa000000000001", "category": "Widget Errors"}
 
-COPYCAT = Predictor("copycat", knows_gold=True, blurb="the answer key", emit=gold_exact)
-MUTE = Predictor("mute", knows_gold=False, blurb="nothing", emit=silent)
+COPYCAT = Predictor("copycat", knows_gold=True, emit=gold_exact)
+MUTE = Predictor("mute", knows_gold=False, emit=silent)
 
 
 def stand_in_scorer(returns: dict[str, float], prints: str = "") -> ModuleType:

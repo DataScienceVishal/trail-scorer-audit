@@ -126,59 +126,23 @@ def one_span_all_categories(case: Case) -> list[Error]:
 class Predictor:
     name: str
     knows_gold: bool
-    blurb: str
     emit: Callable[[Case], list[Error]]
 
 
 PREDICTORS = (
-    Predictor(
-        "silent",
-        knows_gold=False,
-        blurb="emits nothing at all",
-        emit=silent,
-    ),
-    Predictor(
-        "gold-exact",
-        knows_gold=True,
-        blurb="the answer key, copied",
-        emit=gold_exact,
-    ),
-    Predictor(
-        "gold-mispaired",
-        knows_gold=True,
-        blurb="the answer key with categories rotated one step",
-        emit=gold_mispaired,
-    ),
-    Predictor(
-        "every-span-once",
-        knows_gold=False,
-        blurb="every span identifier, one fixed category",
-        emit=every_span_once,
-    ),
-    Predictor(
-        "gold-spans-all-categories",
-        knows_gold=True,
-        blurb="every gold location crossed with the taxonomy",
-        emit=gold_spans_all_categories,
-    ),
-    Predictor(
-        "all-spans-all-categories",
-        knows_gold=False,
-        blurb="every span identifier crossed with the taxonomy",
-        emit=all_spans_all_categories,
-    ),
+    Predictor("silent", knows_gold=False, emit=silent),
+    Predictor("gold-exact", knows_gold=True, emit=gold_exact),
+    Predictor("gold-mispaired", knows_gold=True, emit=gold_mispaired),
+    Predictor("every-span-once", knows_gold=False, emit=every_span_once),
+    Predictor("gold-spans-all-categories", knows_gold=True, emit=gold_spans_all_categories),
+    Predictor("all-spans-all-categories", knows_gold=False, emit=all_spans_all_categories),
 )
 
 
 # Not in PREDICTORS, and `by_name` does not find it. It exists for `trailaudit
 # catf1`, where the question is what the per-category block does with a judge
 # that names every category in a trace without locating any of them.
-ONE_SPAN = Predictor(
-    "one-span-all-categories",
-    knows_gold=False,
-    blurb="the whole taxonomy at the first span identifier",
-    emit=one_span_all_categories,
-)
+ONE_SPAN = Predictor("one-span-all-categories", knows_gold=False, emit=one_span_all_categories)
 
 
 def by_name(name: str) -> Predictor:

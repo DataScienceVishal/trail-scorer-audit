@@ -34,6 +34,11 @@ class ParseFailure:
     Expecting value" and CPython 3.13 calls the same bytes "line 38 column 10:
     Illegal trailing comma before end of array". Publishing either one would
     have made a headline figure a fact about the reader's Python.
+
+    It is kept rather than dropped because it is the first thing a person
+    debugging this wants, and it reaches exactly one place: the terminal, under
+    `trailaudit data-check`, labelled as the decoder's own words. No artifact
+    carries it, and tests/test_committed_artifact.py is what holds that.
     """
 
     split: str
