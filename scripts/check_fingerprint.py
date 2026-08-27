@@ -181,8 +181,13 @@ def word_targets(path: Path, source: str) -> list[tuple[int, str]]:
 def check_file(path: Path, rules: Rules) -> list[Finding]:
     try:
         source = path.read_text(encoding="utf-8")
-    except (UnicodeDecodeError, OSError):
-        return []
+    except (UnicodeDecodeError, OSError) as exc:
+        # Not `return []`. An empty finding list is how this function says "I
+        # read it and it was clean", so returning one here would count the file
+        # in the total, print "clean across N files", and exit 0 over a file
+        # nobody checked. The tokenizer branch below already made the opposite
+        # choice for the same reason, and the two need to agree.
+        return [Finding(path, 1, f"unreadable: {type(exc).__name__}", str(exc)[:120])]
     if DISABLE_FILE_MARKER in source:
         return []
 

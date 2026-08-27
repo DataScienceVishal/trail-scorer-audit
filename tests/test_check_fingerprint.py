@@ -216,3 +216,23 @@ def test_the_shipped_word_list_is_found_from_a_subdirectory(tmp_path):
     )
 
     assert fp.find_banned_md(repo / "tests") == repo / "scripts" / "style-words.md"
+
+
+def test_an_unreadable_file_is_a_finding_and_not_a_silent_pass(tmp_path, rules):
+    """Regression: returning [] here meant "clean", so the run exited 0.
+
+    This is the failure the projects using this script exist to complain about.
+    A file that cannot be read is not a file that passed, and counting it in
+    "clean across N files" is the same swallow with a friendlier message.
+    """
+    unreadable = tmp_path / "broken.md"
+    unreadable.write_bytes(b"\xff\xfe\x00\x01 robust seamless\n")
+
+    found = fp.check_file(unreadable, rules)
+    assert found, "an unreadable file was reported as clean"
+    assert "unreadable" in kinds(found)
+
+
+def test_a_readable_file_is_still_judged_on_its_words(tmp_path, rules):
+    """Guards the test above from passing because everything became a finding."""
+    assert scan(tmp_path, "fine.md", "Parses 4.2M rows in 11s.\n", rules) == []
