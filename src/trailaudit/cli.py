@@ -225,11 +225,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="trailaudit",
         description="Audit the scoring code behind the TRAIL agent-trace benchmark.",
-        epilog="Exit codes: 0 nothing to report, 1 what is on disk does not match the pin, "
-        "2 there is nothing on disk to check, 3 data-check found a pre-registered property "
-        "violated. 3 is the good outcome and it is deliberately not 1: 1 says the audit could "
-        "not trust its own input, 3 says the audit ran and TRAIL's scorer did the thing the "
-        "property was written to catch.",
+        epilog="Exit codes: 0 nothing to report, 1 what is on disk does not match the pin or a "
+        "committed artifact, 2 there is nothing on disk to check, 3 a pre-registered property "
+        "came back violated. The nine are spread over data-check, adversarial, normaliser, "
+        "catf1 and pairing, and each of those exits 3 on a violation. 3 is the good outcome and "
+        "it is deliberately not 1: 1 says the audit could not trust its own input, 3 says the "
+        "audit ran and TRAIL's scorer did the thing the property was written to catch.",
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
