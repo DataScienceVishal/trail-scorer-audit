@@ -283,6 +283,70 @@ def headline(src: Sources) -> list[str]:
     return lines[:-1]
 
 
+def absent_locations(src: Sources) -> list[str]:
+    """P2 as a sentence, with the count and the literal itself read out of the artifact.
+
+    It was prose: "Two gold errors give their location as the literal string".
+    Changing "Two" to anything at all passed every check in the repository,
+    because nothing outside a marker pair is compared against a measurement.
+    """
+    strangers = [
+        one
+        for split in src.adversarial["splits"].values()
+        for listed in split["locations_off_the_index"].values()
+        for one in listed
+    ]
+    named = " and ".join(f"`{one}`" for one in sorted(set(strangers)))
+    return paragraph(
+        f"The gold-blind predictor sits a little under the oracle one on SWE Bench, and the "
+        f"reason is P2. {len(strangers)} gold errors give their location as a string that no "
+        f"trace contains, {named}, so a predictor working from span identifiers cannot reach "
+        f"them and an oracle working from the gold can."
+    )
+
+
+def unreadable_gold(src: Sources) -> list[str]:
+    files = src.datacheck["gold_files"]
+    return paragraph(
+        f"{files['parsed']} of the {files['on_disk']} gold annotation files parse. What stops "
+        f"the rest is a trailing comma: `json.load` refuses the file, the call sits inside a "
+        f"`try` at line 157 whose `except Exception` at line 242 prints a message and continues, "
+        f"and every average TRAIL publishes divides by `files_processed`, which is "
+        f"{files['parsed']}. The errors annotated in the file that did not parse are exactly the "
+        f"gap between the count in the paper's abstract and the count the scorer sees."
+    )
+
+
+def containment(src: Sources) -> list[str]:
+    """Both directions of line 26, named out of the drift table rather than by hand.
+
+    One gold spelling the fallback rescues and one it drops for being a label
+    plus a suffix. Which two those are is a fact about TRAIL's gold, so the
+    sentence reads them out of the artifact and the pair below it in the drift
+    block is where a reader checks them.
+    """
+    drifted = src.normaliser["gold_drift"]
+    # The widest example of each rather than the first, because a spelling one
+    # character short of its label makes the point less clearly than one seven
+    # characters short of it.
+    rescued = max(
+        (one for one in drifted if one["loop"] == "fallback"),
+        key=lambda one: len(one["lands"]) - len(one["spelling"]),
+    )
+    dropped = max(
+        (one for one in drifted if one["loop"] == "neither" and one["labels_inside_it"]),
+        key=lambda one: len(one["spelling"]) - len(one["labels_inside_it"][0]),
+    )
+    return paragraph(
+        f"Containment in that direction promotes a string vaguer than a label and drops one more "
+        f"specific than a label. Both are already in TRAIL's own gold. `{rescued['spelling']}` is "
+        f"rescued onto `{rescued['lands']}`, while `{dropped['spelling']}` reaches nothing at "
+        f"all, because `{dropped['labels_inside_it'][0]}` is a label and the gold spelling is "
+        f"that label plus a suffix. Enumerating every substring of every label and putting each "
+        f"one back through the pinned `normalize_category` gives the size of it:"
+    )
+
+
 def ceiling(src: Sources) -> list[str]:
     splits = src.adversarial["splits"]
     shares = ", ".join(
@@ -524,9 +588,12 @@ BLOCKS: dict[str, Callable[[Sources], list[str]]] = {
     "eleven-percent": eleven_percent,
     "headline": headline,
     "ceiling": ceiling,
+    "absent-locations": absent_locations,
     "precision": precision,
     "table-5": table_5,
+    "unreadable-gold": unreadable_gold,
     "drift": drift,
+    "containment": containment,
     "fallback": fallback,
     "shuffle": shuffle,
     "per-category": per_category,

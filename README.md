@@ -34,7 +34,9 @@ index   4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928  index/
 
 ## The headline
 
-Six predictors go through the pinned scorer. The one the claim rests on is
+Six predictors go through the pinned scorer here, and a seventh,
+`one-span-all-categories`, is scored further down where P7 needs it. The one the
+claim rests on is
 `all-spans-all-categories`, and its entire input is that trace's entry in
 `index/spans.json`: a list of hex identifiers with no contents attached. The
 predictors that read the gold are there as reference points.
@@ -88,6 +90,11 @@ SWE Bench, 31 of 31 gold files scored, 256 gold errors in them:
 | reachable by anything at all |  | 0.968 | 0.968 |  |  |
 <!-- /trailaudit:headline -->
 
+Every figure in both tables was measured on a machine with the corpus on disk
+and committed as an artifact. CI never fetches it, so the badge covers the code
+and not the numbers, and "What CI proves, and what it does not" below is the
+long version of that.
+
 The last column is what the score costs, and it is the answer to the obvious
 objection. Of course a maximal predictor maxes a recall metric. That is the
 finding rather than a rebuttal to it: nothing in Table 1, and nothing in either
@@ -104,11 +111,12 @@ the 116 scored traces on GAIA, 30 of the 31 scored traces on SWE Bench, which
 is 0.974 and 0.968.
 <!-- /trailaudit:ceiling -->
 
+<!-- trailaudit:absent-locations -->
 The gold-blind predictor sits a little under the oracle one on SWE Bench, and
-the reason is P2. Two gold errors give their location as the literal string
-`Span ID not found for this shard`, which no trace contains, so a predictor
-working from span identifiers cannot reach them and an oracle working from the
-gold can.
+the reason is P2. 2 gold errors give their location as a string that no trace
+contains, `Span ID not found for this shard`, so a predictor working from span
+identifiers cannot reach them and an oracle working from the gold can.
+<!-- /trailaudit:absent-locations -->
 
 Dividing the same intersections by the prediction count instead of the gold
 count gives the column the metric does not report. This is a diagnostic and not
@@ -164,11 +172,15 @@ how lucky the data is, and the two sections below are what each one means.
 
 ## Where the gold and the taxonomy drifted apart
 
-One gold annotation file has a trailing comma and does not parse. `json.load`
-refuses it, the call sits inside a `try` at line 157 whose `except Exception` at
-line 242 prints a message and continues, and every average TRAIL publishes
-divides by `files_processed`. The errors annotated in that file are exactly the
-gap between the count in the paper's abstract and the count the scorer sees.
+<!-- trailaudit:unreadable-gold -->
+147 of the 148 gold annotation files parse. What stops the rest is a trailing
+comma: `json.load` refuses the file, the call sits inside a `try` at line 157
+whose `except Exception` at line 242 prints a message and continues, and every
+average TRAIL publishes divides by `files_processed`, which is 147. The errors
+annotated in the file that did not parse are exactly the gap between the count
+in the paper's abstract and the count the scorer sees.
+<!-- /trailaudit:unreadable-gold -->
+
 That is a small defect with a large tell attached: the failure goes to stdout,
 once, in the middle of a run that also prints a per-category table, and nothing
 downstream of it knows the corpus shrank.
@@ -208,13 +220,15 @@ for std_cat in all_categories:
         return std_cat
 ```
 
+<!-- trailaudit:containment -->
 Containment in that direction promotes a string vaguer than a label and drops
-one more specific than a label. Both are already in TRAIL's own gold.
-`Tool Selection` is rescued onto `Tool Selection Errors`, while
-`Task Orchestration Errors` reaches nothing at all, because `Task Orchestration`
-is a label and the gold spelling is that label plus a suffix. Enumerating every
-substring of every label and putting each one back through the pinned
-`normalize_category` gives the size of it:
+one more specific than a label. Both are already in TRAIL's own gold. `Tool
+Selection` is rescued onto `Tool Selection Errors`, while `Task Orchestration
+Errors` reaches nothing at all, because `Task Orchestration` is a label and the
+gold spelling is that label plus a suffix. Enumerating every substring of every
+label and putting each one back through the pinned `normalize_category` gives
+the size of it:
+<!-- /trailaudit:containment -->
 
 <!-- trailaudit:fallback -->
 The shortest of the 21 labels is 12 characters once its spaces are removed.
@@ -429,9 +443,9 @@ tree rather than restating it, because `all_categories` is a local inside
 `main()` and cannot be imported. So the labels the audit checks against are the
 labels the scorer uses, by construction.
 
-`predictors.py` is the six predictors, each declaring whether it is allowed to
-see the gold, with a test that holds every one of them to what it claims to
-read. `scoring.py` writes a directory of predictions and drives TRAIL's
+`predictors.py` is the seven predictors, the six in the headline table plus
+`one-span-all-categories` for P7, each declaring whether it is allowed to see the
+gold, with a test that holds every one of them to what it claims to read. `scoring.py` writes a directory of predictions and drives TRAIL's
 `main()` over it. `spans.py` builds the one derived artifact that is committed.
 `adversarial.py`, `normaliser.py`, `catf1.py`, `pairing.py` and `datacheck.py`
 are one property group each, and every one of them prints a report and writes a
@@ -498,7 +512,7 @@ strings that drifted from the taxonomy they were written against, a normaliser
 fallback that was reasonable when it was written and does something unintended
 at the edges, a metric that reads as accuracy and computes as recall. Naming
 them in a repository with reproducible commands is more useful than not naming
-them, and it is not a takedown.
+them.
 
 ## Data, and what is committed
 

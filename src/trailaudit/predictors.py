@@ -1,4 +1,4 @@
-"""Six predictors, and a record of exactly what each one is handed.
+"""Seven predictors, six of them in PREDICTORS, and a record of what each one is handed.
 
 None of them is a model. Each is a few lines that turn one trace's span
 identifiers, or one trace's gold labels, into the `{"errors": [...]}` document
