@@ -25,8 +25,11 @@ claims and their contingencies are internally consistent with what the audit
 went on to report, and you can verify the commit timestamps. You cannot verify
 from inside this repository that the section was not edited between 10:16 and
 being committed here. If that matters to you, the finding to weigh it against is
-that all nine came back violated, which is the outcome most favourable to
-me.
+that not one of the nine held: seven came back violated and two came back
+violated but latent, meaning the defect is real in the code and moves no number
+on this data. Nothing holding is the outcome most favourable to me, and it is
+the reason to read the section sceptically rather than take the timestamp for
+more than it is worth.
 
 ## The pre-registered properties
 
