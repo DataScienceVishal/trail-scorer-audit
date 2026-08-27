@@ -246,7 +246,7 @@ def test_p5_the_taxonomy_order_decides_237_strings_and_no_gold_spelling(
     assert len(ambiguous) == 237
     assert max(len(one.matched) for one in ambiguous) == len(study.taxonomy) == 21
     assert study.ambiguous_gold() == []
-    assert [one for one in study.rescored if one.moved] == []
+    assert [one for one in study.rescored if one.figures_that_moved] == []
     assert len(study.rescored) == 12
 
 

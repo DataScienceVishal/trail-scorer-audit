@@ -153,10 +153,18 @@ def test_the_drift_table_names_the_spelling_the_count_and_the_loop() -> None:
     assert "Widget Errors" in rows[1]
 
 
-def rescored(*rows: tuple[str, str, float, float]) -> tuple[normaliser.Rescored, ...]:
+def rescored(
+    *rows: tuple[str, str, tuple[float, float], tuple[float, float]],
+) -> tuple[normaliser.Rescored, ...]:
+    """Rows as (split, predictor, pinned pair, shuffled pair), joint then location.
+
+    Both metrics are given separately because P5 counts figures rather than
+    rows, and a helper that set the two to the same number could only ever build
+    a row where both moved or neither did.
+    """
     return tuple(
-        normaliser.Rescored(split, name, pinned=(pinned, pinned), reordered=(moved, moved))
-        for split, name, pinned, moved in rows
+        normaliser.Rescored(split, name, pinned=pinned, reordered=reordered)
+        for split, name, pinned, reordered in rows
     )
 
 
@@ -205,28 +213,48 @@ def test_p5_holds_against_a_normaliser_nothing_is_ambiguous_under() -> None:
     assert normaliser.p5(hand_built(only_whole)).verdict == HELD
 
 
-def test_p5_counts_the_scores_that_moved_rather_than_assuming_none_did() -> None:
+def test_p5_counts_the_figures_that_moved_rather_than_assuming_none_did() -> None:
     """The real run moves nothing, so the branch that reports movement never fires there.
 
     A P5 that printed "moves 0 of the 24" from a hard-coded zero would look
     identical on the real data and would be wrong the moment a gold spelling
-    drifted onto an ambiguous string.
+    drifted onto an ambiguous string. Two rows here, one of which moves its
+    location figure and not its joint one, so the answer is 1 of 4 rather than
+    the 2 of 4 a row-counting numerator would give.
     """
     done = hand_built(
         normaliser.probe(TAXONOMY, first_prefix),
-        rows=rescored(("GAIA", "silent", 0.5, 0.5), ("GAIA", "gold-exact", 0.9, 0.4)),
+        rows=rescored(
+            ("GAIA", "silent", (0.5, 0.5), (0.5, 0.5)),
+            ("GAIA", "gold-exact", (0.9, 0.4), (0.9, 0.6)),
+        ),
     )
     rendered = flat(normaliser.p5(done).render())
     assert "moves 1 of the 4 figures" in rendered
 
 
-def test_a_rescored_row_moved_when_either_metric_moved() -> None:
-    (still,) = rescored(("GAIA", "silent", 0.5, 0.5))
-    assert not still.moved
-    (shifted,) = rescored(("GAIA", "silent", 0.5, 0.6))
-    assert shifted.moved
+def test_a_row_that_moves_both_metrics_counts_as_two_of_the_figures() -> None:
+    """The numerator counted rows and the denominator counted figures.
+
+    Both are zero on the real data, so the published ratio understated a
+    violation by up to 2x with nothing in the run to show it.
+    """
+    done = hand_built(
+        normaliser.probe(TAXONOMY, first_prefix),
+        rows=rescored(("GAIA", "gold-exact", (0.9, 0.4), (0.8, 0.6))),
+    )
+    assert "moves 2 of the 2 figures" in flat(normaliser.p5(done).render())
+
+
+def test_a_rescored_row_names_which_of_its_two_figures_moved() -> None:
+    (still,) = rescored(("GAIA", "silent", (0.5, 0.5), (0.5, 0.5)))
+    assert still.figures_that_moved == ()
+    (joint_only,) = rescored(("GAIA", "silent", (0.5, 0.5), (0.6, 0.5)))
+    assert joint_only.figures_that_moved == ("joint",)
+    (both,) = rescored(("GAIA", "silent", (0.5, 0.5), (0.6, 0.6)))
+    assert both.figures_that_moved == ("joint", "location")
 
 
 def test_the_rescored_table_puts_the_two_orders_side_by_side() -> None:
-    rows = normaliser.rescored_table(rescored(("GAIA", "silent", 0.25, 0.75)))
+    rows = normaliser.rescored_table(rescored(("GAIA", "silent", (0.25, 0.25), (0.75, 0.75))))
     assert "0.250000  0.750000" in rows[1]

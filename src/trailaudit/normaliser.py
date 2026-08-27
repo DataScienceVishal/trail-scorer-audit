@@ -293,8 +293,23 @@ class Rescored:
     reordered: tuple[float, float]
 
     @property
-    def moved(self) -> bool:
-        return self.pinned != self.reordered
+    def figures_that_moved(self) -> tuple[str, ...]:
+        """Which of this row's two figures the shuffle moved, joint before location.
+
+        Per metric rather than per row. P5's magnitude is published as a count
+        of figures against a denominator of `rows * 2`, so a row that counted as
+        one while moving both of its metrics would understate the violation by
+        half. Zero on the real data either way, which is exactly the condition
+        this project reports TRAIL's own line 45 for.
+        """
+        return tuple(
+            metric
+            for metric, was, now in (
+                ("joint", self.pinned[0], self.reordered[0]),
+                ("location", self.pinned[1], self.reordered[1]),
+            )
+            if was != now
+        )
 
 
 def rescore(
@@ -453,7 +468,7 @@ def p5(done: Study) -> Finding:
         1 for one in ambiguous if done.normalise(one.candidate, other) != one.lands
     )
     figures = len(done.rescored) * 2
-    moved = sum(1 for one in done.rescored if one.moved)
+    moved = sum(len(one.figures_that_moved) for one in done.rescored)
     in_the_gold = done.ambiguous_gold()
 
     lines = [
@@ -491,7 +506,7 @@ def p5(done: Study) -> Finding:
         claim,
         VIOLATED,
         f"{len(ambiguous)} of {len(done.reaches):,} strings change label under a shuffled "
-        f"taxonomy, {elsewhere} of them under seed {SEED}, and {moved} of the {figures} scores "
+        f"taxonomy, {elsewhere} of them under seed {SEED}, and {moved} of the {figures} figures "
         f"in slice 2 move as a result",
         lines,
     )
@@ -582,8 +597,10 @@ def artifact(done: Study) -> dict:
             "seed": SEED,
             "taxonomy": list(shuffled(done.taxonomy)),
             "ambiguous_gold_spellings": done.ambiguous_gold(),
-            "scores_that_moved": [
-                f"{one.split}/{one.predictor}" for one in done.rescored if one.moved
+            "figures_that_moved": [
+                f"{one.split}/{one.predictor} {metric}"
+                for one in done.rescored
+                for metric in one.figures_that_moved
             ],
             "scores": [
                 {

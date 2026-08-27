@@ -318,7 +318,7 @@ def fallback(src: Sources) -> list[str]:
 def shuffle(src: Sources) -> list[str]:
     ambiguous = src.normaliser["order_dependent"]
     shuffled = src.normaliser["shuffle"]
-    moved = len(shuffled["scores_that_moved"])
+    moved = len(shuffled["figures_that_moved"])
     figures = len(shuffled["scores"]) * 2
     return paragraph(
         f"{ambiguous['count']} of those {src.normaliser['substrings_enumerated']:,} strings "
