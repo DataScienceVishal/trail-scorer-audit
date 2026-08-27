@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+.env
+.env.local
+
+node_modules/
+
+.DS_Store
+.vscode/
+.idea/
+
+# The clone of patronus-ai/trail-benchmark that `trailaudit fetch` writes.
+# 186.4 MB of traces and gold annotations that this repository deliberately does
+# not carry: the audit commits the derived span index, which is identifiers and
+# integers, and fetches everything else on demand at a pinned commit.
+.trail/
