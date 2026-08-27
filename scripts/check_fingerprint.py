@@ -265,6 +265,23 @@ def interesting(path: Path) -> bool:
     return suffix in PROSE_SUFFIXES or suffix in CODE_SUFFIXES
 
 
+def working_tree(start: Path) -> Path:
+    """The top of the repository, so a run from a subdirectory checks the same files.
+
+    Path.cwd() alone meant `python ../scripts/check_fingerprint.py` from tests/
+    reported "clean across 25 file(s)" and exited 0, having never looked at the
+    twenty it was standing below. scripts/pre-commit already resolves the root
+    this way. Outside a repository there is nothing to resolve, and walking from
+    where you are is the only thing left to do.
+    """
+    found = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"], cwd=start, capture_output=True, text=True
+    )
+    if found.returncode != 0:
+        return start
+    return Path(found.stdout.strip())
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*", type=Path)
@@ -272,7 +289,7 @@ def main() -> int:
     parser.add_argument("--banned", type=Path, help="path to the word list, otherwise discovered")
     args = parser.parse_args()
 
-    root = Path.cwd()
+    root = working_tree(Path.cwd())
     rules = parse_banned(args.banned or find_banned_md(root))
 
     if args.staged:

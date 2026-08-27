@@ -112,18 +112,6 @@ def test_p3_p4_and_p9_reproduce_from_a_fresh_run(
     assert [one.verdict for one in datacheck.findings_for(checked)] == [VIOLATED] * 3
 
 
-def test_the_artifact_refuses_to_be_written_without_the_gold(repo_root: pathlib.Path) -> None:
-    """--no-clone measures P9 and nothing else, and a file saying so would overwrite the real one.
-
-    Not a clone test at heart, but it belongs next to the one above: the pair of
-    them is what stops results/datacheck.json ever holding a partial run.
-    """
-    index = spans.load(repo_root / spans.COMMITTED)
-    checked = datacheck.inspect(None, index)
-    with pytest.raises(upstream.MissingClone):
-        datacheck.artifact(checked, spans.digest(index))
-
-
 def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pathlib.Path) -> None:
     """The whole of slice 2, rerun against the real scorer and diffed leaf by leaf.
 

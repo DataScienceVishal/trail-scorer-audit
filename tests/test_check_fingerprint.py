@@ -236,3 +236,19 @@ def test_an_unreadable_file_is_a_finding_and_not_a_silent_pass(tmp_path, rules):
 def test_a_readable_file_is_still_judged_on_its_words(tmp_path, rules):
     """Guards the test above from passing because everything became a finding."""
     assert scan(tmp_path, "fine.md", "Parses 4.2M rows in 11s.\n", rules) == []
+
+
+def test_the_root_is_the_working_tree_and_not_the_directory_you_ran_from(tmp_path):
+    """Regression: from tests/ it reported "clean across 25 file(s)" and exited 0.
+
+    Every file above the cwd went unchecked and the run still passed, which is
+    the same swallow as the unreadable file above wearing a different hat.
+    """
+    import subprocess
+
+    repo = tmp_path / "someproject"
+    (repo / "tests").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+
+    assert fp.working_tree(repo / "tests") == repo.resolve()
+    assert fp.working_tree(tmp_path) == tmp_path

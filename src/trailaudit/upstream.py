@@ -49,6 +49,11 @@ SCORER_SHA256 = "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d
 # hashes to diff against.
 CORPUS_SHA256 = "e27721ffd74bef970daa02a91e9a2362d87dd8f956a2e4ec49cf5c8c088781e5"
 
+# Relative to the working directory, which is why every command in the README is
+# run from the repository root. A path resolved at import time would bake in
+# whatever directory the process happened to start in, and `--into` is there for
+# anyone who wants the clone somewhere else. The test suite resolves it against
+# the repository root, which is the same thing when the README is followed.
 DEFAULT_CLONE = Path(".trail/trail-benchmark")
 
 SCORER = "benchmarking/calculate_scores.py"

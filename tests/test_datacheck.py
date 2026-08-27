@@ -12,7 +12,7 @@ import pathlib
 import pytest
 
 from stand_ins import TAXONOMY, strip_only
-from trailaudit import datacheck, gold, paper, spans
+from trailaudit import datacheck, gold, paper, spans, upstream
 from trailaudit.datacheck import HELD, UNMEASURED, VIOLATED, Gold
 
 
@@ -26,6 +26,19 @@ def annotated(annotations: pathlib.Path) -> Gold:
         taxonomy=TAXONOMY,
         normalise=strip_only,
     )
+
+
+def test_the_artifact_refuses_to_be_written_without_the_gold(repo_root: pathlib.Path) -> None:
+    """--no-clone measures P9 and nothing else, and a file saying so would overwrite the real one.
+
+    Its pair is test_pinned_clone.py's reproduction check, which needs the 186 MB.
+    This one does not, and it was marked `upstream` and skipping in CI beside it,
+    where it is the half that can run.
+    """
+    index = spans.load(repo_root / spans.COMMITTED)
+    checked = datacheck.inspect(None, index)
+    with pytest.raises(upstream.MissingClone):
+        datacheck.artifact(checked, spans.digest(index))
 
 
 def test_p3_without_a_clone_is_unmeasured_and_not_held() -> None:
