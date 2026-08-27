@@ -31,6 +31,17 @@ on this data. Nothing holding is the outcome most favourable to me, and it is
 the reason to read the section sceptically rather than take the timestamp for
 more than it is worth.
 
+**One arithmetic error in the section below, left in rather than corrected.** The
+paragraph after the table says four of the nine had a known direction, and then
+names P2, P5 and P6 as the open ones. Nine minus three is six, and six is what
+the README says. The spec was wrong when it was written and the number was
+already right everywhere the audit reports it.
+
+Correcting it here would be the easier option and it is the wrong one, because
+this file is only worth reading if it is what was written at the time. A
+pre-registration that gets tidied up after the results are in is not a
+pre-registration. So the error stays, this note names it, and you can weigh both.
+
 ## The pre-registered properties
 
 Written before any code exists, so the target cannot move afterwards. These are properties a competent benchmark scorer should have. A property that is **violated** is a finding.
