@@ -12,10 +12,12 @@ from trailaudit import (
     datacheck,
     normaliser,
     pairing,
+    report,
     spans,
     upstream,
 )
 from trailaudit.artifacts import Stale
+from trailaudit.report import MarkerError
 from trailaudit.scoring import DiagnosticDrifted
 from trailaudit.spans import IndexInconsistent
 from trailaudit.upstream import DEFAULT_CLONE, MissingClone, PinMismatch
@@ -196,6 +198,51 @@ def _pairing(args: argparse.Namespace) -> int:
     lines, violated = pairing.report(scored, counted, taxonomy)
     print("\n".join(lines))
     return _settle(args, built, pairing.load, violated)
+
+
+def _report(args: argparse.Namespace) -> int:
+    """Render every block in the README from the committed artifacts, or check that it matches.
+
+    No clone and no network, so this is the one property of the finished
+    repository that CI can actually enforce end to end. Everything else it runs
+    is either offline consistency or a skip.
+    """
+    src = report.load(args.root)
+    rendered = report.render(src)
+    markdown = args.readme.read_text(encoding="utf-8")
+
+    if args.check:
+        moved = report.stale(markdown, rendered)
+        loose = report.loose_scores(markdown)
+        for name in moved:
+            print(
+                f"trailaudit: {args.readme} block {name} is not what the artifacts render",
+                file=sys.stderr,
+            )
+        for line in loose:
+            print(
+                f"trailaudit: {args.readme} states a score outside every block, {line}",
+                file=sys.stderr,
+            )
+        if moved or loose:
+            print(
+                f"rerun `trailaudit report --format {args.format}` and commit what it writes",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"{args.readme}: {len(rendered)} blocks, all of them what the artifacts render")
+        return 0
+
+    rewritten = report.rewrite(markdown, rendered)
+    moved = report.stale(markdown, rendered)
+    if not moved:
+        print(f"{args.readme} already matches the artifacts, {len(rendered)} blocks")
+        return 0
+    args.readme.write_text(rewritten, encoding="utf-8")
+    print(f"rewrote {len(moved)} of {len(rendered)} blocks in {args.readme}")
+    for name in moved:
+        print(f"  {name}")
+    return 0
 
 
 def _settle(
@@ -410,6 +457,34 @@ def build_parser() -> argparse.ArgumentParser:
         help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
         "if any figure moved",
     )
+
+    rendered = commands.add_parser(
+        "report",
+        help="render every table and figure in the README out of the committed artifacts, "
+        "between the HTML comment markers, so no number in the prose is typed by hand",
+    )
+    rendered.add_argument(
+        "--format",
+        choices=("md",),
+        default="md",
+        help="the only rendering there is. The blocks are markdown because the README is",
+    )
+    rendered.add_argument(
+        "--readme", type=Path, default=report.README, help=f"which file (default {report.README})"
+    )
+    rendered.add_argument(
+        "--root",
+        type=Path,
+        default=Path("."),
+        help="where results/ and index/ are read from (default the working directory)",
+    )
+    rendered.add_argument(
+        "--check",
+        action="store_true",
+        help="compare instead of writing. Exit 1 if a block has drifted from the artifact that "
+        "renders it, if a marker has no generator or a generator has no marker, or if a score "
+        "appears in prose outside every block",
+    )
     return parser
 
 
@@ -423,10 +498,11 @@ def main(argv: list[str] | None = None) -> int:
         "normaliser": _normaliser,
         "catf1": _catf1,
         "pairing": _pairing,
+        "report": _report,
     }
     try:
         return routes[args.command](args)
-    except (PinMismatch, IndexInconsistent, Stale, DiagnosticDrifted) as exc:
+    except (PinMismatch, IndexInconsistent, Stale, DiagnosticDrifted, MarkerError) as exc:
         print(f"trailaudit: {exc}", file=sys.stderr)
         return 1
     except (MissingClone, FileNotFoundError) as exc:
