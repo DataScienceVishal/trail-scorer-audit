@@ -148,14 +148,15 @@ def _wrapped(sentence: str) -> list[str]:
 
 
 def table_5_rows(measured: dict[str, dict[str, int]]) -> list[str]:
+    columns = [paper.compare(split.name, measured[split.name]) for split in upstream.SPLITS]
     rows = [
         f"{'':<22}" + "".join(f"{split.name:>24}" for split in upstream.SPLITS),
         f"{'':<22}" + "".join(f"{'paper / here':>24}" for _ in upstream.SPLITS),
     ]
-    for index, name in enumerate(paper.ROWS):
+    for position, name in enumerate(paper.ROWS):
         cells = ""
-        for split in upstream.SPLITS:
-            _, published, here = paper.compare(split.name, measured[split.name])[index]
+        for column in columns:
+            _, published, here = column[position]
             shown = f"{here:,}" if here is not None else "unmeasured"
             cells += f"{published:,} / {shown}".rjust(24)
         rows.append(f"{paper.LABELS[name]:<22}{cells}")
