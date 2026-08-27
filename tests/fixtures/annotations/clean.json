@@ -1,0 +1,20 @@
+{
+    "trace_id": "clean",
+    "errors": [
+        {
+            "category": "Widget Errors",
+            "location": "aaaaaaaaaaaaaaaa",
+            "impact": "LOW"
+        },
+        {
+            "category": "Flange Misuse",
+            "location": "bbbbbbbbbbbbbbbb",
+            "impact": "HIGH"
+        }
+    ],
+    "scores": [
+        {
+            "overall": 3
+        }
+    ]
+}

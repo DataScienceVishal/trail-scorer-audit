@@ -1,0 +1,35 @@
+{
+    "trace_id": "drifted",
+    "errors": [
+        {
+            "category": " Widget Errors",
+            "location": "cccccccccccccccc",
+            "impact": "LOW"
+        },
+        {
+            "category": "Gasket Handling Failure",
+            "location": "dddddddddddddddd",
+            "impact": "MEDIUM"
+        },
+        {
+            "category": "Sprocket-Only",
+            "location": "eeeeeeeeeeeeeeee",
+            "impact": "HIGH"
+        },
+        {
+            "category": "Flangee Misuze",
+            "location": "ffffffffffffffff",
+            "impact": "LOW"
+        },
+        {
+            "category": "Widget Errors",
+            "location": "cccccccccccccccc",
+            "impact": "LOW"
+        }
+    ],
+    "scores": [
+        {
+            "overall": 2
+        }
+    ]
+}

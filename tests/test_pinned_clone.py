@@ -13,7 +13,7 @@ import pathlib
 
 import pytest
 
-from trailaudit import spans, upstream
+from trailaudit import gold, spans, upstream
 
 pytestmark = pytest.mark.upstream
 
@@ -50,3 +50,40 @@ def test_importing_the_scorer_does_not_parse_sys_argv(
     module = upstream.load_scorer(clone)
     assert callable(module.calculate_metrics)
     assert callable(module.normalize_category)
+
+
+def test_p3_exactly_one_gold_file_does_not_parse(clone: pathlib.Path) -> None:
+    """The finding this slice ends on, pinned so nobody has to retype it.
+
+    841 annotated errors are published over 148 traces. The scorer loads 147 of
+    those files and prints a message about the other one, so every figure on the
+    leaderboard is an average over 147 and covers 836 errors.
+    """
+    loaded, refused = gold.read_all(clone)
+    assert len(loaded) == 147
+    (failure,) = refused
+    assert failure.trace == "a96c6811716c0473b86a23321db79c34"
+    assert failure.split == "GAIA"
+    assert (failure.line, failure.column, failure.character) == (38, 10, ",")
+    assert sum(len(one.categories) for one in loaded) == 836
+
+
+def test_p4_the_gold_vocabulary_has_drifted_off_the_taxonomy(clone: pathlib.Path) -> None:
+    loaded, _ = gold.read_all(clone)
+    counted = gold.vocabulary(loaded)
+    labels = upstream.taxonomy(clone)
+    assert len(counted) == 31
+    assert len(gold.off_taxonomy(counted, labels)) == 11
+    assert " Incorrect Problem Identification" in counted
+
+
+def test_the_normaliser_drops_four_gold_errors(clone: pathlib.Path) -> None:
+    loaded, _ = gold.read_all(clone)
+    labels = upstream.taxonomy(clone)
+    normalise = gold.binder(upstream.load_scorer(clone).normalize_category, labels)
+    lost = gold.dropped(gold.vocabulary(loaded), labels, normalise)
+    assert lost == {
+        "Instruction non complience": 1,
+        "Task Orchestration Error": 1,
+        "Task Orchestration Errors": 2,
+    }

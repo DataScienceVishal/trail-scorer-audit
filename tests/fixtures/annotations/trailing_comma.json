@@ -1,0 +1,15 @@
+{
+    "trace_id": "trailing_comma",
+    "errors": [
+        {
+            "category": "Widget Errors",
+            "location": "aaaaaaaaaaaaaaaa",
+            "impact": "LOW"
+        },
+    ],
+    "scores": [
+        {
+            "overall": 1
+        }
+    ]
+}

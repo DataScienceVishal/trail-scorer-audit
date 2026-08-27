@@ -27,3 +27,8 @@ def clone() -> pathlib.Path:
     if not upstream.scorer_path(where).is_file():
         pytest.skip(f"no clone at {where}. Run `trailaudit fetch` to include these")
     return where
+
+
+@pytest.fixture(scope="session")
+def annotations() -> pathlib.Path:
+    return REPO_ROOT / "tests" / "fixtures" / "annotations"
