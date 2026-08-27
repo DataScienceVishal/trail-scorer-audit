@@ -443,16 +443,17 @@ because 1 means the audit could not trust its own input.
 ## How it works
 
 `upstream.py` owns everything that touches somebody else's repository: the
-pin, the digests, the fetch, and the import of
-`calculate_scores.py` by path. It reads the taxonomy out of that file's syntax
-tree rather than restating it, because `all_categories` is a local inside
-`main()` and cannot be imported. So the labels the audit checks against are the
-labels the scorer uses, by construction.
+pin, the digests, the fetch, and the one place `calculate_scores.py` is compiled
+and run. It reads the taxonomy out of that file's syntax tree rather than
+restating it, because `all_categories` is a local inside `main()` and cannot be
+imported. So the labels the audit checks against are the labels the scorer uses,
+by construction.
 
 `predictors.py` is the seven predictors, the six in the headline table plus
-`one-span-all-categories` for P7, each declaring whether it is allowed to see the
-gold, with a test that holds every one of them to what it claims to read. `scoring.py` writes a directory of predictions and drives TRAIL's
-`main()` over it. `spans.py` builds the one derived artifact that is committed.
+`one-span-all-categories` for P7, each declaring whether it is allowed to see
+the gold, with a test that holds every one of them to what it claims to read.
+`scoring.py` writes a directory of predictions and drives TRAIL's `main()` over
+it. `spans.py` builds the one derived artifact that is committed.
 `adversarial.py`, `normaliser.py`, `catf1.py`, `pairing.py` and `datacheck.py`
 are one property group each, and every one of them prints a report and writes a
 JSON artifact.
@@ -497,8 +498,8 @@ would be making a smaller version of the mistake it is reporting.
 
 ## What this does not do
 
-It does not re-score the published table. TRAIL publishes no raw model outputs and
-there is no `results/` directory in the benchmark repository, so there is
+It does not re-score the published table. TRAIL publishes no raw model outputs
+and there is no `results/` directory in the benchmark repository, so there is
 nothing to re-score. Running my own judges instead would compare a number
 produced under one setup against a number produced under another, which
 confounds model with method and answers no question anyone asked.
