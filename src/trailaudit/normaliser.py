@@ -48,7 +48,7 @@ Normalise = Callable[[str, list[str]], str]
 # candidate was chosen by a person instead of enumerated.
 QUOTED_IN_THE_SPEC = ("error", "resource", "tool")
 
-# Line 14 tests the argument before line 16 strips it, so a category of one
+# Line 14 tests the argument before line 17 strips it, so a category of one
 # space is not caught by the empty-string guard and reaches the fallback as "",
 # which is inside every label.
 WHITESPACE_ONLY = " "
@@ -527,7 +527,7 @@ def report(done: Study) -> tuple[list[str], bool]:
         *(f"  {row}".rstrip() for row in shortest_table(done.shortest)),
         "",
         "the three the spec names, plus a category of one space, which line 14 lets past",
-        "because it tests the argument before line 16 strips it",
+        "because it tests the argument before line 17 strips it",
         *(f"  {row}" for row in quoted_probes(done.taxonomy, done.normalise)),
         "",
         f"the {len(done.drifted)} gold spellings that are not a label, and which loop caught them",

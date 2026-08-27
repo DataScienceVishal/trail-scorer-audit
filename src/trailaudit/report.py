@@ -22,9 +22,10 @@ for the life of the project. The scan here matches any name, and a generator
 whose block is missing from the file is refused just as loudly.
 
 One more thing is checked that has nothing to do with markers. Every score in
-this project is written to three decimal places, so a hand-typed one is easy to
-find: `loose_scores` looks for that shape outside the generated blocks and
-reports it. There is no honest reason for a figure to be there.
+this project is written to three decimal places, or four in the weighted F1
+column, so a hand-typed one is easy to find: `loose_scores` looks for both
+shapes outside the generated blocks and reports it. There is no honest reason
+for a figure to be there.
 """
 
 from __future__ import annotations
@@ -47,9 +48,12 @@ README = Path("README.md")
 # a conditions table that does not cover all nine exactly once.
 PROPERTIES = tuple(f"P{number}" for number in range(1, 10))
 
-# Anything that reads as a score: 0.973, 1.000. Line numbers, byte counts and
-# arXiv identifiers do not match, and no figure of this shape belongs in prose.
-SCORE = re.compile(r"\b[01]\.\d{3}\b")
+# Anything that reads as a score: 0.973, 1.000, and the four-place weighted F1
+# at 0.4725. Three places was the original rule and the fourth column broke it:
+# the trailing \b cannot match a four-digit fraction, so a hand-typed 0.9999 in
+# prose passed while 0.990 was caught. Line numbers, byte counts and arXiv
+# identifiers still do not match, and no figure of either shape belongs in prose.
+SCORE = re.compile(r"\b[01]\.\d{3,4}\b")
 
 # Sixteen hex digits for a span, thirty-two for a trace, forty for a commit,
 # sixty-four for a digest.

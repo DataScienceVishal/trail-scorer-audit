@@ -192,6 +192,20 @@ def test_a_score_typed_into_prose_is_found_and_one_inside_a_block_is_not(
     assert complaint.startswith(f"line {len(markdown.splitlines()) + 2}:")
 
 
+def test_the_four_place_weighted_f1_column_is_caught_in_prose_too(
+    rendered: dict[str, str],
+) -> None:
+    """Three places was the rule; the catf1 column publishes four.
+
+    The pattern ended at a word boundary, so a fourth digit stopped it matching
+    and every hand-typed figure from that column was invisible to the check that
+    exists to find hand-typed figures.
+    """
+    markdown = whole(rendered)
+    (complaint,) = report.loose_scores(markdown + "\nweighted F1 came out at 0.4725.\n")
+    assert complaint.endswith("weighted F1 came out at 0.4725.")
+
+
 def test_a_line_number_is_not_mistaken_for_a_score(rendered: dict[str, str]) -> None:
     """Lines 54 and 58, arXiv:2505.08638 and 186.4 MB all appear in the prose."""
     prose = "\nlines 54 and 58 of arXiv:2505.08638v3, over 186.4 MB, at 0ffbed9db859.\n"

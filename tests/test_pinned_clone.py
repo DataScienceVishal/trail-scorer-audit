@@ -186,7 +186,7 @@ def test_the_three_strings_the_spec_quotes_land_where_it_says(study: normaliser.
 
 
 def test_a_category_of_one_space_reaches_the_first_label(study: normaliser.Study) -> None:
-    """Line 14 tests the argument, line 16 strips it, and "" is inside everything.
+    """Line 14 tests the argument, line 17 strips it, and "" is inside everything.
 
     So a judge that emits a single space is credited with whichever label the
     scorer's list happens to start with. Nothing else in this audit needs the

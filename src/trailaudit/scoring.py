@@ -214,7 +214,7 @@ class Driven:
     """One call into `calculate_scores.main()`, before anything is read out of it.
 
     `returned` is upstream's dict whole, so a caller wanting the per-category
-    block at lines 297 to 314 gets it without a second run over the same files.
+    block at lines 298 to 314 gets it without a second run over the same files.
     """
 
     returned: dict

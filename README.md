@@ -211,7 +211,7 @@ between them.
 <!-- /trailaudit:fallback -->
 
 A category of one space gets past the empty-string guard at line 14, because
-line 14 tests the argument before line 16 strips it, and then matches the first
+line 14 tests the argument before line 17 strips it, and then matches the first
 label in the list.
 
 ## An order dependence that costs nothing today
@@ -270,7 +270,7 @@ difference in how much it says, not in where.
 
 ## One null category, and a correct judge scoring zero
 
-Lines 45 and 48 build the pairs both headline metrics are computed from. The
+Lines 45 and 49 build the pairs both headline metrics are computed from. The
 categories are filtered on truthiness, the locations are not, and then the two
 lists are zipped by position:
 
@@ -282,8 +282,8 @@ gt_loc_cat_pairs = [(gt_locations[i], gt_categories[i])
 ```
 
 One error carrying a null category shortens the category list by one, and every
-category after it slides onto the location belonging to the error before. The
-same two lines do it to the judge's output, so a judge that names both real
+category after it slides onto the location belonging to the error before. Lines
+46 and 50 do the same to the judge's output, so a judge that names both real
 spans, gets both categories right, and mentions one further span with no
 category has all of its correct answers land on the wrong span.
 
@@ -427,10 +427,14 @@ itself. Deleting a generator while leaving its marker stayed invisible for the
 life of that project, and the block sat there reading like a maintained table.
 
 The other half of the same idea is that every score in this project is written
-to three decimal places, which makes a hand-typed one easy to find. `report
---check` looks for that shape outside the generated blocks and fails on a hit,
-including in this paragraph, which is how the sentence you are reading ended up
-phrased the way it is.
+to three decimal places, or four in the weighted F1 column, which makes a
+hand-typed one easy to find. `report --check` looks for both shapes outside the
+generated blocks and fails on a hit, including in this paragraph, which is how
+the sentence you are reading ended up phrased the way it is. Three places was
+the rule when that check was written and the four-place weighted F1 column
+arrived after it: the pattern ended at a word boundary, so a fourth digit
+stopped it matching and a hand-typed figure from that column went straight
+past.
 
 ## What CI proves, and what it does not
 

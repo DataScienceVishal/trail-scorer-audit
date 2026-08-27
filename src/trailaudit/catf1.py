@@ -1,4 +1,4 @@
-"""What `trailaudit catf1` runs and prints: P7, and the per-category block at lines 297 to 314.
+"""What `trailaudit catf1` runs and prints: P7, and the per-category block at lines 298 to 314.
 
 Category F1 is the third column of TRAIL's Table 1 and it is built from two
 21-element binary vectors per trace, at lines 61 to 70:

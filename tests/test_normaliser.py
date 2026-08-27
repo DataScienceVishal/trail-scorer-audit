@@ -28,7 +28,7 @@ def test_substrings_are_enumerated_in_the_form_line_26_compares() -> None:
 
 
 def test_the_empty_string_is_not_a_candidate() -> None:
-    """It cannot arrive as a substring, only as whitespace that line 16 strips.
+    """It cannot arrive as a substring, only as whitespace that line 17 strips.
 
     Line 14's guard tests the argument before the strip, so `" "` gets past it
     and reaches the fallback as "". That path is reported separately, and letting

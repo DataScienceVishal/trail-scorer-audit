@@ -1,6 +1,6 @@
 """What `trailaudit pairing` runs and prints: P8, the one defect that never fires on the gold.
 
-Lines 44 to 48 of calculate_scores.py build the pairs both headline metrics are
+Lines 44 to 50 of calculate_scores.py build the pairs both headline metrics are
 computed from:
 
     gt_categories = [normalize_category(cat, all_categories)
@@ -13,7 +13,7 @@ Each of those is one line upstream and is wrapped here to fit.
 The categories are filtered on truthiness and the locations are not, and then
 the two lists are paired by position. So one error carrying a null or empty
 category shortens the category list by one, and every category after it slides
-onto the location belonging to the error before. Lines 45 and 48 do the same to
+onto the location belonging to the error before. Lines 46 and 50 do the same to
 the judge's output, so a judge that emits one null category mispairs its own
 answers.
 
@@ -190,7 +190,7 @@ def p8(scored: tuple[Run, ...], counted: Latent) -> Finding:
             f"the sharpest of the three is the judge's own: one that names both real spans, "
             f"gets both categories right, and mentions one further span with no category scores "
             f"{misjudged.location_accuracy:.3f} location accuracy and "
-            f"{misjudged.joint_accuracy:.3f} joint. Line 45 drops its null category, line 48 "
+            f"{misjudged.joint_accuracy:.3f} joint. Line 46 drops its null category, line 50 "
             f"pairs what is left against the unfiltered location list, and both of its correct "
             f"answers land on the wrong span."
         ),
