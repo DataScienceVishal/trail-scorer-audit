@@ -1,0 +1,330 @@
+{
+  "pinned_commit": "0ffbed9db859b4a66250dc783fa4dccf86869595",
+  "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
+  "labels": 21,
+  "shortest_label_squashed": 12,
+  "substrings_enumerated": 3205,
+  "labels_reached": 21,
+  "shortest_reaching": {
+    "Language-only": {
+      "length": 1,
+      "strings": [
+        "-",
+        "a",
+        "e",
+        "g",
+        "l",
+        "n",
+        "o",
+        "u",
+        "y"
+      ],
+      "reaching": 87
+    },
+    "Tool-related": {
+      "length": 1,
+      "strings": [
+        "d",
+        "r",
+        "t"
+      ],
+      "reaching": 68
+    },
+    "Poor Information Retrieval": {
+      "length": 1,
+      "strings": [
+        "f",
+        "i",
+        "m",
+        "p",
+        "v"
+      ],
+      "reaching": 275
+    },
+    "Incorrect Memory Usage": {
+      "length": 1,
+      "strings": [
+        "c",
+        "s"
+      ],
+      "reaching": 185
+    },
+    "Tool Output Misinterpretation": {
+      "length": 2,
+      "strings": [
+        "er",
+        "is",
+        "lo",
+        "mi",
+        "nt",
+        "ou",
+        "pr",
+        "pu",
+        "rp",
+        "si",
+        "ta",
+        "tp",
+        "ut"
+      ],
+      "reaching": 328
+    },
+    "Incorrect Problem Identification": {
+      "length": 1,
+      "strings": [
+        "b"
+      ],
+      "reaching": 384
+    },
+    "Tool Selection Errors": {
+      "length": 2,
+      "strings": [
+        "ls",
+        "ne",
+        "rs",
+        "se"
+      ],
+      "reaching": 150
+    },
+    "Formatting Errors": {
+      "length": 2,
+      "strings": [
+        "tt"
+      ],
+      "reaching": 86
+    },
+    "Instruction Non-compliance": {
+      "length": 2,
+      "strings": [
+        "-c",
+        "ce",
+        "ia",
+        "li",
+        "mp",
+        "n-",
+        "nn",
+        "no",
+        "ns",
+        "om",
+        "pl",
+        "ru",
+        "st",
+        "uc"
+      ],
+      "reaching": 284
+    },
+    "Tool Definition Issues": {
+      "length": 2,
+      "strings": [
+        "ef",
+        "es",
+        "it",
+        "ld",
+        "ni",
+        "ss",
+        "su",
+        "ue"
+      ],
+      "reaching": 173
+    },
+    "Environment Setup Errors": {
+      "length": 2,
+      "strings": [
+        "ir",
+        "nm",
+        "nv",
+        "pe",
+        "ts",
+        "tu",
+        "up",
+        "vi"
+      ],
+      "reaching": 207
+    },
+    "Rate Limiting": {
+      "length": 2,
+      "strings": [
+        "im",
+        "ra"
+      ],
+      "reaching": 52
+    },
+    "Authentication Errors": {
+      "length": 1,
+      "strings": [
+        "h"
+      ],
+      "reaching": 124
+    },
+    "Service Errors": {
+      "length": 2,
+      "strings": [
+        "ee",
+        "rv"
+      ],
+      "reaching": 58
+    },
+    "Resource Not Found": {
+      "length": 2,
+      "strings": [
+        "nd",
+        "ot",
+        "rc",
+        "so",
+        "tf",
+        "un",
+        "ur"
+      ],
+      "reaching": 112
+    },
+    "Resource Exhaustion": {
+      "length": 1,
+      "strings": [
+        "x"
+      ],
+      "reaching": 115
+    },
+    "Timeout Issues": {
+      "length": 2,
+      "strings": [
+        "eo"
+      ],
+      "reaching": 56
+    },
+    "Context Handling Failures": {
+      "length": 2,
+      "strings": [
+        "ai",
+        "dl",
+        "fa",
+        "gf",
+        "il",
+        "lu",
+        "xt"
+      ],
+      "reaching": 235
+    },
+    "Resource Abuse": {
+      "length": 2,
+      "strings": [
+        "ab",
+        "bu",
+        "ea"
+      ],
+      "reaching": 48
+    },
+    "Goal Deviation": {
+      "length": 2,
+      "strings": [
+        "go",
+        "oa"
+      ],
+      "reaching": 61
+    },
+    "Task Orchestration": {
+      "length": 1,
+      "strings": [
+        "k"
+      ],
+      "reaching": 117
+    }
+  },
+  "quoted_in_the_spec": {
+    "error": "Tool Selection Errors",
+    "resource": "Resource Not Found",
+    "tool": "Tool-related"
+  },
+  "whitespace_only": "Language-only",
+  "gold_drift": [
+    {
+      "spelling": " Incorrect Problem Identification",
+      "errors": 1,
+      "lands": "Incorrect Problem Identification",
+      "loop": "exact",
+      "labels_inside_it": [
+        "Incorrect Problem Identification"
+      ]
+    },
+    {
+      "spelling": "Context Handling Failure",
+      "errors": 5,
+      "lands": "Context Handling Failures",
+      "loop": "fallback",
+      "labels_inside_it": []
+    },
+    {
+      "spelling": "Formatting Error",
+      "errors": 1,
+      "lands": "Formatting Errors",
+      "loop": "fallback",
+      "labels_inside_it": []
+    },
+    {
+      "spelling": "Goal deviation",
+      "errors": 1,
+      "lands": "Goal Deviation",
+      "loop": "exact",
+      "labels_inside_it": [
+        "Goal Deviation"
+      ]
+    },
+    {
+      "spelling": "Instruction Non-Compliance",
+      "errors": 2,
+      "lands": "Instruction Non-compliance",
+      "loop": "exact",
+      "labels_inside_it": [
+        "Instruction Non-compliance"
+      ]
+    },
+    {
+      "spelling": "Instruction non complience",
+      "errors": 1,
+      "lands": "instruction non complience",
+      "loop": "neither",
+      "labels_inside_it": []
+    },
+    {
+      "spelling": "Language-Only",
+      "errors": 3,
+      "lands": "Language-only",
+      "loop": "exact",
+      "labels_inside_it": [
+        "Language-only"
+      ]
+    },
+    {
+      "spelling": "Poor Information retrieval",
+      "errors": 1,
+      "lands": "Poor Information Retrieval",
+      "loop": "exact",
+      "labels_inside_it": [
+        "Poor Information Retrieval"
+      ]
+    },
+    {
+      "spelling": "Task Orchestration Error",
+      "errors": 1,
+      "lands": "task orchestration error",
+      "loop": "neither",
+      "labels_inside_it": [
+        "Task Orchestration"
+      ]
+    },
+    {
+      "spelling": "Task Orchestration Errors",
+      "errors": 2,
+      "lands": "task orchestration errors",
+      "loop": "neither",
+      "labels_inside_it": [
+        "Task Orchestration"
+      ]
+    },
+    {
+      "spelling": "Tool Selection",
+      "errors": 1,
+      "lands": "Tool Selection Errors",
+      "loop": "fallback",
+      "labels_inside_it": []
+    }
+  ]
+}

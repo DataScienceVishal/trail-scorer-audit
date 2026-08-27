@@ -70,7 +70,7 @@ def test_p3_holds_when_everything_parses(annotated: Gold) -> None:
 def test_p4_counts_spellings_and_the_errors_they_cover(annotated: Gold) -> None:
     rendered = datacheck.p4(annotated).render()
     assert datacheck.p4(annotated).verdict == VIOLATED
-    assert "6 distinct spellings over 7 errors, against 4 labels" in rendered
+    assert f"6 distinct spellings over 7 errors, against {len(TAXONOMY)} labels" in rendered
     assert "4 are not a label, covering 4 errors" in rendered
 
 

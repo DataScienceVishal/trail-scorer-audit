@@ -10,10 +10,11 @@ dataset.
 from __future__ import annotations
 
 import pathlib
+from collections import Counter
 
 import pytest
 
-from trailaudit import adversarial, artifacts, gold, spans, upstream
+from trailaudit import adversarial, artifacts, gold, normaliser, spans, upstream
 from trailaudit.datacheck import VIOLATED
 
 pytestmark = pytest.mark.upstream
@@ -122,3 +123,69 @@ def test_the_maximal_predictor_reads_no_span_contents_and_still_beats_every_mode
         assert mine.joint_accuracy > joint
         assert mine.location_accuracy > location
         assert mine.volume_ratio > 80
+
+
+@pytest.fixture(scope="module")
+def study(clone: pathlib.Path) -> normaliser.Study:
+    return normaliser.study(clone)
+
+
+def test_p6_every_one_of_the_21_labels_is_reachable_from_two_characters(
+    study: normaliser.Study,
+) -> None:
+    """The magnitude the spec left open, and it is not close.
+
+    The shortest label squashes to 12 characters. Nothing in the taxonomy needs
+    more than 2 to be reached, because line 26 asks whether the judge's string is
+    inside the label and a two-letter string is inside a great many of them.
+    """
+    reached = [one for one in study.shortest if one.strings]
+    assert len(reached) == len(study.taxonomy) == 21
+    assert max(one.length for one in reached) == 2
+    assert min(len(normaliser.squash(label)) for label in study.taxonomy) == 12
+
+
+def test_the_three_strings_the_spec_quotes_land_where_it_says(study: normaliser.Study) -> None:
+    labels = list(study.taxonomy)
+    assert study.normalise("error", labels) == "Tool Selection Errors"
+    assert study.normalise("resource", labels) == "Resource Not Found"
+    assert study.normalise("tool", labels) == "Tool-related"
+
+
+def test_a_category_of_one_space_reaches_the_first_label(study: normaliser.Study) -> None:
+    """Line 14 tests the argument, line 16 strips it, and "" is inside everything.
+
+    So a judge that emits a single space is credited with whichever label the
+    scorer's list happens to start with. Nothing else in this audit needs the
+    empty-string guard to be wrong; this is only what it costs that it is.
+    """
+    assert study.normalise(" ", list(study.taxonomy)) == study.taxonomy[0] == "Language-only"
+
+
+def test_the_eleven_drifted_gold_spellings_split_five_three_and_three(
+    study: normaliser.Study,
+) -> None:
+    """Which loop caught each one, which is what the P4 drift table could not say.
+
+    Five match a label exactly once case and spacing are folded away. Three need
+    the fallback. Three reach nothing, and two of those are `Task Orchestration`
+    plus a suffix, so the same line would catch them if the containment ran the
+    other way.
+    """
+    by_loop = Counter(one.loop for one in study.drifted)
+    assert by_loop == {normaliser.EXACT: 5, normaliser.FALLBACK: 3, normaliser.NEITHER: 3}
+    assert sum(one.errors for one in study.drifted) == 19
+
+    reversible = [one for one in study.drifted if one.loop == normaliser.NEITHER]
+    assert [one.would_contain for one in reversible] == [
+        (),
+        ("Task Orchestration",),
+        ("Task Orchestration",),
+    ]
+
+
+def test_p6_reproduces_from_a_fresh_run(study: normaliser.Study, repo_root: pathlib.Path) -> None:
+    committed = normaliser.load(repo_root / normaliser.COMMITTED)
+    assert artifacts.differences(committed, normaliser.artifact(study)) == []
+    _, violated = normaliser.report(study)
+    assert violated

@@ -46,9 +46,16 @@ class Finding:
     lines: list[str]
 
     def render(self) -> str:
+        """The claim, then the verdict in a fixed column, then the evidence indented under it.
+
+        Padding to 72 and then adding two spaces rather than padding to 74:
+        identical for every claim that fits, and a claim that does not fit still
+        has a gap before its verdict instead of running into it. P6's claim is
+        the one that does not fit.
+        """
         head = f"{self.name}  {self.claim}"
         body = [f"    {line}".rstrip() for line in self.lines]
-        return "\n".join([f"{head:<74}{self.verdict}", *body])
+        return "\n".join([f"{head:<72}  {self.verdict}", *body])
 
 
 def read_gold(clone: Path) -> Gold:

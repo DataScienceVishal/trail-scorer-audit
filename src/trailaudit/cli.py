@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
-from trailaudit import adversarial, artifacts, datacheck, spans, upstream
+from trailaudit import adversarial, artifacts, datacheck, normaliser, spans, upstream
 from trailaudit.artifacts import Stale
 from trailaudit.scoring import DiagnosticDrifted
 from trailaudit.spans import IndexInconsistent
@@ -118,8 +119,42 @@ def _adversarial(args: argparse.Namespace) -> int:
     built = adversarial.artifact(runs)
     lines, violated = adversarial.report(runs)
     print("\n".join(lines))
+    return _settle(args, built, adversarial.load, violated)
+
+
+def _normaliser(args: argparse.Namespace) -> int:
+    if not upstream.scorer_path(args.into).is_file():
+        print(
+            f"trailaudit: no clone at {args.into}. P5 and P6 are measured by asking TRAIL's "
+            f"own normalize_category what it does with each string, so the file has to be on "
+            f"disk. Run `trailaudit fetch`.",
+            file=sys.stderr,
+        )
+        return 2
+    upstream.verify_corpus(args.into)
+
+    done = normaliser.study(args.into)
+    built = normaliser.artifact(done)
+    lines, violated = normaliser.report(done)
+    print("\n".join(lines))
+    return _settle(args, built, normaliser.load, violated)
+
+
+def _settle(
+    args: argparse.Namespace,
+    built: dict,
+    load: Callable[[Path], dict],
+    violated: bool,
+) -> int:
+    """Write the artifact, or under --check rerun and diff against it instead.
+
+    The exit code carries the property verdict either way, so a `--check` run
+    that reproduces a violation still exits 3. Only a figure that moved turns it
+    into 1, because that is the case where the printed report and the committed
+    artifact are two different claims.
+    """
     if args.check:
-        drifted = artifacts.differences(adversarial.load(args.out), built)
+        drifted = artifacts.differences(load(args.out), built)
         if drifted:
             print(f"\ntrailaudit: {args.out} and this run disagree:", file=sys.stderr)
             for line in drifted[:20]:
@@ -234,6 +269,25 @@ def build_parser() -> argparse.ArgumentParser:
         "if any figure moved",
     )
 
+    fallback = commands.add_parser(
+        "normaliser",
+        help="report P5 and P6 against the pinned normalize_category: every substring of every "
+        "taxonomy label, the shortest string that reaches each of the 21, and where the gold "
+        "spellings that are not labels end up",
+    )
+    fallback.add_argument("--into", type=Path, default=DEFAULT_CLONE, help="where the clone is")
+    fallback.add_argument(
+        "--out",
+        type=Path,
+        default=normaliser.COMMITTED,
+        help=f"where the run artifact is written and read (default {normaliser.COMMITTED})",
+    )
+    fallback.add_argument(
+        "--check",
+        action="store_true",
+        help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
+        "if any figure moved",
+    )
     return parser
 
 
@@ -244,6 +298,7 @@ def main(argv: list[str] | None = None) -> int:
         "index": _index,
         "data-check": _data_check,
         "adversarial": _adversarial,
+        "normaliser": _normaliser,
     }
     try:
         return routes[args.command](args)
