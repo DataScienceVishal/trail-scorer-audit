@@ -31,6 +31,15 @@ from trailaudit.upstream import MissingClone
 
 HELD = "HELD"
 VIOLATED = "VIOLATED"
+
+# A property that fails as a property of the scorer while costing nothing on
+# this data. P5 and P8 are the two: the taxonomy order decides 237 strings and
+# none of them is a spelling TRAIL's gold uses, and one null category destroys a
+# correct judge while no gold error in either split carries one. Folding those
+# into VIOLATED made a table of nine identical cells, which reads as a target
+# that moved. Folding them into HELD would be worse, and they still exit 3.
+LATENT = "LATENT"
+
 UNMEASURED = "not measured"
 
 _NOT_MEASURED = "nothing looked, so nothing is claimed"
@@ -365,7 +374,17 @@ def report(checked: Checked) -> tuple[list[str], bool]:
             ),
         ]
 
-    return lines, any(finding.verdict == VIOLATED for finding in findings)
+    return lines, any_violated(findings)
+
+
+def any_violated(findings: Iterable[Finding]) -> bool:
+    """Whether the command should exit 3, which a latent violation does too.
+
+    Not `verdict != HELD`. UNMEASURED is neither held nor violated, and a
+    property nobody looked at must not become a finding on the way to an exit
+    code.
+    """
+    return any(one.verdict in (VIOLATED, LATENT) for one in findings)
 
 
 def verdicts(findings: Iterable[Finding]) -> dict:

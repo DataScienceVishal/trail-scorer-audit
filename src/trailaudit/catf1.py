@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from trailaudit import adversarial, artifacts, gold, predictors, scoring, upstream
-from trailaudit.datacheck import HELD, VIOLATED, Finding, verdicts, wrapped
+from trailaudit.datacheck import HELD, VIOLATED, Finding, any_violated, verdicts, wrapped
 
 COMMITTED = Path("results/catf1.json")
 
@@ -248,7 +248,7 @@ def report(rows: tuple[Row, ...]) -> tuple[list[str], bool]:
         "carries no errors, so it sets fewer bits and picks up fewer false positives. That is a "
         "difference in how much it says. Where it says it changes nothing."
     )
-    return lines, finding.verdict == VIOLATED
+    return lines, any_violated([finding])
 
 
 def artifact(rows: tuple[Row, ...], index_sha256: str) -> dict:

@@ -147,3 +147,25 @@ def test_locations_off_the_index_reports_per_trace() -> None:
         "t2": Annotation("GAIA", "t2", ("c", "c"), (MISSING_SHARD, "aaaa000000000002")),
     }
     assert adversarial.locations_off_the_index(annotations, index) == {"t2": [MISSING_SHARD]}
+
+
+def test_the_report_carries_both_findings_both_tables_and_the_precision_column() -> None:
+    """What `trailaudit adversarial` puts on a terminal, which no test ran before."""
+    absent = {"e7bdf7bbf6b931c3be95afe323704041": [MISSING_SHARD]}
+    lines, violated = adversarial.report(both(0.9, 0.9, absent))
+    printed = "\n".join(lines)
+
+    assert violated
+    assert "P1" in printed and "P2" in printed
+    assert all(one.name in printed for one in PREDICTORS)
+    assert all(one.name in printed for one in upstream.SPLITS)
+    assert "best published, Table 1" in printed
+    assert "precision, which neither headline metric reports" in printed
+
+
+def test_the_report_reports_nothing_when_the_predictors_stay_under_the_published_row() -> None:
+    """Both properties held, which is the run this project would have had nothing to say about."""
+    lines, violated = adversarial.report(both(0.04, 0.2))
+    assert not violated
+    assert "P1" in "\n".join(lines)
+    assert VIOLATED not in "\n".join(lines)

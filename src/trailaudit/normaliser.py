@@ -33,7 +33,7 @@ from pathlib import Path
 from types import ModuleType
 
 from trailaudit import adversarial, artifacts, gold, predictors, scoring, upstream
-from trailaudit.datacheck import HELD, VIOLATED, Finding, verdicts, wrapped
+from trailaudit.datacheck import HELD, LATENT, VIOLATED, Finding, any_violated, verdicts, wrapped
 
 COMMITTED = Path("results/normaliser.json")
 
@@ -493,18 +493,19 @@ def p5(done: Study) -> Finding:
         ),
         "",
         *wrapped(
-            "which is worth being plain about: the consequence this property was written to "
-            "catch, two people scoring the same data and getting different numbers, does not "
-            "follow here. `all_categories` is a literal inside `main()` at line 115, so nobody "
-            "running calculate_scores.py gets a different order by accident. The exposure is "
-            "`calculate_metrics` and `normalize_category` themselves, which are importable, "
-            "take the list as a parameter, and are the reusable part of this file."
+            "which is why the verdict above reads LATENT and not VIOLATED: the consequence "
+            "this property was written to catch, two people scoring the same data and getting "
+            "different numbers, does not follow here. `all_categories` is a literal inside "
+            "`main()` at line 115, so nobody running calculate_scores.py gets a different order "
+            "by accident. The exposure is `calculate_metrics` and `normalize_category` "
+            "themselves, which are importable, take the list as a parameter, and are the "
+            "reusable part of this file. Latent is not held, and it still exits 3."
         ),
     ]
     return Finding(
         "P5",
         claim,
-        VIOLATED,
+        VIOLATED if moved else LATENT,
         f"{len(ambiguous)} of {len(done.reaches):,} strings change label under a shuffled "
         f"taxonomy, {elsewhere} of them under seed {SEED}, and {moved} of the {figures} figures "
         f"in slice 2 move as a result",
@@ -546,7 +547,7 @@ def report(done: Study) -> tuple[list[str], bool]:
         f"the same {len(done.rescored) * 2} figures under the pinned order and under seed {SEED}",
         *(f"  {row}".rstrip() for row in rescored_table(done.rescored)),
     ]
-    return lines, any(one.verdict == VIOLATED for one in findings)
+    return lines, any_violated(findings)
 
 
 def rescored_table(rescored: Sequence[Rescored]) -> list[str]:

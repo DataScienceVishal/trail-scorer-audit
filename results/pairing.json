@@ -4,7 +4,7 @@
   "properties": {
     "P8": {
       "claim": "the scorer pairs each predicted location with the category predicted for it",
-      "verdict": "VIOLATED",
+      "verdict": "LATENT",
       "magnitude": "one null category takes a correct judge from 1.000 joint to 0.000 on the constructed trace, and 0 of 836 real gold errors carry one"
     }
   },

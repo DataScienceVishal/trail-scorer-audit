@@ -25,7 +25,7 @@ from trailaudit import (
     spans,
     upstream,
 )
-from trailaudit.datacheck import VIOLATED
+from trailaudit.datacheck import LATENT, VIOLATED
 
 pytestmark = pytest.mark.upstream
 
@@ -258,8 +258,8 @@ def test_p5_and_p6_reproduce_from_a_fresh_run(
     committed = normaliser.load(repo_root / normaliser.COMMITTED)
     assert artifacts.differences(committed, normaliser.artifact(study, index_sha256)) == []
     _, violated = normaliser.report(study)
-    assert violated
-    assert normaliser.p5(study).verdict == VIOLATED
+    assert violated, "a latent violation still has to exit 3"
+    assert normaliser.p5(study).verdict == LATENT
 
 
 def test_the_shuffled_rescore_reproduces_what_main_returned_under_the_pinned_order(
@@ -365,7 +365,7 @@ def test_p8_one_null_category_costs_a_correct_judge_every_pair(clone: pathlib.Pa
     assert by_case[(True, False)].joint_accuracy == 0.0
     assert by_case[(False, True)].joint_accuracy == 0.0
     assert by_case[(False, True)].location_accuracy == 1.0
-    assert pairing.p8(scored, counted).verdict == VIOLATED
+    assert pairing.p8(scored, counted).verdict == LATENT
 
 
 def test_p8_never_fires_on_the_real_gold(clone: pathlib.Path) -> None:

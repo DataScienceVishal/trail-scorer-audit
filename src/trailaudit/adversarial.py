@@ -23,7 +23,7 @@ from pathlib import Path
 from types import ModuleType
 
 from trailaudit import artifacts, gold, paper, predictors, scoring, spans, upstream
-from trailaudit.datacheck import HELD, VIOLATED, WIDTH, Finding, verdicts, wrapped
+from trailaudit.datacheck import HELD, VIOLATED, WIDTH, Finding, any_violated, verdicts, wrapped
 from trailaudit.gold import Annotation
 from trailaudit.predictors import Case, Predictor
 from trailaudit.scoring import Scores
@@ -353,7 +353,7 @@ def report(runs: list[SplitRun]) -> tuple[list[str], bool]:
             "calculate_scores.py returned."
         ),
     ]
-    return lines, any(finding.verdict == VIOLATED for finding in findings)
+    return lines, any_violated(findings)
 
 
 def artifact(runs: list[SplitRun], index_sha256: str) -> dict:

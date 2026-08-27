@@ -140,3 +140,21 @@ def test_paired_returns_the_located_row_first(split: str) -> None:
     located, blind = catf1.paired(rows, split)
     assert located.predictor == DIFFER_ONLY_IN_WHERE[0]
     assert blind.predictor == DIFFER_ONLY_IN_WHERE[1]
+
+
+def test_the_report_prints_the_finding_the_lineup_and_one_full_category_block() -> None:
+    """What `trailaudit catf1` puts on a terminal, and the exit code under it."""
+    lines, violated = catf1.report(pair(block(4, 2, 0), block(4, 2, 0)))
+    printed = "\n".join(lines)
+
+    assert violated
+    assert "P7" in printed
+    assert VIOLATED in printed
+    assert all(label in printed for label in LABELS)
+    assert "gold-spans-all-categories is the row that does move" in printed
+
+
+def test_the_report_reports_nothing_when_the_block_moves_with_the_locations() -> None:
+    lines, violated = catf1.report(pair(block(4, 2, 0), block(3, 2, 0)))
+    assert not violated
+    assert HELD in "\n".join(lines)

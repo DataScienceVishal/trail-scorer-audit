@@ -14,7 +14,7 @@ from collections import Counter
 
 from stand_ins import TAXONOMY, first_prefix
 from trailaudit import normaliser
-from trailaudit.datacheck import HELD, VIOLATED
+from trailaudit.datacheck import HELD, LATENT, VIOLATED
 from trailaudit.normaliser import EXACT, FALLBACK, NEITHER
 
 
@@ -194,13 +194,30 @@ def test_the_shuffle_is_a_permutation_and_the_seed_decides_it() -> None:
     assert once != normaliser.shuffled(TAXONOMY, seed=normaliser.SEED + 1)
 
 
-def test_p5_is_violated_by_a_string_that_two_labels_will_take() -> None:
-    """Six strings here, the prefixes of `widget` that both Widget labels accept."""
+def test_p5_is_latent_when_two_labels_take_a_string_and_no_score_moves() -> None:
+    """Six strings here, the prefixes of `widget` that both Widget labels accept.
+
+    No rescored rows, so nothing measured moved, which is the real run's
+    position too: the property fails and the failure costs nothing on this data.
+    """
     finding = normaliser.p5(hand_built(normaliser.probe(TAXONOMY, first_prefix)))
-    assert finding.verdict == VIOLATED
+    assert finding.verdict == LATENT
     rendered = flat(finding.render())
     assert "6 of the 502 enumerated strings match more than one label" in rendered
     assert "'w' matches all 2 and lands on 'Widget Errors'" in rendered
+
+
+def test_p5_is_violated_outright_once_a_published_figure_moves() -> None:
+    """The branch the real data does not take, and the reason latent is a third verdict.
+
+    A gold spelling drifting onto an ambiguous string is all it would take, and
+    then the shuffle moves a number somebody published.
+    """
+    done = hand_built(
+        normaliser.probe(TAXONOMY, first_prefix),
+        rows=rescored(("GAIA", "gold-exact", (0.9, 0.4), (0.8, 0.4))),
+    )
+    assert normaliser.p5(done).verdict == VIOLATED
 
 
 def test_p5_holds_against_a_normaliser_nothing_is_ambiguous_under() -> None:

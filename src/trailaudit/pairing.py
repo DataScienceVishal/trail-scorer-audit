@@ -38,7 +38,7 @@ from pathlib import Path
 from types import ModuleType
 
 from trailaudit import artifacts, gold, upstream
-from trailaudit.datacheck import HELD, VIOLATED, Finding, verdicts, wrapped
+from trailaudit.datacheck import HELD, LATENT, VIOLATED, Finding, any_violated, verdicts, wrapped
 from trailaudit.gold import Annotation
 
 COMMITTED = Path("results/pairing.json")
@@ -206,7 +206,7 @@ def p8(scored: tuple[Run, ...], counted: Latent) -> Finding:
     return Finding(
         "P8",
         claim,
-        VIOLATED,
+        VIOLATED if counted.falsy_categories else LATENT,
         f"one null category takes a correct judge from {clean.joint_accuracy:.3f} joint to "
         f"{misjudged.joint_accuracy:.3f} on the constructed trace, and "
         f"{counted.falsy_categories} of {counted.gold_errors} real gold errors carry one",
@@ -237,7 +237,7 @@ def report(
         "and the three runs of it through the pinned unmodified scorer",
         *(f"  {row}".rstrip() for row in table(scored)),
     ]
-    return lines, finding.verdict == VIOLATED
+    return lines, any_violated([finding])
 
 
 def artifact(scored: tuple[Run, ...], counted: Latent, taxonomy: tuple[str, ...]) -> dict:

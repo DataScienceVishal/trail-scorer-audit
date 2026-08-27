@@ -22,6 +22,7 @@ import pytest
 
 from trailaudit import report, spans
 from trailaudit.artifacts import Stale
+from trailaudit.datacheck import LATENT, VIOLATED
 from trailaudit.report import BLOCKS, MarkerError, Sources
 
 
@@ -51,9 +52,19 @@ def test_every_generator_produces_something(rendered: dict[str, str]) -> None:
 
 
 def test_the_nine_properties_come_from_five_separate_runs(src: Sources) -> None:
+    """Seven violated and two latent, which is what the conditions table has to show.
+
+    Nine identical cells read as a target that moved. P5 and P8 are the two that
+    fail as properties of the scorer while moving no number on this data, and
+    the verdict column is where that distinction has to survive.
+    """
     decided = report.properties(src)
     assert list(decided) == list(report.PROPERTIES)
-    assert {one["verdict"] for one in decided.values()} == {"VIOLATED"}
+    assert [one for one, decision in decided.items() if decision["verdict"] == LATENT] == [
+        "P5",
+        "P8",
+    ]
+    assert {one["verdict"] for one in decided.values()} == {VIOLATED, LATENT}
 
 
 def test_a_property_nobody_decided_is_refused(src: Sources) -> None:

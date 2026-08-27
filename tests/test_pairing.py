@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from stand_ins import TAXONOMY
 from trailaudit import pairing
-from trailaudit.datacheck import HELD, VIOLATED
+from trailaudit.datacheck import HELD, LATENT, VIOLATED
 from trailaudit.gold import Annotation
 from trailaudit.pairing import LOCATIONS, Latent, Run
 
@@ -57,12 +57,28 @@ def test_the_categories_come_from_the_taxonomy_it_was_handed() -> None:
     assert [one["category"] for one in listed[1:]] == ["Alpha Errors", "Beta Failures"]
 
 
-def test_p8_is_violated_when_a_null_category_costs_the_control_its_score() -> None:
+def test_p8_is_latent_when_no_real_gold_error_can_trigger_it() -> None:
+    """The scorer breaks on the constructed trace and no gold file reaches that line.
+
+    Which is the whole of P8's position on the real data, and the reason the
+    verdict column carries a third value rather than nine identical cells.
+    """
     finding = pairing.p8(runs(0.0, 1.0, 0.0), NOTHING_LATENT)
-    assert finding.verdict == VIOLATED
+    assert finding.verdict == LATENT
     rendered = flat(finding.render())
     assert "control scores 1.000 joint" in rendered
     assert "0 of 836 gold errors carry a falsy category" in rendered
+
+
+def test_p8_is_violated_outright_when_the_gold_carries_a_falsy_category() -> None:
+    """One annotated error with no category anywhere in either split would do it."""
+    reached = Latent(
+        gold_errors=836,
+        falsy_categories=1,
+        traces_that_would_mispair=1,
+        traces_that_would_lose_a_pair=0,
+    )
+    assert pairing.p8(runs(0.0, 1.0, 0.0), reached).verdict == VIOLATED
 
 
 def test_p8_holds_when_the_null_costs_nothing() -> None:
@@ -81,7 +97,7 @@ def test_p8_fires_on_the_prediction_side_alone() -> None:
     damage would name that 1.000 as the cost of the null.
     """
     finding = pairing.p8(runs(1.0, 1.0, 0.0), NOTHING_LATENT)
-    assert finding.verdict == VIOLATED
+    assert finding.verdict == LATENT
     rendered = flat(finding.render())
     assert "takes it to 0.000." in rendered
     assert "mentions one further span with no category" in rendered
@@ -135,3 +151,23 @@ def test_the_table_carries_every_run_and_both_metrics() -> None:
     printed = pairing.table(runs(0.0, 1.0, 0.0))
     assert len(printed) == 4
     assert "0.000     0.667" in printed[1]
+
+
+def test_the_report_prints_the_finding_the_trace_and_the_three_runs() -> None:
+    """The whole of what `trailaudit pairing` puts on a terminal, which no test ran before."""
+    lines, violated = pairing.report(runs(0.0, 1.0, 0.0), NOTHING_LATENT, TAXONOMY)
+    printed = "\n".join(lines)
+
+    assert violated, "a latent violation is not held, and the command still exits 3"
+    assert "P8" in printed
+    assert LATENT in printed
+    assert "the constructed trace, which is this repository's and not TRAIL's" in printed
+    assert '"category": null' in printed
+    assert printed.count("span-one") == 1
+
+
+def test_the_report_says_nothing_happened_when_the_null_costs_nothing() -> None:
+    """The scorer this repository would like to be auditing, and the exit 0 path."""
+    lines, violated = pairing.report(runs(1.0, 1.0, 1.0), NOTHING_LATENT, TAXONOMY)
+    assert not violated
+    assert HELD in "\n".join(lines)

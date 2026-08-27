@@ -132,15 +132,20 @@ makes the outcome surprising.
 | P2 | every gold error location is a span identifier in its own trace | VIOLATED | 2 of 836 gold locations are not a span in the trace they annotate. All of them are the literal 'Span ID not found for this shard' |
 | P3 | every gold annotation file parses as JSON | VIOLATED | 147 of 148 gold files parse, so every published average divides by 147 |
 | P4 | every gold category string is one of the taxonomy labels | VIOLATED | 11 of 31 gold spellings are not a label, covering 19 of 836 errors |
-| P5 | the normaliser's output depends on its input alone, not on the taxonomy order | VIOLATED | 237 of 3,205 strings change label under a shuffled taxonomy, 115 of them under seed 20260827, and 0 of the 24 figures in slice 2 move as a result |
+| P5 | the normaliser's output depends on its input alone, not on the taxonomy order | LATENT | 237 of 3,205 strings change label under a shuffled taxonomy, 115 of them under seed 20260827, and 0 of the 24 figures in slice 2 move as a result |
 | P6 | no string shorter than the shortest taxonomy label normalises to a taxonomy label | VIOLATED | the shortest label is 12 characters and every one of the 21 is reached by 2 characters or fewer, 8 of them by one |
 | P7 | per-category F1 separates naming a category at the right span from naming it anywhere | VIOLATED | GAIA scores the same 21 columns for a predictor at 0.974 location accuracy and one at 0.000; SWE Bench scores the same 21 columns for a predictor at 0.961 location accuracy and one at 0.000 |
-| P8 | the scorer pairs each predicted location with the category predicted for it | VIOLATED | one null category takes a correct judge from 1.000 joint to 0.000 on the constructed trace, and 0 of 836 real gold errors carry one |
+| P8 | the scorer pairs each predicted location with the category predicted for it | LATENT | one null category takes a correct judge from 1.000 joint to 0.000 on the constructed trace, and 0 of 836 real gold errors carry one |
 | P9 | the repository's split sizes match the paper's Table 5 | VIOLATED | 8 of the 10 Table 5 cells this repository can compare disagree with the tree at 0ffbed9db859 |
 <!-- /trailaudit:conditions -->
 
-P5 is the row to read carefully. It is violated with a magnitude of zero, and
-"An order dependence that costs nothing today" below is what that means.
+Two verdicts, and the difference between them is the point. VIOLATED means the
+property fails and a number somebody published moves because of it. LATENT means
+the property fails and nothing on this data moves: rescoring every predictor
+under a shuffled taxonomy leaves all 24 of P5's figures where they were, and no
+gold error in either split carries the null category P8 turns on. Both still
+exit 3, because the pre-registration asked about the scorer rather than about
+how lucky the data is, and the two sections below are what each one means.
 
 ## Where the gold and the taxonomy drifted apart
 
@@ -233,9 +238,10 @@ exposure is `calculate_metrics` and `normalize_category` themselves, which are
 importable, take the list as a parameter, and are the part of that file another
 project would reuse.
 
-Reported as violated with a magnitude of zero rather than quietly downgraded to
-held, because the pre-registration asked whether the output depends on the input
-alone and the answer is that it does not.
+Reported as latent rather than quietly downgraded to held, because the
+pre-registration asked whether the output depends on its input alone and the
+answer is that it does not. Latent is a violation whose cost on this corpus is
+zero, and the row says so in both columns rather than in neither.
 
 ## Category F1 never looks at where the error is
 
@@ -505,9 +511,9 @@ them is counted on every run rather than asserted once:
 | `index/spans.json` | 99,308 | 4,782 | 4,774 | 0 | 0 |
 | `results/datacheck.json` | 2,294 | 56 | 5 | 0 | 7 |
 | `results/adversarial.json` | 6,039 | 56 | 6 | 1 | 7 |
-| `results/normaliser.json` | 47,480 | 373 | 3 | 32 | 4 |
+| `results/normaliser.json` | 47,478 | 374 | 3 | 32 | 4 |
 | `results/catf1.json` | 30,373 | 57 | 3 | 21 | 2 |
-| `results/pairing.json` | 1,544 | 35 | 2 | 2 | 5 |
+| `results/pairing.json` | 1,542 | 35 | 2 | 2 | 5 |
 <!-- /trailaudit:committed-files -->
 
 `index/spans.json` is a mapping from trace identifier to the span identifiers in
