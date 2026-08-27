@@ -207,6 +207,42 @@ def conditions(src: Sources) -> list[str]:
     )
 
 
+def eleven_percent(src: Sources) -> list[str]:
+    """The abstract's headline against the two cells this audit compares with.
+
+    Every number here is divided out of the adversarial artifact, including the
+    two weightings, so the arithmetic is in the document rather than only in
+    paper.py where nobody reading the README would find it. The 11 percent
+    itself is the one figure in this file that no run of anything produces: it is
+    TRAIL's prose, transcribed.
+    """
+    splits = src.adversarial["splits"]
+    best = {
+        split: one["best_published"]["joint_accuracy"]["value"] for split, one in splits.items()
+    }
+    quoted = src.adversarial["paper_prose"]["combined_joint"]
+    plain = sum(best.values()) / len(best)
+    files = _weighted(best, {split: one["gold_files_scored"] for split, one in splits.items()})
+    errors = _weighted(best, {split: one["gold_errors"] for split, one in splits.items()})
+    return paragraph(
+        f"The {quoted:.0%} is the abstract's, and it is not a cell in Table 1. Table 1's best "
+        f"joint accuracy is "
+        f"{', '.join(f'{value:.3f} on {split}' for split, value in best.items())}, which the "
+        f"paper's conclusion quotes rounded, at "
+        f"{' and '.join(f'{value:.0%}' for value in best.values())}. The plain mean of the two "
+        f"is {plain:.1%}, which rounds to {plain:.0%} and reaches {quoted:.0%} only by "
+        f"truncation, and weighting the splits moves it further off rather than closer: by the "
+        f"gold files the scorer loads it is {files:.1%}, by the errors in those files "
+        f"{errors:.1%}. calculate_scores.main() is called once per split and returns one number "
+        f"per split, so that is the granularity this audit compares at, per split against the "
+        f"two cells above."
+    )
+
+
+def _weighted(values: dict[str, float], weights: dict[str, int]) -> float:
+    return sum(values[split] * weights[split] for split in values) / sum(weights.values())
+
+
 def headline(src: Sources) -> list[str]:
     lines: list[str] = []
     for split, one in src.adversarial["splits"].items():
@@ -485,6 +521,7 @@ def strings_in(node: object) -> Iterator[str]:
 BLOCKS: dict[str, Callable[[Sources], list[str]]] = {
     "pin": pin,
     "conditions": conditions,
+    "eleven-percent": eleven_percent,
     "headline": headline,
     "ceiling": ceiling,
     "precision": precision,

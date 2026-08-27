@@ -200,7 +200,7 @@ def p8(scored: tuple[Run, ...], counted: Latent) -> Finding:
             f"errors carry a falsy category, so {counted.traces_that_would_mispair} files "
             f"mispair and {counted.traces_that_would_lose_a_pair} lose a pair. No published "
             f"figure moves because of this. It is a defect in the scorer, not a correction to "
-            f"the leaderboard, and the README says so in those words."
+            f"the published numbers, and the README says so in those words."
         ),
     ]
     return Finding(

@@ -55,17 +55,17 @@ def test_no_score_is_typed_into_the_prose(markdown: str) -> None:
     assert report.loose_scores(markdown) == [], REGENERATE
 
 
-def test_the_leaderboard_figure_in_the_first_paragraph_is_the_transcribed_one(
-    markdown: str,
-) -> None:
-    """The one number in the prose that is not generated, because it is not measured here.
+def test_the_headline_in_the_opening_is_the_transcribed_one(markdown: str) -> None:
+    """The one number in the prose that is not generated, because nothing here measures it.
 
-    It is the paper's own headline, transcribed in paper.py with the pages it
-    appears on. Written as a percentage rather than a score so it reads as
-    theirs, which also keeps it out of the shape `loose_scores` hunts for.
+    It is TRAIL's own headline, transcribed in paper.py with the pages it appears
+    on, and written as a percentage rather than as a score so it reads as theirs
+    and stays out of the shape `loose_scores` hunts for. The eleven-percent block
+    reconciles it against Table 1's two cells; this holds the opening sentence to
+    the same transcription.
     """
-    claim = f"reaches {paper.COMBINED_JOINT_PROSE:.0%}".replace("%", " percent")
-    assert claim in " ".join(markdown.split())
+    opening = " ".join(markdown.split("## ")[0].split())
+    assert f"{paper.COMBINED_JOINT_PROSE:.0%}".replace("%", " percent") in opening
 
 
 def test_nothing_is_left_to_be_written(markdown: str) -> None:

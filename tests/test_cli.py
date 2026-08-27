@@ -250,8 +250,8 @@ def test_report_rewrites_the_block_that_moved_and_then_says_it_matches(
     argv = ["report", "--readme", str(copied), "--root", str(repo_root)]
     assert main(argv) == 0
     rewritten = capsys.readouterr().out
-    assert "rewrote 2 of 12 blocks" in rewritten
-    assert "headline" in rewritten
+    assert rewritten.startswith("rewrote 2 of ")
+    assert "headline" in rewritten and "per-category" in rewritten
     assert copied.read_text(encoding="utf-8") == original
 
     assert main(argv) == 0

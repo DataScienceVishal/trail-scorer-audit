@@ -8,9 +8,9 @@ Two numbers come out of it per row and both are published together. The first is
 what TRAIL reports, joint and location accuracy, which divide the intersection
 by the gold count at lines 54 and 58. The second is the volume ratio, the number
 of errors the predictor emitted for every gold error, which is what the first
-number costs. A row reading 0.966 at 129 predictions per gold error is a
-different claim from the same 0.966 at 1, and the leaderboard column carries only
-the part they have in common.
+number costs. The gold-blind predictor's 0.973 on GAIA at 129 predictions per
+gold error is a different claim from gold-exact's 0.974 at 1, and Table 1's
+column carries only the part they have in common.
 """
 
 from __future__ import annotations
@@ -368,6 +368,7 @@ def artifact(runs: list[SplitRun], index_sha256: str) -> dict:
         "scorer_sha256": upstream.SCORER_SHA256,
         "index_sha256": index_sha256,
         "table_1": paper.TABLE_1_CITATION,
+        "paper_prose": {"combined_joint": paper.COMBINED_JOINT_PROSE},
         "properties": verdicts([p1(runs), p2(runs)]),
         "splits": {
             one.split: {

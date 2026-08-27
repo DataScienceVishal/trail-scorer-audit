@@ -3,6 +3,9 @@
   "scorer_sha256": "ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2",
   "index_sha256": "4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928",
   "table_1": "arXiv:2505.08638v3, Table 1, page 7",
+  "paper_prose": {
+    "combined_joint": 0.11
+  },
   "properties": {
     "P1": {
       "claim": "all-spans-all-categories scores no better than a published judge",

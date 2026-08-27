@@ -3,18 +3,18 @@
 [![ci](https://github.com/DataScienceVishal/trail-scorer-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/DataScienceVishal/trail-scorer-audit/actions/workflows/ci.yml)
 
 TRAIL is a benchmark of human-annotated agent execution traces from Patronus AI,
-published under MIT, with a leaderboard on which the best model reaches 11
-percent. This repository audits the code that produces that number.
+published under MIT. Its abstract reports the best model scoring 11 percent.
+This repository audits the code that produces the numbers behind that.
 
-A program that cannot read scores higher than every model on that leaderboard.
+A program that cannot read scores higher than every model in their Table 1.
 It is a loop over the cross product of the span identifiers in a trace and the
 labels in the taxonomy. It never opens a span, never looks at the gold, and does
 not know what an error is. Run through TRAIL's own unmodified scorer it beats
 the best published row on both headline metrics and both splits.
 
 The audit is possible at all because the TRAIL authors published the scorer, the
-gold labels and the traces. A benchmark that ships a leaderboard and keeps its
-scoring code cannot be audited from outside, and most of them do exactly that.
+gold labels and the traces. A benchmark that publishes a table of model scores
+and keeps its scoring code to itself cannot be audited from outside.
 Nothing here is copied or edited either: `benchmarking/calculate_scores.py` is
 fetched at a pinned commit, checked against a SHA-256, imported by path, and
 left alone.
@@ -46,6 +46,20 @@ at lines 54 and 58 of `calculate_scores.py`. Both divide the intersection by the
 gold count. There is a precision term at line 312, it belongs to a per-category
 metric, and it reaches neither headline number.
 
+The comparison row in both tables below is Table 1's best, per split, and that
+needs one paragraph because the paper states its headline three ways:
+
+<!-- trailaudit:eleven-percent -->
+The 11% is the abstract's, and it is not a cell in Table 1. Table 1's best
+joint accuracy is 0.183 on GAIA, 0.050 on SWE Bench, which the paper's
+conclusion quotes rounded, at 18% and 5%. The plain mean of the two is 11.6%,
+which rounds to 12% and reaches 11% only by truncation, and weighting the
+splits moves it further off rather than closer: by the gold files the scorer
+loads it is 15.5%, by the errors in those files 14.2%. calculate_scores.main()
+is called once per split and returns one number per split, so that is the
+granularity this audit compares at, per split against the two cells above.
+<!-- /trailaudit:eleven-percent -->
+
 <!-- trailaudit:headline -->
 GAIA, 116 of 117 gold files scored, 580 gold errors in them:
 
@@ -76,9 +90,10 @@ SWE Bench, 31 of 31 gold files scored, 256 gold errors in them:
 
 The last column is what the score costs, and it is the answer to the obvious
 objection. Of course a maximal predictor maxes a recall metric. That is the
-finding rather than a rebuttal to it: nothing on the leaderboard, and nothing in
-either metric's name, tells a reader that a model emitting more errors scores at
-least as well for that reason alone.
+finding rather than a rebuttal to it: nothing in Table 1, and nothing in either
+metric's name, tells a reader that a model emitting more errors scores at least
+as well for that reason alone. Nor does the order matter: lines 53 and 57
+intersect sets, so shuffling the errors a judge reports changes neither figure.
 
 <!-- trailaudit:ceiling -->
 Nothing in either table reaches 1.000, and the row holding the answer key does
@@ -306,7 +321,7 @@ files mispair and 0 lose a pair. No published number moves because of this one.
 
 The trace those three runs score is constructed and belongs to this repository,
 not to TRAIL. It is demonstrated rather than found because it is latent: this is
-a defect in the scorer, not a correction to the leaderboard.
+a defect in the scorer, not a correction to the published numbers.
 
 ## The paper and the repository describe different datasets
 
@@ -462,7 +477,7 @@ would be making a smaller version of the mistake it is reporting.
 
 ## What this does not do
 
-It does not re-score the leaderboard. TRAIL publishes no raw model outputs and
+It does not re-score the published table. TRAIL publishes no raw model outputs and
 there is no `results/` directory in the benchmark repository, so there is
 nothing to re-score. Running my own judges instead would compare a number
 produced under one setup against a number produced under another, which
@@ -509,8 +524,8 @@ them is counted on every run rather than asserted once:
 | file | bytes | distinct strings | identifiers | TRAIL's own words | longer than three words |
 |---|---|---|---|---|---|
 | `index/spans.json` | 99,308 | 4,782 | 4,774 | 0 | 0 |
-| `results/datacheck.json` | 2,294 | 56 | 5 | 0 | 7 |
-| `results/adversarial.json` | 6,039 | 56 | 6 | 1 | 7 |
+| `results/datacheck.json` | 2,370 | 56 | 5 | 0 | 7 |
+| `results/adversarial.json` | 6,090 | 58 | 6 | 1 | 7 |
 | `results/normaliser.json` | 47,478 | 374 | 3 | 32 | 4 |
 | `results/catf1.json` | 30,373 | 57 | 3 | 21 | 2 |
 | `results/pairing.json` | 1,542 | 35 | 2 | 2 | 5 |

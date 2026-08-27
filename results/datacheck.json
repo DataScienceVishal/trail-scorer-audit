@@ -83,6 +83,10 @@
   },
   "paper_prose": {
     "traces": 148,
-    "errors": 841
+    "errors": 841,
+    "traces_with_errors": {
+      "GAIA": 114,
+      "SWE Bench": 30
+    }
   }
 }

@@ -180,6 +180,16 @@ def p9(measured: dict[str, dict[str, int]]) -> Finding:
                 f"{sum(row.errors for row in paper.TABLE_5)}"
             ),
             *wrapped(
+                f"the same disagreement runs inside the paper. Section 4.3 on page 5 says "
+                f"errors were found in {paper.PROSE_TRACES_WITH_ERRORS['GAIA']} GAIA traces "
+                f"and {paper.PROSE_TRACES_WITH_ERRORS['SWE Bench']} from SWE Bench, and Table 5 "
+                f"on page 16 says "
+                f"{', '.join(str(row.traces_with_errors) for row in paper.TABLE_5)} for the same "
+                f"quantity. That row is the ceiling on both headline metrics, because lines 54 "
+                f"and 58 score a trace with no gold errors as 0 for every predictor including a "
+                f"perfect one."
+            ),
+            *wrapped(
                 "the last three rows are counted over the gold files that parse, so GAIA's "
                 "leaves out the errors in the one that does not"
             ),
@@ -466,7 +476,11 @@ def artifact(checked: Checked, index_sha256: str) -> dict:
             }
             for split in upstream.SPLITS
         },
-        "paper_prose": {"traces": paper.ABSTRACT_TRACES, "errors": paper.ABSTRACT_ERRORS},
+        "paper_prose": {
+            "traces": paper.ABSTRACT_TRACES,
+            "errors": paper.ABSTRACT_ERRORS,
+            "traces_with_errors": dict(paper.PROSE_TRACES_WITH_ERRORS),
+        },
     }
 
 
