@@ -64,7 +64,11 @@ CITED = {
     361: 'if __name__ == "__main__":',
 }
 
-CITATION = re.compile(r"\blines?\s+(\d+)(?:\s+(?:to|and|or)\s+(\d+))?")
+# re.I because a citation that opens a sentence is capitalised, and the two
+# that were wrong when this guard was written were both sentence-initial.
+# Without it the guard reads every citation except the ones most likely to
+# be edited, which is the shape of hole it exists to close.
+CITATION = re.compile(r"\blines?\s+(\d+)(?:\s+(?:to|and|or)\s+(\d+))?", re.I)
 
 # "line 39 column 5" is a json decoder talking about a gold annotation file, not
 # a citation into the scorer, and the two shapes are otherwise identical.
