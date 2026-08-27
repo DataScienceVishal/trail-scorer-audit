@@ -299,7 +299,7 @@ def absent_locations(src: Sources) -> list[str]:
     named = " and ".join(f"`{one}`" for one in sorted(set(strangers)))
     return paragraph(
         f"The gold-blind predictor sits a little under the oracle one on SWE Bench, and the "
-        f"reason is P2. {len(strangers)} gold errors give their location as a string that no "
+        f"reason is P2: {len(strangers)} gold errors give their location as a string that no "
         f"trace contains, {named}, so a predictor working from span identifiers cannot reach "
         f"them and an oracle working from the gold can."
     )

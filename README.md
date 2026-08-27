@@ -16,8 +16,8 @@ The audit is possible at all because the TRAIL authors published the scorer, the
 gold labels and the traces. A benchmark that publishes a table of model scores
 and keeps its scoring code to itself cannot be audited from outside.
 Nothing here is copied or edited either: `benchmarking/calculate_scores.py` is
-fetched at a pinned commit, checked against a SHA-256, imported by path, and
-left alone.
+fetched at a pinned commit, checked against a SHA-256, run by compiling those
+same bytes, and left alone.
 
 What is not in dispute is the paper's own claim, that debugging agent traces is
 hard and that frontier models are bad at it. What is in dispute is that these
@@ -36,10 +36,9 @@ index   4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928  index/
 
 Six predictors go through the pinned scorer here, and a seventh,
 `one-span-all-categories`, is scored further down where P7 needs it. The one the
-claim rests on is
-`all-spans-all-categories`, and its entire input is that trace's entry in
-`index/spans.json`: a list of hex identifiers with no contents attached. The
-predictors that read the gold are there as reference points.
+claim rests on is `all-spans-all-categories`, and its entire input is that
+trace's entry in `index/spans.json`: a list of hex identifiers with no contents
+attached. The predictors that read the gold are there as reference points.
 `gold-exact` is a perfect judge, `gold-spans-all-categories` is what oracle
 knowledge of the locations buys, and `silent` emits nothing.
 
@@ -113,7 +112,7 @@ is 0.974 and 0.968.
 
 <!-- trailaudit:absent-locations -->
 The gold-blind predictor sits a little under the oracle one on SWE Bench, and
-the reason is P2. 2 gold errors give their location as a string that no trace
+the reason is P2: 2 gold errors give their location as a string that no trace
 contains, `Span ID not found for this shard`, so a predictor working from span
 identifiers cannot reach them and an oracle working from the gold can.
 <!-- /trailaudit:absent-locations -->
@@ -122,7 +121,9 @@ Dividing the same intersections by the prediction count instead of the gold
 count gives the column the metric does not report. This is a diagnostic and not
 a proposed metric. The audit computes it, TRAIL does not, and the run refuses to
 finish unless its own recall figures reproduce the ones `calculate_scores.py`
-returned.
+returned. That check anchors the pair building and the intersection, which both
+directions share, and not the final division: upstream computes no precision, so
+there is nothing there to reproduce.
 
 <!-- trailaudit:precision -->
 | predictor | GAIA, joint / location | SWE Bench, joint / location |

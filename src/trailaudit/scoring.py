@@ -21,10 +21,11 @@ anchors the pair construction and the intersection, because both directions
 share them. It does not anchor the final division: replacing `joint_precision`
 with a constant leaves every recall figure where it was and the run finishes.
 Nor does it anchor `normalize_category`, which is handed to both sides from the
-same clone, so a poisoned normaliser agrees with itself. Upstream computes no
-precision at all, so there is nothing to compare that last step against, and
-what the column is entitled to claim is that it divides the same intersections
-by the other denominator.
+same clone, so a poisoned normaliser agrees with itself: what covers that is the
+scorer's SHA-256, which `upstream.load_scorer` compiles and executes rather than
+importing by path. Upstream computes no precision at all, so there is nothing to
+compare the last step against, and what the column is entitled to claim is that
+it divides the same intersections by the other denominator.
 """
 
 from __future__ import annotations
