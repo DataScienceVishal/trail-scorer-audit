@@ -4,7 +4,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from trailaudit import adversarial, datacheck, spans, upstream
+from trailaudit import adversarial, artifacts, datacheck, spans, upstream
+from trailaudit.artifacts import Stale
 from trailaudit.scoring import DiagnosticDrifted
 from trailaudit.spans import IndexInconsistent
 from trailaudit.upstream import DEFAULT_CLONE, MissingClone, PinMismatch
@@ -117,9 +118,8 @@ def _adversarial(args: argparse.Namespace) -> int:
     built = adversarial.artifact(runs)
     lines, violated = adversarial.report(runs)
     print("\n".join(lines))
-
     if args.check:
-        drifted = adversarial.differences(adversarial.load(args.out), built)
+        drifted = artifacts.differences(adversarial.load(args.out), built)
         if drifted:
             print(f"\ntrailaudit: {args.out} and this run disagree:", file=sys.stderr)
             for line in drifted[:20]:
@@ -128,8 +128,7 @@ def _adversarial(args: argparse.Namespace) -> int:
         print(f"\n{args.out} matches this run")
         return 3 if violated else 0
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(adversarial.render(built), encoding="utf-8")
+    artifacts.write(args.out, built)
     print(f"\nwrote {args.out}")
     return 3 if violated else 0
 
@@ -234,6 +233,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="rerun and diff against the committed artifact instead of overwriting it. Exit 1 "
         "if any figure moved",
     )
+
     return parser
 
 
@@ -247,7 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     try:
         return routes[args.command](args)
-    except (PinMismatch, IndexInconsistent, DiagnosticDrifted) as exc:
+    except (PinMismatch, IndexInconsistent, Stale, DiagnosticDrifted) as exc:
         print(f"trailaudit: {exc}", file=sys.stderr)
         return 1
     except (MissingClone, FileNotFoundError) as exc:

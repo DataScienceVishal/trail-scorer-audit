@@ -13,7 +13,7 @@ import pathlib
 
 import pytest
 
-from trailaudit import adversarial, gold, spans, upstream
+from trailaudit import adversarial, artifacts, gold, spans, upstream
 from trailaudit.datacheck import VIOLATED
 
 pytestmark = pytest.mark.upstream
@@ -100,7 +100,7 @@ def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pa
     index = spans.load(repo_root / spans.COMMITTED)
     runs = adversarial.run(clone, index)
     committed = adversarial.load(repo_root / adversarial.COMMITTED)
-    assert adversarial.differences(committed, adversarial.artifact(runs)) == []
+    assert artifacts.differences(committed, adversarial.artifact(runs)) == []
 
     assert adversarial.p1(runs).verdict == VIOLATED
     assert adversarial.p2(runs).verdict == VIOLATED

@@ -8,10 +8,6 @@ the HELD branch and would not notice if it had been wired to the wrong metric.
 
 from __future__ import annotations
 
-import pathlib
-
-import pytest
-
 from stand_ins import TAXONOMY
 from trailaudit import adversarial, upstream
 from trailaudit.adversarial import MISSING_SHARD, SplitRun
@@ -19,7 +15,6 @@ from trailaudit.datacheck import HELD, VIOLATED
 from trailaudit.gold import Annotation
 from trailaudit.predictors import PREDICTORS
 from trailaudit.scoring import Scores
-from trailaudit.spans import IndexInconsistent
 
 GEMINI_JOINT = {"GAIA": 0.183, "SWE Bench": 0.050}
 
@@ -152,27 +147,3 @@ def test_locations_off_the_index_reports_per_trace() -> None:
         "t2": Annotation("GAIA", "t2", ("c", "c"), (MISSING_SHARD, "aaaa000000000002")),
     }
     assert adversarial.locations_off_the_index(annotations, index) == {"t2": [MISSING_SHARD]}
-
-
-def test_differences_points_at_the_leaf_that_moved() -> None:
-    committed = {"splits": {"GAIA": {"joint": 0.5, "gone": 1}}}
-    fresh = {"splits": {"GAIA": {"joint": 0.6, "new": 2}}}
-    assert adversarial.differences(committed, fresh) == [
-        "splits.GAIA.gone: in the committed artifact, not in this run",
-        "splits.GAIA.joint: committed 0.5, ran 0.6",
-        "splits.GAIA.new: not in the committed artifact",
-    ]
-
-
-def test_an_identical_rerun_reports_nothing() -> None:
-    same = {"splits": {"GAIA": {"joint": 0.5, "names": ["a", "b"]}}}
-    assert adversarial.differences(same, dict(same)) == []
-
-
-def test_loading_an_artifact_from_another_commit_says_what_to_rerun(
-    tmp_path: pathlib.Path,
-) -> None:
-    path = tmp_path / "adversarial.json"
-    path.write_text(adversarial.render({"pinned_commit": "0" * 40}), encoding="utf-8")
-    with pytest.raises(IndexInconsistent, match="trailaudit adversarial"):
-        adversarial.load(path)

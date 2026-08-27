@@ -15,7 +15,6 @@ the part they have in common.
 
 from __future__ import annotations
 
-import json
 import tempfile
 import textwrap
 from collections.abc import Callable
@@ -23,7 +22,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
 
-from trailaudit import gold, paper, predictors, scoring, spans, upstream
+from trailaudit import artifacts, gold, paper, predictors, scoring, spans, upstream
 from trailaudit.datacheck import HELD, VIOLATED, WIDTH, Finding, wrapped
 from trailaudit.gold import Annotation
 from trailaudit.predictors import Case, Predictor
@@ -375,39 +374,7 @@ def artifact(runs: list[SplitRun]) -> dict:
     }
 
 
-def render(built: dict) -> str:
-    return json.dumps(built, indent=2) + "\n"
-
-
 def load(path: Path = COMMITTED) -> dict:
-    stored = json.loads(path.read_text(encoding="utf-8"))
-    if stored.get("pinned_commit") != upstream.PINNED_COMMIT:
-        raise spans.IndexInconsistent(
-            f"{path} was produced at {stored.get('pinned_commit')} and the audit is pinned to "
-            f"{upstream.PINNED_COMMIT}. Rerun `trailaudit adversarial`."
-        )
-    return stored
-
-
-def differences(committed: dict, fresh: dict) -> list[str]:
-    """Where a rerun disagrees with the committed artifact, leaf by leaf."""
-    return sorted(_walk(committed, fresh, ""))
-
-
-def _walk(was, now, path: str) -> list[str]:
-    if isinstance(was, dict) and isinstance(now, dict):
-        drifted = []
-        for key in sorted(set(was) | set(now)):
-            here = f"{path}.{key}" if path else key
-            if key not in was:
-                drifted.append(f"{here}: not in the committed artifact")
-            elif key not in now:
-                drifted.append(f"{here}: in the committed artifact, not in this run")
-            else:
-                drifted += _walk(was[key], now[key], here)
-        return drifted
-    if was != now:
-        return [f"{path}: committed {was!r}, ran {now!r}"]
-    return []
+    return artifacts.load(path, rerun="trailaudit adversarial")
 
 
