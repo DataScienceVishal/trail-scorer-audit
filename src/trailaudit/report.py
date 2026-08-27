@@ -243,6 +243,77 @@ def _weighted(values: dict[str, float], weights: dict[str, int]) -> float:
     return sum(values[split] * weights[split] for split in values) / sum(weights.values())
 
 
+def _above_the_fold(src: Sources) -> tuple[str, dict]:
+    """The one split the first screen quotes, named out of the artifact rather than typed.
+
+    GAIA today, because it is first in `upstream.SPLITS` and the larger of the
+    two. Both blocks above the fold read it through here and print the name they
+    were handed, so the opening sentence and the three-row table under it cannot
+    end up describing different splits.
+    """
+    return next(iter(src.adversarial["splits"].items()))
+
+
+def claim(src: Sources) -> list[str]:
+    """The opening sentence, with the three figures it rests on.
+
+    Generated for the same reason the tables are. `loose_scores` refuses a score
+    typed into prose anywhere in the file, and the first thing a reader sees is
+    the worst place for a figure that stopped being true.
+    """
+    split, one = _above_the_fold(src)
+    blind = one["predictors"][adversarial.HEADLINE.name]
+    best = one["best_published"]["joint_accuracy"]["value"]
+    return paragraph(
+        f"`{adversarial.HEADLINE.name}` never opens a span, never looks at the gold and does not "
+        f"know what an error is. Run through TRAIL's own unmodified scorer on {split} it scores "
+        f"**{blind['joint_accuracy']:.3f}** joint accuracy against **{best:.3f}** for the best "
+        f"row in Table 1, by emitting **{blind['volume_ratio']:.1f}x** as many errors as the "
+        f"answer key holds. Both headline metrics divide by the number of errors in the answer "
+        f"key, never by the number the judge reported."
+    )
+
+
+def teaser(src: Sources) -> list[str]:
+    """Three rows of the headline table, for a reader deciding whether to read the rest.
+
+    The predictor that cannot read, the row it beats, and the ceiling. The
+    volume ratio comes with them because it is the first objection anybody
+    raises, and an objection answered two clicks further down is an objection
+    that stands.
+    """
+    split, one = _above_the_fold(src)
+    blind = one["predictors"][adversarial.HEADLINE.name]
+    best = one["best_published"]
+    ceiling = f"{one['reachable_ceiling']:.3f}"
+    return table(
+        (
+            f"{split}, {one['gold_files_scored']} gold files, {one['gold_errors']} gold errors",
+            "joint",
+            "location",
+            "errors emitted",
+            "per gold error",
+        ),
+        (
+            (
+                f"`{adversarial.HEADLINE.name}`, which cannot read",
+                f"{blind['joint_accuracy']:.3f}",
+                f"{blind['location_accuracy']:.3f}",
+                f"{blind['predicted_errors']:,}",
+                f"{blind['volume_ratio']:.1f}x",
+            ),
+            (
+                "best published, Table 1",
+                f"{best['joint_accuracy']['value']:.3f}",
+                f"{best['location_accuracy']['value']:.3f}",
+                "",
+                "",
+            ),
+            ("reachable by anything at all", ceiling, ceiling, "", ""),
+        ),
+    )
+
+
 def headline(src: Sources) -> list[str]:
     lines: list[str] = []
     for split, one in src.adversarial["splits"].items():
@@ -583,6 +654,8 @@ def strings_in(node: object) -> Iterator[str]:
 
 
 BLOCKS: dict[str, Callable[[Sources], list[str]]] = {
+    "claim": claim,
+    "teaser": teaser,
     "pin": pin,
     "conditions": conditions,
     "eleven-percent": eleven_percent,

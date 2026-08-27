@@ -63,8 +63,13 @@ def test_the_headline_in_the_opening_is_the_transcribed_one(markdown: str) -> No
     and stays out of the shape `loose_scores` hunts for. The eleven-percent block
     reconciles it against Table 1's two cells; this holds the opening sentence to
     the same transcription.
+
+    The opening is everything above the first `<details>`, which is all a reader
+    sees before clicking anything. It was everything above the first `## ` until
+    the sections became folds, and that split would now match nothing and hand
+    the assertion the whole file, including the block that reconciles the figure.
     """
-    opening = " ".join(markdown.split("## ")[0].split())
+    opening = " ".join(markdown.split("<details")[0].split())
     assert f"{paper.COMBINED_JOINT_PROSE:.0%}".replace("%", " percent") in opening
 
 

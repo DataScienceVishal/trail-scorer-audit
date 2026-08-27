@@ -215,9 +215,16 @@ def readme_copy(repo_root: pathlib.Path, tmp_path: pathlib.Path) -> pathlib.Path
 def test_report_check_names_a_block_that_no_longer_matches(
     repo_root: pathlib.Path, tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
+    """The doctored row is every-span-once, which is in the headline table and nowhere else.
+
+    The row the claim rests on is now in two blocks: the full table and the
+    three-row teaser above the fold. Doctoring that one would fail two blocks at
+    once and the assertion below would pass on either, which is a weaker test
+    than it reads as.
+    """
     copied = readme_copy(repo_root, tmp_path)
     copied.write_text(
-        copied.read_text(encoding="utf-8").replace("| 0.973 | 0.974 |", "| 0.111 | 0.222 |"),
+        copied.read_text(encoding="utf-8").replace("| 0.088 | 0.974 |", "| 0.111 | 0.222 |"),
         encoding="utf-8",
     )
 
@@ -245,13 +252,15 @@ def test_report_rewrites_the_block_that_moved_and_then_says_it_matches(
     original = copied.read_text(encoding="utf-8")
     copied.write_text(original.replace("| 0.973 | 0.974 |", "| 0.111 | 0.222 |"), encoding="utf-8")
 
-    # That figure is in two blocks, headline and per-category, which is the
-    # point of rewriting by block rather than by string.
+    # That figure is in three blocks: the headline table, the per-category table
+    # and the teaser above the fold, which is the point of rewriting by block
+    # rather than by string.
     argv = ["report", "--readme", str(copied), "--root", str(repo_root)]
     assert main(argv) == 0
     rewritten = capsys.readouterr().out
-    assert rewritten.startswith("rewrote 2 of ")
-    assert "headline" in rewritten and "per-category" in rewritten
+    assert rewritten.startswith("rewrote 3 of ")
+    for name in ("headline", "per-category", "teaser"):
+        assert name in rewritten, name
     assert copied.read_text(encoding="utf-8") == original
 
     assert main(argv) == 0

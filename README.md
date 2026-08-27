@@ -7,40 +7,52 @@ published under MIT. Its abstract reports the best model scoring 11 percent.
 This repository audits the code that produces the numbers behind that.
 
 A program that cannot read scores higher than every model in their Table 1.
-It is a loop over the cross product of the span identifiers in a trace and the
-labels in the taxonomy. It never opens a span, never looks at the gold, and does
-not know what an error is. Run through TRAIL's own unmodified scorer it beats
-the best published row on both headline metrics and both splits.
+
+<!-- trailaudit:claim -->
+`all-spans-all-categories` never opens a span, never looks at the gold and does
+not know what an error is. Run through TRAIL's own unmodified scorer on GAIA it
+scores **0.973** joint accuracy against **0.183** for the best row in Table 1,
+by emitting **129.1x** as many errors as the answer key holds. Both headline
+metrics divide by the number of errors in the answer key, never by the number
+the judge reported.
+<!-- /trailaudit:claim -->
+
+<!-- trailaudit:teaser -->
+| GAIA, 116 gold files, 580 gold errors | joint | location | errors emitted | per gold error |
+|---|---|---|---|---|
+| `all-spans-all-categories`, which cannot read | 0.973 | 0.974 | 74,865 | 129.1x |
+| best published, Table 1 | 0.183 | 0.546 |  |  |
+| reachable by anything at all | 0.974 | 0.974 |  |  |
+<!-- /trailaudit:teaser -->
+
+Every figure in this file was measured on a machine with the corpus on disk and
+committed as an artifact. CI never fetches it, so the badge covers the code and
+not the numbers.
 
 The audit is possible at all because the TRAIL authors published the scorer, the
 gold labels and the traces. A benchmark that publishes a table of model scores
 and keeps its scoring code to itself cannot be audited from outside.
-Nothing here is copied or edited either: `benchmarking/calculate_scores.py` is
-fetched at a pinned commit, checked against a SHA-256, run by compiling those
-same bytes, and left alone.
 
-What is not in dispute is the paper's own claim, that debugging agent traces is
-hard and that frontier models are bad at it. What is in dispute is that these
-two numbers measure it. That is the narrower claim and the more useful one.
-
-<!-- trailaudit:pin -->
+```bash
+git clone https://github.com/DataScienceVishal/trail-scorer-audit.git
+cd trail-scorer-audit && uv sync --all-extras && uv run trailaudit report --check
 ```
-commit  0ffbed9db859b4a66250dc783fa4dccf86869595
-scorer  ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2  benchmarking/calculate_scores.py
-corpus  e27721ffd74bef970daa02a91e9a2362d87dd8f956a2e4ec49cf5c8c088781e5  296 files, 186.4 MB
-index   4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928  index/spans.json
-```
-<!-- /trailaudit:pin -->
 
-## The headline
+<details>
+<summary>How can that be true? The full table, both splits</summary>
 
-Six predictors go through the pinned scorer here, and a seventh,
-`one-span-all-categories`, is scored further down where P7 needs it. The one the
-claim rests on is `all-spans-all-categories`, and its entire input is that
-trace's entry in `index/spans.json`: a list of hex identifiers with no contents
-attached. The predictors that read the gold are there as reference points.
-`gold-exact` is a perfect judge, `gold-spans-all-categories` is what oracle
-knowledge of the locations buys, and `silent` emits nothing.
+Nothing here is copied or edited: `benchmarking/calculate_scores.py` is fetched
+at a pinned commit, checked against a SHA-256, run by compiling those same
+bytes, and left alone.
+
+Six predictors go through it here, and a seventh, `one-span-all-categories`, is
+scored further down where P7 needs it. The one the claim rests on is
+`all-spans-all-categories`, and its entire input is that trace's entry in
+`index/spans.json`: a list of hex identifiers with no contents attached. It is a
+loop over the cross product of those identifiers and the labels in the taxonomy.
+The predictors that read the gold are there as reference points. `gold-exact` is
+a perfect judge, `gold-spans-all-categories` is what oracle knowledge of the
+locations buys, and `silent` emits nothing.
 
 `joint` and `location` are TRAIL's two headline metrics, computed by their code
 at lines 54 and 58 of `calculate_scores.py`. Both divide the intersection by the
@@ -89,13 +101,13 @@ SWE Bench, 31 of 31 gold files scored, 256 gold errors in them:
 | reachable by anything at all |  | 0.968 | 0.968 |  |  |
 <!-- /trailaudit:headline -->
 
-Every figure in both tables was measured on a machine with the corpus on disk
-and committed as an artifact. CI never fetches it, so the badge covers the code
-and not the numbers, and "What CI proves, and what it does not" below is the
-long version of that.
+</details>
 
-The last column is what the score costs, and it is the answer to the obvious
-objection. Of course a maximal predictor maxes a recall metric. That is the
+<details>
+<summary>Of course a maximal predictor maxes a recall metric</summary>
+
+The last column of both tables is what the score costs, and it is the answer to
+that objection. Of course a maximal predictor maxes a recall metric. That is the
 finding rather than a rebuttal to it: nothing in Table 1, and nothing in either
 metric's name, tells a reader that a model emitting more errors scores at least
 as well for that reason alone. Nor does the order matter: lines 53 and 57
@@ -136,7 +148,10 @@ there is nothing there to reproduce.
 | `all-spans-all-categories` | 0.011 / 0.130 | 0.013 / 0.191 |
 <!-- /trailaudit:precision -->
 
-## Nine properties, written down before any code
+</details>
+
+<details>
+<summary>The other eight findings, written down before any code existed</summary>
 
 Each one is a property a competent benchmark scorer should have, fixed in the
 spec before the repository existed. Six had a known direction from a first-hand
@@ -174,9 +189,13 @@ the property fails and nothing on this data moves: rescoring every predictor
 under a shuffled taxonomy leaves all 24 of P5's figures where they were, and no
 gold error in either split carries the null category P8 turns on. Both still
 exit 3, because the pre-registration asked about the scorer rather than about
-how lucky the data is, and the two sections below are what each one means.
+how lucky the data is, and the two folds below on the shuffled taxonomy and on
+the null category are what each one means.
 
-## Where the gold and the taxonomy drifted apart
+</details>
+
+<details>
+<summary>One trailing comma keeps a gold file out of every published average</summary>
 
 <!-- trailaudit:unreadable-gold -->
 147 of the 148 gold annotation files parse. What stops the rest is a trailing
@@ -191,7 +210,12 @@ That is a small defect with a large tell attached: the failure goes to stdout,
 once, in the middle of a run that also prints a per-category table, and nothing
 downstream of it knows the corpus shrank.
 
-The gold category strings and the taxonomy have also drifted. Most of the drift
+</details>
+
+<details>
+<summary>Gold labels that miss the taxonomy, and the fallback that catches them</summary>
+
+The gold category strings and the taxonomy have drifted apart. Most of the drift
 is absorbed on the way through the normaliser, and the `loop` column says which
 of its two loops caught each one.
 
@@ -254,7 +278,10 @@ A category of one space gets past the empty-string guard at line 14, because
 line 14 tests the argument before line 17 strips it, and then matches the first
 label in the list.
 
-## An order dependence that costs nothing today
+</details>
+
+<details>
+<summary>An order dependence that costs nothing today</summary>
 
 <!-- trailaudit:shuffle -->
 237 of those 3,205 strings match more than one label, so list position decides
@@ -278,7 +305,10 @@ pre-registration asked whether the output depends on its input alone and the
 answer is that it does not. Latent is a violation whose cost on this corpus is
 zero, and the row says so in both columns rather than in neither.
 
-## Category F1 never looks at where the error is
+</details>
+
+<details>
+<summary>Category F1 never looks at where the error is</summary>
 
 The third column of the paper's Table 1 is built from two binary vectors per
 trace at lines 61 to 70, one bit per label. A location never reaches those
@@ -309,7 +339,10 @@ wrong reason: it is the only one that stays silent in a trace whose gold carries
 no error, so it sets fewer bits and picks up fewer false positives. That is a
 difference in how much it says, not in where.
 
-## One null category, and a correct judge scoring zero
+</details>
+
+<details>
+<summary>One null category, and a correct judge scoring zero</summary>
 
 Lines 45 and 49 build the pairs both headline metrics are computed from. The
 categories are filtered on truthiness, the locations are not, and then the two
@@ -343,7 +376,10 @@ The trace those three runs score is constructed and belongs to this repository,
 not to TRAIL. It is demonstrated rather than found because it is latent: this is
 a defect in the scorer, not a correction to the published numbers.
 
-## The paper and the repository describe different datasets
+</details>
+
+<details>
+<summary>The paper and the repository describe different datasets</summary>
 
 Table 5 of the paper counts the corpus five ways per split. The tree at the
 pinned commit disagrees with most of them, and the paper's own prose disagrees
@@ -368,7 +404,19 @@ depth prefix of the trees lands on the published one, and I do not know what
 definition would. The row is printed because leaving it out would be choosing
 which disagreements to show.
 
-## Running it
+</details>
+
+<details>
+<summary>How to run it</summary>
+
+<!-- trailaudit:pin -->
+```
+commit  0ffbed9db859b4a66250dc783fa4dccf86869595
+scorer  ed81ebd529da189425efb9c58183e7c1dcd55a234264ea039e03428bcc5f24d2  benchmarking/calculate_scores.py
+corpus  e27721ffd74bef970daa02a91e9a2362d87dd8f956a2e4ec49cf5c8c088781e5  296 files, 186.4 MB
+index   4370086c255bdc6bc90a0af032ef68f72a23bc2c362234058c7d82258a52b928  index/spans.json
+```
+<!-- /trailaudit:pin -->
 
 ```bash
 git clone https://github.com/DataScienceVishal/trail-scorer-audit.git
@@ -391,7 +439,7 @@ span index and says P3 and P4 were not measured rather than reporting them as
 held.
 
 Everything else needs the benchmark. The download lands in `.trail/`, which is
-gitignored, and its size is in the pin block at the top:
+gitignored, and its size is in the pin block above:
 
 ```bash
 uv run trailaudit fetch
@@ -440,7 +488,10 @@ committed artifact, 2 there is nothing on disk to check, 3 a pre-registered
 property came back violated. 3 is the good outcome and it is deliberately not 1,
 because 1 means the audit could not trust its own input.
 
-## How it works
+</details>
+
+<details>
+<summary>What each file does, and which one to read first</summary>
 
 `upstream.py` owns everything that touches somebody else's repository: the
 pin, the digests, the fetch, and the one place `calculate_scores.py` is compiled
@@ -478,7 +529,10 @@ arrived after it: the pattern ended at a word boundary, so a fourth digit
 stopped it matching and a hand-typed figure from that column went straight
 past.
 
-## What CI proves, and what it does not
+</details>
+
+<details>
+<summary>What the green badge does not cover</summary>
 
 The suite runs with `pytest-socket` and `--disable-socket` in `addopts`, so a
 stray network call is a test failure rather than a slow test. No credentials, no
@@ -496,7 +550,14 @@ Reproducing the findings takes `trailaudit fetch` and the commands above with
 not a weakness to bury. A benchmark audit that overstated what its own CI proved
 would be making a smaller version of the mistake it is reporting.
 
-## What this does not do
+</details>
+
+<details>
+<summary>What this audit does not do</summary>
+
+What is not in dispute is the paper's own claim, that debugging agent traces is
+hard and that frontier models are bad at it. What is in dispute is that these
+two numbers measure it. That is the narrower claim and the more useful one.
 
 It does not re-score the published table. TRAIL publishes no raw model outputs
 and there is no `results/` directory in the benchmark repository, so there is
@@ -521,7 +582,10 @@ at the edges, a metric that reads as accuracy and computes as recall. Naming
 them in a repository with reproducible commands is more useful than not naming
 them.
 
-## Data, and what is committed
+</details>
+
+<details>
+<summary>Where the data comes from, and why no trace bytes are committed</summary>
 
 `github.com/patronus-ai/trail-benchmark` at the pinned commit above, which
 carries an MIT LICENSE, copyright 2025 patronus-ai, read at that commit on
@@ -573,3 +637,5 @@ than a file built to be.
 
 Paper: Deshpande et al., *TRAIL: Trace Reasoning and Agentic Issue
 Localization*, arXiv:2505.08638.
+
+</details>
