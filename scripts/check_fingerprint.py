@@ -38,7 +38,9 @@ SKIP_DIRS = {
     ".trail",
 }
 # These two quote the banned list in order to define it.
-SKIP_NAMES = {"BANNED.md", "style-words.md", "CLAUDE.md"}
+# The list quotes every banned term in order to define them, so scanning it
+# would report each one as a violation of itself.
+SKIP_NAMES = {"style-words.md"}
 
 # Built by concatenation on purpose. Spelling either marker out as one literal
 # would make this file match its own escape hatch and skip itself.
@@ -108,30 +110,23 @@ def parse_banned(md: Path) -> Rules:
     )
 
 
-def find_banned_md(start: Path) -> Path:
-    """Nearest BANNED.md walking up, preferring a repo-local copy at each level.
+def find_word_list(start: Path) -> Path:
+    """The nearest word list, walking up from `start`.
 
-    The repo-local check has to happen at every level, not only at `start`. An
-    earlier version checked `start / "BANNED.md"` once and then walked up looking
-    only for `_factory/BANNED.md`. Called from a repo's `tests/` directory that
-    meant the repo's own root-level copy was skipped, and on the author's machine
-    the walk found the factory's copy one directory above the repo instead. Tests
-    passed there and failed in every clone, which is the exact shape of bug the
-    adversary agent exists to catch.
+    The walk checks every level rather than only `start`. An earlier version
+    looked at `start` once and then climbed, so running it from `tests/` skipped
+    the repo's own copy and found one belonging to a different project higher up
+    the disk. That passed on the machine it was written on and failed in every
+    clone, which is the shape of bug worth a regression test.
     """
     for parent in [start, *start.parents]:
         for candidate in (
             parent / "style-words.md",
             parent / "scripts" / "style-words.md",
-            parent / "BANNED.md",
-            parent / "_factory" / "BANNED.md",
         ):
             if candidate.is_file():
                 return candidate
-    raise SystemExit(
-        "check_fingerprint: no style-words.md in this repo and no BANNED.md in "
-        "any _factory/ above it"
-    )
+    raise SystemExit("check_fingerprint: no style-words.md in this repo")
 
 
 def excused(text: str, rules: Rules) -> bool:
@@ -286,11 +281,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*", type=Path)
     parser.add_argument("--staged", action="store_true", help="check the git index, not the tree")
-    parser.add_argument("--banned", type=Path, help="path to the word list, otherwise discovered")
+    parser.add_argument(
+        "--banned", type=Path, help="path to the word list, otherwise discovered"
+    )
     args = parser.parse_args()
 
     root = working_tree(Path.cwd())
-    rules = parse_banned(args.banned or find_banned_md(root))
+    rules = parse_banned(args.banned or find_word_list(root))
 
     if args.staged:
         candidates = staged_files(root)

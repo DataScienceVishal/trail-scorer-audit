@@ -42,6 +42,6 @@ def test_the_phrase_in_that_clone_is_one_the_checker_would_otherwise_catch(
     loose = tmp_path / "README.md"
     loose.write_text(f"It is {BANNED_PHRASE}.\n", encoding="utf-8")
     rules = check_fingerprint.parse_banned(
-        check_fingerprint.find_banned_md(pathlib.Path(__file__).resolve().parent)
+        check_fingerprint.find_word_list(pathlib.Path(__file__).resolve().parent)
     )
     assert check_fingerprint.check_file(loose, rules)

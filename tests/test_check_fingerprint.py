@@ -15,7 +15,7 @@ import pytest
 
 
 def _script_dir() -> Path:
-    """Sibling in the factory, ../scripts once init_project.sh has split them."""
+    """Beside this file, or in ../scripts once the two have been split apart."""
     here = Path(__file__).resolve().parent
     for candidate in (here, here.parent / "scripts"):
         if (candidate / "check_fingerprint.py").is_file():
@@ -31,7 +31,7 @@ import check_fingerprint as fp  # noqa: E402
 
 @pytest.fixture(scope="module")
 def rules() -> fp.Rules:
-    return fp.parse_banned(fp.find_banned_md(Path(__file__).resolve().parent))
+    return fp.parse_banned(fp.find_word_list(Path(__file__).resolve().parent))
 
 
 def scan(tmp_path: Path, name: str, body: str, rules: fp.Rules) -> list[fp.Finding]:
@@ -141,47 +141,48 @@ def test_checker_does_not_exempt_itself(rules):
     assert fp.IGNORE_LINE_MARKER not in source
 
 
-def test_finds_a_repo_local_banned_md_from_a_subdirectory(tmp_path):
-    """Regression: this is what made the suite pass only on the author's machine.
+def test_finds_the_repo_local_list_from_a_subdirectory(tmp_path):
+    """Regression: this is what made the suite pass only on one machine.
 
-    `find_banned_md` used to check `start / "BANNED.md"` once and then walk up
-    for `_factory/BANNED.md` only. Called from `tests/`, it skipped the repo's
-    own root copy and kept climbing until it found the factory's copy outside
-    the repo. Green locally, 18 errors in every clone.
+    The walk used to check `start` once and then climb. Called from `tests/` it
+    skipped the repo's own copy and kept going until it found a list belonging
+    to some other project further up the disk. Green there, broken everywhere
+    else, and the failure only appears in a clone.
     """
     repo = tmp_path / "someproject"
-    (repo / "tests").mkdir(parents=True)
-    (repo / "BANNED.md").write_text("```banned-words\nrobust\n```\n", encoding="utf-8")
+    (repo / "scripts").mkdir(parents=True)
+    (repo / "tests").mkdir()
+    (repo / "scripts" / "style-words.md").write_text(
+        "```banned-words\nrobust\n```\n", encoding="utf-8"
+    )
 
-    assert fp.find_banned_md(repo / "tests") == repo / "BANNED.md"
+    assert fp.find_word_list(repo / "tests") == repo / "scripts" / "style-words.md"
 
 
-def test_repo_local_banned_md_wins_over_a_factory_copy_further_up(tmp_path):
-    (tmp_path / "_factory").mkdir()
-    (tmp_path / "_factory" / "BANNED.md").write_text(
+def test_a_list_belonging_to_a_project_further_up_does_not_win(tmp_path):
+    (tmp_path / "style-words.md").write_text(
         "```banned-words\ndelve\n```\n", encoding="utf-8"
     )
     repo = tmp_path / "someproject"
-    (repo / "tests").mkdir(parents=True)
-    (repo / "BANNED.md").write_text("```banned-words\nrobust\n```\n", encoding="utf-8")
-
-    assert fp.find_banned_md(repo / "tests") == repo / "BANNED.md"
-
-
-def test_falls_back_to_the_factory_when_the_repo_has_no_copy(tmp_path):
-    (tmp_path / "_factory").mkdir()
-    (tmp_path / "_factory" / "BANNED.md").write_text(
-        "```banned-words\ndelve\n```\n", encoding="utf-8"
+    (repo / "scripts").mkdir(parents=True)
+    (repo / "tests").mkdir()
+    (repo / "scripts" / "style-words.md").write_text(
+        "```banned-words\nrobust\n```\n", encoding="utf-8"
     )
-    nested = tmp_path / "someproject" / "tests"
-    nested.mkdir(parents=True)
 
-    assert fp.find_banned_md(nested) == tmp_path / "_factory" / "BANNED.md"
+    assert fp.find_word_list(repo / "tests") == repo / "scripts" / "style-words.md"
 
 
-def test_banned_and_claude_md_are_skipped_by_name():
-    assert not fp.interesting(Path("BANNED.md"))
-    assert not fp.interesting(Path("CLAUDE.md"))
+def test_no_list_anywhere_is_an_error_rather_than_an_empty_rule_set(tmp_path):
+    """An empty rule set would pass every file, which is worse than failing."""
+    import pytest as _pytest
+
+    with _pytest.raises(SystemExit):
+        fp.find_word_list(tmp_path)
+
+
+def test_the_word_list_is_skipped_and_ordinary_prose_is_not():
+    assert not fp.interesting(Path("style-words.md"))
     assert fp.interesting(Path("README.md"))
 
 
@@ -215,7 +216,7 @@ def test_the_shipped_word_list_is_found_from_a_subdirectory(tmp_path):
         "```banned-words\nrobust\n```\n", encoding="utf-8"
     )
 
-    assert fp.find_banned_md(repo / "tests") == repo / "scripts" / "style-words.md"
+    assert fp.find_word_list(repo / "tests") == repo / "scripts" / "style-words.md"
 
 
 def test_an_unreadable_file_is_a_finding_and_not_a_silent_pass(tmp_path, rules):
