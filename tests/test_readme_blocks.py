@@ -64,10 +64,13 @@ def test_the_headline_in_the_opening_is_the_transcribed_one(markdown: str) -> No
     reconciles it against Table 1's two cells; this holds the opening sentence to
     the same transcription.
 
-    The opening is everything above the first `<details>`, which is all a reader
-    sees before clicking anything. It was everything above the first `## ` until
-    the sections became folds, and that split would now match nothing and hand
-    the assertion the whole file, including the block that reconciles the figure.
+    The opening is everything above the first `<details>`, which is what a reader
+    sees before clicking anything. It cannot be the first `## `: the findings
+    table sits under a heading and above every fold, so that split would stop
+    short of it. A split matching nothing at all is the worse failure, because it
+    hands the assertion the whole README including the eleven-percent block that
+    reconciles the figure, and the check passes on the thing it was meant to
+    hold to account.
     """
     opening = " ".join(markdown.split("<details")[0].split())
     assert f"{paper.COMBINED_JOINT_PROSE:.0%}".replace("%", " percent") in opening

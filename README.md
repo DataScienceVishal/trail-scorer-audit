@@ -38,6 +38,52 @@ git clone https://github.com/DataScienceVishal/trail-scorer-audit.git
 cd trail-scorer-audit && uv sync --all-extras && uv run trailaudit report --check
 ```
 
+## The nine pre-registered properties
+
+Each one is a property a competent benchmark scorer should have, fixed in the
+spec before the repository existed. Six had a known direction from a first-hand
+read of the scorer; what pre-registration buys is the magnitude and the
+contingency, not the direction. P2, P5 and P6 were open in direction as well.
+
+<!-- trailaudit:conditions -->
+| property | as written before any code existed | verdict | how far off it is |
+|---|---|---|---|
+| P1 | all-spans-all-categories scores no better than a published judge | VIOLATED | the gold-blind predictor beats the best published row: GAIA joint 0.973 against 0.183, location 0.974 against 0.546; SWE Bench joint 0.958 against 0.050, location 0.961 against 0.238 |
+| P2 | every gold error location is a span identifier in its own trace | VIOLATED | 2 of 836 gold locations are not a span in the trace they annotate. All of them are the literal 'Span ID not found for this shard' |
+| P3 | every gold annotation file parses as JSON | VIOLATED | 147 of 148 gold files parse, so every published average divides by 147 |
+| P4 | every gold category string is one of the taxonomy labels | VIOLATED | 11 of 31 gold spellings are not a label, covering 19 of 836 errors |
+| P5 | the normaliser's output depends on its input alone, not on the taxonomy order | LATENT | 237 of 3,205 strings change label under a shuffled taxonomy, 115 of them under seed 20260827, and 0 of the 24 figures in slice 2 move as a result |
+| P6 | no string shorter than the shortest taxonomy label normalises to a taxonomy label | VIOLATED | the shortest label is 12 characters and every one of the 21 is reached by 2 characters or fewer, 8 of them by one |
+| P7 | per-category F1 separates naming a category at the right span from naming it anywhere | VIOLATED | GAIA scores the same 21 columns for a predictor at 0.974 location accuracy and one at 0.000; SWE Bench scores the same 21 columns for a predictor at 0.961 location accuracy and one at 0.000 |
+| P8 | the scorer pairs each predicted location with the category predicted for it | LATENT | one null category takes a correct judge from 1.000 joint to 0.000 on the constructed trace, and 0 of 836 real gold errors carry one |
+| P9 | the repository's split sizes match the paper's Table 5 | VIOLATED | 8 of the 10 Table 5 cells this repository can compare disagree with the tree at 0ffbed9db859 |
+<!-- /trailaudit:conditions -->
+
+<details>
+<summary>A pre-registration where a clean sweep would have meant nothing to publish</summary>
+
+The section of the spec that fixed them is committed as
+[docs/pre-registration.md](docs/pre-registration.md), verbatim apart from one
+declared edit, with its own note on what a reader can check from inside this
+repository and what they cannot.
+
+Note the inversion, because it is what makes a pre-registration worth less than
+it looks if nobody says it: here the object under test is somebody else's code,
+so a violation is a result and a clean sweep would have meant there was nothing
+to publish. Naming the nine in advance is what stops the target moving, not what
+makes the outcome surprising.
+
+Two verdicts, and the difference between them is the point. VIOLATED means the
+property fails and a number somebody published moves because of it. LATENT means
+the property fails and nothing on this data moves: rescoring every predictor
+under a shuffled taxonomy leaves all 24 of P5's figures where they were, and no
+gold error in either split carries the null category P8 turns on. Both still
+exit 3, because the pre-registration asked about the scorer rather than about
+how lucky the data is, and the two folds below on the shuffled taxonomy and on
+the null category are what each one means.
+
+</details>
+
 <details>
 <summary>How can that be true? The full table, both splits</summary>
 
@@ -150,49 +196,7 @@ there is nothing there to reproduce.
 
 </details>
 
-<details>
-<summary>The other eight findings, written down before any code existed</summary>
-
-Each one is a property a competent benchmark scorer should have, fixed in the
-spec before the repository existed. Six had a known direction from a first-hand
-read of the scorer; what pre-registration buys is the magnitude and the
-contingency, not the direction. P2, P5 and P6 were open in direction as well.
-
-The section of the spec that fixed them is committed as
-[docs/pre-registration.md](docs/pre-registration.md), verbatim apart from one
-declared edit, with its own note on what a reader can check from inside this
-repository and what they cannot.
-
-Note the inversion, because it is what makes a pre-registration worth less than
-it looks if nobody says it: here the object under test is somebody else's code,
-so a violation is a result and a clean sweep would have meant there was nothing
-to publish. Naming the nine in advance is what stops the target moving, not what
-makes the outcome surprising.
-
-<!-- trailaudit:conditions -->
-| property | as written before any code existed | verdict | how far off it is |
-|---|---|---|---|
-| P1 | all-spans-all-categories scores no better than a published judge | VIOLATED | the gold-blind predictor beats the best published row: GAIA joint 0.973 against 0.183, location 0.974 against 0.546; SWE Bench joint 0.958 against 0.050, location 0.961 against 0.238 |
-| P2 | every gold error location is a span identifier in its own trace | VIOLATED | 2 of 836 gold locations are not a span in the trace they annotate. All of them are the literal 'Span ID not found for this shard' |
-| P3 | every gold annotation file parses as JSON | VIOLATED | 147 of 148 gold files parse, so every published average divides by 147 |
-| P4 | every gold category string is one of the taxonomy labels | VIOLATED | 11 of 31 gold spellings are not a label, covering 19 of 836 errors |
-| P5 | the normaliser's output depends on its input alone, not on the taxonomy order | LATENT | 237 of 3,205 strings change label under a shuffled taxonomy, 115 of them under seed 20260827, and 0 of the 24 figures in slice 2 move as a result |
-| P6 | no string shorter than the shortest taxonomy label normalises to a taxonomy label | VIOLATED | the shortest label is 12 characters and every one of the 21 is reached by 2 characters or fewer, 8 of them by one |
-| P7 | per-category F1 separates naming a category at the right span from naming it anywhere | VIOLATED | GAIA scores the same 21 columns for a predictor at 0.974 location accuracy and one at 0.000; SWE Bench scores the same 21 columns for a predictor at 0.961 location accuracy and one at 0.000 |
-| P8 | the scorer pairs each predicted location with the category predicted for it | LATENT | one null category takes a correct judge from 1.000 joint to 0.000 on the constructed trace, and 0 of 836 real gold errors carry one |
-| P9 | the repository's split sizes match the paper's Table 5 | VIOLATED | 8 of the 10 Table 5 cells this repository can compare disagree with the tree at 0ffbed9db859 |
-<!-- /trailaudit:conditions -->
-
-Two verdicts, and the difference between them is the point. VIOLATED means the
-property fails and a number somebody published moves because of it. LATENT means
-the property fails and nothing on this data moves: rescoring every predictor
-under a shuffled taxonomy leaves all 24 of P5's figures where they were, and no
-gold error in either split carries the null category P8 turns on. Both still
-exit 3, because the pre-registration asked about the scorer rather than about
-how lucky the data is, and the two folds below on the shuffled taxonomy and on
-the null category are what each one means.
-
-</details>
+## The rest of the table, up close
 
 <details>
 <summary>One trailing comma keeps a gold file out of every published average</summary>
@@ -406,6 +410,8 @@ which disagreements to show.
 
 </details>
 
+## Running it, and reading the code
+
 <details>
 <summary>How to run it</summary>
 
@@ -551,6 +557,8 @@ not a weakness to bury. A benchmark audit that overstated what its own CI proved
 would be making a smaller version of the mistake it is reporting.
 
 </details>
+
+## Limits and licence
 
 <details>
 <summary>What this audit does not do</summary>
