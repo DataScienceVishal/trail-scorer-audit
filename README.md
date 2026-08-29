@@ -558,6 +558,55 @@ would be making a smaller version of the mistake it is reporting.
 
 </details>
 
+## How this was built
+
+An agent pipeline wrote most of this code. The commit trailers say so on every
+commit, and the checks in this repository are the reason I am willing to publish
+what it produced.
+
+The rule I settled on is that anything I would otherwise have to remember gets
+turned into something that fails a build. Eighteen blocks in this README are
+rendered from committed artifacts, so a figure here cannot be a figure anybody
+typed. Thirty-six line numbers quoted into someone else's source are held against
+that source at its pinned hash. The suite runs with sockets disabled, so the claim
+that this project makes no model calls is enforced rather than asserted.
+
+<details>
+<summary>The four defects those checks caught, and the one they nearly missed</summary>
+
+Worth naming, because a verification layer that has never caught anything is
+decoration.
+
+**The digest did not cover the bytes that ran.** `fetch --check` hashed
+`calculate_scores.py` and then handed the path to Python's import machinery,
+which will use a cached `__pycache__` entry when its header matches the source.
+A forged entry could replace both metric lines with `1.0` while the digest still
+passed. The audit now compiles the bytes it hashed. This is the one that would
+have been fatal, because the whole claim rests on running their code unmodified.
+
+**An input flag could turn a violated property into a pass.** Passing `--index`
+with a fabricated span index gave exit 0 and a HELD verdict, on an index holding
+no real identifier. Worse, an index built from the gold locations turned the
+gold-blind predictor into an oracle while the artifact still recorded it as
+reading only spans. Every artifact now records the digest of the index its run
+read, and the README refuses to render from one that does not match.
+
+**The guard against wrong line citations had the same bug it was guarding.** Two
+citations into the pinned file were wrong, so I added a test pinning all of them.
+The pattern was case sensitive, and the two that had been wrong both opened a
+sentence. The guard could read every citation except the ones most likely to be
+edited.
+
+**The style checker reported a file it could not read as clean.** It returned no
+findings on a decode error and exited 0, which is the same shape as the defect
+this project reports in TRAIL: a check that looks like it ran.
+
+Three of those four were found by pointing the same adversarial habit at my own
+work that the audit points at TRAIL's. That is the part of this repository I would
+defend hardest, and it is not the finding.
+
+</details>
+
 ## Limits and licence
 
 <details>
