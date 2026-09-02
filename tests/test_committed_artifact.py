@@ -98,7 +98,7 @@ def test_the_published_comparison_is_the_transcribed_one(splits: dict) -> None:
 
 
 def test_the_denominators_are_147_of_148(splits: dict) -> None:
-    """The slice 1 finding, carried into slice 2's own numbers rather than restated.
+    """P3's finding, carried into the adversarial numbers rather than restated.
 
     Every average in this artifact divides by gold_files_scored, so if that ever
     stops being 147 the headline moved and the run said nothing about it.

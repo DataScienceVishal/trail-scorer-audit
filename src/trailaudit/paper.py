@@ -77,7 +77,7 @@ COMBINED_JOINT_PROSE = 0.11
 
 # Section 4.3, page 5: "we found errors in 114 GAIA traces and 30 from SWE
 # Bench". Table 5 on page 16 says 115 and 31 for the same quantity. Both matter
-# to slice 2 rather than only to P9, because the count of traces carrying at
+# to P1 and P2 rather than only to P9, because the count of traces carrying at
 # least one gold error is the ceiling on both headline metrics: lines 54 and 58
 # score a trace with no gold errors as 0 for every predictor including a perfect
 # one.

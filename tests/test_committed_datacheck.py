@@ -1,9 +1,9 @@
 """results/datacheck.json, and whether it agrees with the artifacts written beside it.
 
-P3, P4 and P9 were measured by slice 1 and printed. This file is where they were
-finally written down, so the README can quote them without the 186 MB, and the
-checks here are the ones that do not need it either: that the counts inside the
-file add up, that the Table 5 column it carries is the one transcribed in
+P3, P4 and P9 were measured by `data-check` and printed. This file is where they
+were finally written down, so the README can quote them without the 186 MB, and
+the checks here are the ones that do not need it either: that the counts inside
+the file add up, that the Table 5 column it carries is the one transcribed in
 paper.py, and that the two commands which both counted the gold got the same
 answer.
 

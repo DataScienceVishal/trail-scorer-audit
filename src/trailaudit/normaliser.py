@@ -318,7 +318,7 @@ def rescore(
     index: dict[str, dict[str, list[str]]],
     taxonomy: Sequence[str],
 ) -> tuple[Rescored, ...]:
-    """The whole slice 2 measurement again, with a shuffled taxonomy and the same predictions.
+    """The whole P1 and P2 measurement again, with a shuffled taxonomy and the same predictions.
 
     Only the list handed to `calculate_metrics` moves. The predictions are built
     once from the pinned order and reused, because `every-span-once` picks
@@ -486,8 +486,8 @@ def p5(done: Study) -> Finding:
         *wrapped(
             f"{len(in_the_gold)} of the {len(done.vocabulary)} gold spellings are among them, "
             f"and no prediction is either, because the predictors emit the labels themselves "
-            f"and an exact match is settled before the fallback runs. So rescoring the whole of "
-            f"slice 2 under the shuffled order moves {moved} of the {figures} figures it "
+            f"and an exact match is settled before the fallback runs. So rescoring the whole "
+            f"adversarial run under the shuffled order moves {moved} of the {figures} figures it "
             f"produces, over {len(done.rescored)} predictor and split pairs with joint and "
             f"location accuracy each, to {scoring.PLACES} decimal places."
         ),
@@ -508,7 +508,7 @@ def p5(done: Study) -> Finding:
         VIOLATED if moved else LATENT,
         f"{len(ambiguous)} of {len(done.reaches):,} strings change label under a shuffled "
         f"taxonomy, {elsewhere} of them under seed {SEED}, and {moved} of the {figures} figures "
-        f"in slice 2 move as a result",
+        f"the adversarial run publishes move as a result",
         lines,
     )
 

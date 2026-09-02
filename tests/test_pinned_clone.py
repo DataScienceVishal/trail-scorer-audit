@@ -113,7 +113,7 @@ def test_p3_p4_and_p9_reproduce_from_a_fresh_run(
 
 
 def test_p1_and_p2_reproduce_from_a_fresh_run(clone: pathlib.Path, repo_root: pathlib.Path) -> None:
-    """The whole of slice 2, rerun against the real scorer and diffed leaf by leaf.
+    """The whole adversarial artifact, rerun against the real scorer and diffed leaf by leaf.
 
     Every figure the README quotes comes out of results/adversarial.json, and
     nothing offline can tell whether that file describes a real run. This is what
@@ -229,7 +229,7 @@ def test_p5_the_taxonomy_order_decides_237_strings_and_no_gold_spelling(
 
     237 of the 3,205 enumerated strings are settled by list position, and 'e' is
     accepted by all 21 labels. None of the 31 gold spellings is among them, so
-    shuffling the taxonomy leaves all 24 figures of the slice 2 measurement
+    shuffling the taxonomy leaves all 24 figures of the adversarial measurement
     exactly where they were.
     """
     ambiguous = [one for one in study.reaches if one.order_dependent]

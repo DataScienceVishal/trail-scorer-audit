@@ -11,10 +11,11 @@ commit, so without a clone they say they were not measured. A property that
 quietly reports HELD because it could not look is worse than one that admits it.
 
 The run also writes `results/datacheck.json`, which is what the README's tables
-are rendered from. Slices 2 and 3 committed an artifact each and this one did
-not, because slice 1 printed its findings and stopped. That left the three
-oldest findings as the only ones a reader had to take on trust, and the report
-command in slice 4 needs them in the same form as the rest.
+are rendered from. It did not at first. This was the earliest command in the
+repository and it printed its findings and stopped, while every command written
+after it committed an artifact. That left P3, P4 and P9 as the only findings a
+reader had to take on trust, and `trailaudit report` needs them in the same form
+as the rest.
 """
 
 from __future__ import annotations

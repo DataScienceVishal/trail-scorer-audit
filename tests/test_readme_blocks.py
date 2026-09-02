@@ -1,9 +1,9 @@
 """The README against the artifacts it is rendered from.
 
-This is the whole of slice 4 stated as a test failure. Every figure in that file
-sits inside a marker pair, `trailaudit report --format md` writes the bodies,
-and the only way to move a number is to rerun the measurement and commit what
-came out. It runs offline against committed JSON and never touches the clone.
+This is `trailaudit report --check` stated as a test failure. Every figure in
+that file sits inside a marker pair, `trailaudit report --format md` writes the
+bodies, and the only way to move a number is to rerun the measurement and commit
+what came out. It runs offline against committed JSON and never touches the clone.
 
 The file it replaces, test_readme_numbers.py, checked a handful of hand-typed
 figures by searching for them in the prose. That caught the ones somebody

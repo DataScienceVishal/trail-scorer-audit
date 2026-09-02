@@ -172,7 +172,7 @@ def test_one_span_is_deliberately_not_in_the_adversarial_lineup() -> None:
 
     The adversarial table reports joint, location and volume. This predictor's
     finding is in the per-category block, which that table does not carry, and
-    adding it would move an artifact slice 2 published.
+    adding it would move a figure results/adversarial.json already published.
     """
     assert predictors.ONE_SPAN not in predictors.PREDICTORS
     with pytest.raises(KeyError):

@@ -427,7 +427,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=spans.COMMITTED,
         help=f"the committed span index, which the shuffled rescore needs because it runs the "
-        f"slice 2 predictors again (default {spans.COMMITTED})",
+        f"adversarial predictors again (default {spans.COMMITTED})",
     )
     fallback.add_argument(
         "--out",
