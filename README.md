@@ -79,8 +79,8 @@ the property fails and nothing on this data moves: rescoring every predictor
 under a shuffled taxonomy leaves all 24 of P5's figures where they were, and no
 gold error in either split carries the null category P8 turns on. Both still
 exit 3, because the pre-registration asked about the scorer rather than about
-how lucky the data is, and the two folds below on the shuffled taxonomy and on
-the null category are what each one means.
+how lucky the data is. What each latent verdict rests on is worked out in the P5
+fold on the shuffled taxonomy and the P8 fold on the null category.
 
 </details>
 
@@ -92,13 +92,13 @@ at a pinned commit, checked against a SHA-256, run by compiling those same
 bytes, and left alone.
 
 Six predictors go through it here, and a seventh, `one-span-all-categories`, is
-scored further down where P7 needs it. The one the claim rests on is
-`all-spans-all-categories`, and its entire input is that trace's entry in
-`index/spans.json`: a list of hex identifiers with no contents attached. It is a
-loop over the cross product of those identifiers and the labels in the taxonomy.
-The predictors that read the gold are there as reference points. `gold-exact` is
-a perfect judge, `gold-spans-all-categories` is what oracle knowledge of the
-locations buys, and `silent` emits nothing.
+scored in the fold on category F1, which is where P7 needs it. The one the claim
+rests on is `all-spans-all-categories`, and its entire input is that trace's
+entry in `index/spans.json`: a list of hex identifiers with no contents
+attached. It is a loop over the cross product of those identifiers and the
+labels in the taxonomy. The predictors that read the gold are there as reference
+points. `gold-exact` is a perfect judge, `gold-spans-all-categories` is what
+oracle knowledge of the locations buys, and `silent` emits nothing.
 
 `joint` and `location` are TRAIL's two headline metrics, computed by their code
 at lines 54 and 58 of `calculate_scores.py`. Both divide the intersection by the
@@ -152,12 +152,13 @@ SWE Bench, 31 of 31 gold files scored, 256 gold errors in them:
 <details>
 <summary>Of course a maximal predictor maxes a recall metric</summary>
 
-The last column of both tables is what the score costs, and it is the answer to
-that objection. Of course a maximal predictor maxes a recall metric. That is the
-finding rather than a rebuttal to it: nothing in Table 1, and nothing in either
-metric's name, tells a reader that a model emitting more errors scores at least
-as well for that reason alone. Nor does the order matter: lines 53 and 57
-intersect sets, so shuffling the errors a judge reports changes neither figure.
+The `per gold error` column of the two headline tables is what the score costs,
+and it is the answer to that objection. Of course a maximal predictor maxes a
+recall metric. That is the finding rather than a rebuttal to it: nothing in
+Table 1, and nothing in either metric's name, tells a reader that a model
+emitting more errors scores at least as well for that reason alone. Nor does the
+order matter: lines 53 and 57 intersect sets, so shuffling the errors a judge
+reports changes neither figure.
 
 <!-- trailaudit:ceiling -->
 Nothing in either table reaches 1.000, and the row holding the answer key does
@@ -288,11 +289,12 @@ label in the list.
 <summary>An order dependence that costs nothing today</summary>
 
 <!-- trailaudit:shuffle -->
-237 of those 3,205 strings match more than one label, so list position decides
-which one they get, and 115 of them land somewhere else once the taxonomy is
-reordered under seed 20260827. Of the 31 spellings TRAIL's gold actually uses,
-0 are ambiguous, so rescoring every predictor on both splits under the shuffled
-order moved 0 of the 24 figures it produces.
+237 of the 3,205 substrings the 21 taxonomy labels contain sit inside more than
+one of those labels, so list position decides which one they get, and 115 of
+them land somewhere else once the taxonomy is reordered under seed 20260827. Of
+the 31 spellings TRAIL's gold actually uses, 0 are ambiguous, so rescoring
+every predictor on both splits under the shuffled order moved 0 of the 24
+figures it produces.
 <!-- /trailaudit:shuffle -->
 
 So P5 is violated as a property of the function and the consequence it was
@@ -551,10 +553,11 @@ corpus on disk and committed as an artifact; what CI enforces is that the blocks
 here are what those artifacts render, that the artifacts agree with each other,
 and that the code does what its tests say.
 
-Reproducing the findings takes `trailaudit fetch` and the commands above with
-`--check`, on a machine whose owner has accepted GAIA's terms. Saying so is
-not a weakness to bury. A benchmark audit that overstated what its own CI proved
-would be making a smaller version of the mistake it is reporting.
+Reproducing the findings takes `trailaudit fetch` and then each of the commands
+listed under How to run it, with `--check`, on a machine whose owner has
+accepted GAIA's terms. Saying so is not a weakness to bury. A benchmark audit
+that overstated what its own CI proved would be making a smaller version of the
+mistake it is reporting.
 
 </details>
 
@@ -644,9 +647,9 @@ them.
 <details>
 <summary>Where the data comes from, and why no trace bytes are committed</summary>
 
-`github.com/patronus-ai/trail-benchmark` at the pinned commit above, which
-carries an MIT LICENSE, copyright 2025 patronus-ai, read at that commit on
-2026-08-27.
+`github.com/patronus-ai/trail-benchmark` at the commit the pin block under How
+to run it records, which carries an MIT LICENSE, copyright 2025 patronus-ai,
+read at that commit on 2026-08-27.
 
 The licence question is not as settled as it looks, and the design here is the
 one that is safe under every reading of it. TRAIL's MIT file says "the Software"

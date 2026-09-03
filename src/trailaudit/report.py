@@ -527,8 +527,9 @@ def shuffle(src: Sources) -> list[str]:
     moved = len(shuffled["figures_that_moved"])
     figures = len(shuffled["scores"]) * 2
     return paragraph(
-        f"{ambiguous['count']} of those {src.normaliser['substrings_enumerated']:,} strings "
-        f"match more than one label, so list position decides which one they get, and "
+        f"{ambiguous['count']} of the {src.normaliser['substrings_enumerated']:,} substrings "
+        f"the {src.normaliser['labels']} taxonomy labels contain sit inside more than one of "
+        f"those labels, so list position decides which one they get, and "
         f"{ambiguous['moved_under_the_shuffle']} of them land somewhere else once the "
         f"taxonomy is reordered under seed {shuffled['seed']}. Of the "
         f"{src.datacheck['vocabulary']['spellings']} spellings TRAIL's gold actually uses, "
