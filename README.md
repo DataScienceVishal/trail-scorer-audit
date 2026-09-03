@@ -563,9 +563,8 @@ mistake it is reporting.
 
 ## How this was built
 
-An agent pipeline wrote most of this code. The commit trailers say so on every
-commit, and the checks in this repository are the reason I am willing to publish
-what it produced.
+An agent pipeline wrote most of this code, and the checks in this repository
+are the reason I am willing to publish what it produced.
 
 The rule I settled on is that anything I would otherwise have to remember gets
 turned into something that fails a build. Eighteen blocks in this README are
