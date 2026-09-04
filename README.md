@@ -542,16 +542,19 @@ past.
 <details>
 <summary>What the green badge does not cover</summary>
 
+CI runs `ruff`, the style check in `scripts/check_fingerprint.py`, and the
+suite, and nothing in that list touches the corpus. `tests/test_readme_blocks.py`
+renders every block in this file out of the committed artifacts and fails on a
+byte of difference, so a green badge means the code does what its tests say and
+this file quotes what the artifacts hold. It does not mean the figures in those
+artifacts are right, because nothing in CI reruns the measurement that produced
+them.
+
 The suite runs with `pytest-socket` and `--disable-socket` in `addopts`, so a
 stray network call is a test failure rather than a slow test. No credentials, no
-model calls, no download, nothing to configure.
-
-Which means the badge covers the code and not the numbers. The checks that read
-the real corpus are marked `upstream` and skip wherever it is absent, and CI
-never fetches it. Every figure in this file was measured on a machine with the
-corpus on disk and committed as an artifact; what CI enforces is that the blocks
-here are what those artifacts render, that the artifacts agree with each other,
-and that the code does what its tests say.
+model calls, no download, nothing to configure. Everything that reads the real
+corpus is marked `upstream` and skips wherever it is absent, which on a runner
+is every time.
 
 Reproducing the findings takes `trailaudit fetch` and then each of the commands
 listed under How to run it, with `--check`, on a machine whose owner has
