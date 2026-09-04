@@ -540,7 +540,7 @@ past.
 </details>
 
 <details>
-<summary>What the green badge does not cover</summary>
+<summary>A green badge over numbers CI never measured would be a smaller version of TRAIL's mistake</summary>
 
 CI runs `ruff`, the style check in `scripts/check_fingerprint.py`, and the
 suite, and nothing in that list touches the corpus. `tests/test_readme_blocks.py`
@@ -615,7 +615,7 @@ defend hardest, and it is not the finding.
 ## Limits and licence
 
 <details>
-<summary>What this audit does not do</summary>
+<summary>The paper's finding is not in dispute, the two numbers that measure it are</summary>
 
 What is not in dispute is the paper's own claim, that debugging agent traces is
 hard and that frontier models are bad at it. What is in dispute is that these
