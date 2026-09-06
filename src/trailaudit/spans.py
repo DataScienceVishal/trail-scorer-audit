@@ -1,8 +1,9 @@
 """The one derived artifact this repository commits: trace identifier to span identifiers.
 
 Identifiers and integers, no trace content. That is deliberate. The traces are
-185.6 MB and derive from GAIA and SWE-Bench Lite, so committing any of them
-would need a licence answer this project does not have. Committing the
+185.6 MB of the 186.4 MB the pin block covers, the rest being the gold
+annotations, and they derive from GAIA and SWE-Bench Lite, so committing any of
+them would need a licence answer this project does not have. Committing the
 identifiers needs no answer, and it is enough for what the audit does with them:
 the adversarial predictor names every span in a trace and never reads one.
 

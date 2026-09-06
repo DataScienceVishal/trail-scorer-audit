@@ -211,9 +211,9 @@ annotated in the file that did not parse are exactly the gap between the count
 in the paper's abstract and the count the scorer sees.
 <!-- /trailaudit:unreadable-gold -->
 
-That is a small defect with a large tell attached: the failure goes to stdout,
-once, in the middle of a run that also prints a per-category table, and nothing
-downstream of it knows the corpus shrank.
+The defect itself is one unparseable file. What makes it expensive is where the
+failure goes: stdout, once, in the middle of a run that also prints a
+per-category table, and nothing downstream of it knows the corpus shrank.
 
 </details>
 

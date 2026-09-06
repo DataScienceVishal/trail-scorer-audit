@@ -8,9 +8,11 @@ Two numbers come out of it per row and both are published together. The first is
 what TRAIL reports, joint and location accuracy, which divide the intersection
 by the gold count at lines 54 and 58. The second is the volume ratio, the number
 of errors the predictor emitted for every gold error, which is what the first
-number costs. The gold-blind predictor's 0.973 on GAIA at 129 predictions per
-gold error is a different claim from gold-exact's 0.974 at 1, and Table 1's
-column carries only the part they have in common.
+number costs. On GAIA the gold-blind predictor lands within a thousandth of
+gold-exact's joint accuracy while emitting over a hundred errors for every gold
+error against gold-exact's one, and Table 1's column carries only the part they
+have in common. The digits themselves stay in the artifact and the tables it
+generates, because `loose_scores` does not read this docstring.
 """
 
 from __future__ import annotations
