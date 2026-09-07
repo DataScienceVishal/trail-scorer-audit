@@ -14,12 +14,11 @@ out.
 The guard that matters is `line_up`, and it refuses in both directions. A marker
 with no generator behind it is the failure that hides: nothing regenerates it,
 `--check` has nothing to compare it against, and the block sits there reading
-like a maintained table while it slowly stops being true. `twicerun` shipped
-this same mechanism with a scan that looked only for the names its generator
-already offered, so the test compared a dict against a subset of itself and
-could not fail, and deleting a generator while leaving its marker was invisible
-for the life of the project. The scan here matches any name, and a generator
-whose block is missing from the file is refused just as loudly.
+like a maintained table while it slowly stops being true. So `blocks_in` matches
+any marker name instead of the names `BLOCKS` offers, and a generator whose
+block is missing from the file is refused just as loudly. None of that is
+hypothetical: the README's paragraph on this file names the earlier repository of
+mine that shipped the restricted scan and what it cost.
 
 One more thing is checked that has nothing to do with markers. Every score in
 this project is written to three decimal places, or four in the weighted F1
@@ -693,10 +692,9 @@ def blocks_in(markdown: str) -> dict[str, Block]:
     """Every marker pair in the file, whatever it is called.
 
     Matching any name rather than only the names `BLOCKS` offers is the whole
-    difference between a check and a decoration, and it is the half `twicerun`
-    got wrong: scanning for known names means an orphaned marker is invisible to
-    the scan, to the comparison, and to `--check`, and the block quietly freezes
-    at whatever it last said.
+    difference between a check and a decoration: scanning for known names means
+    an orphaned marker is invisible to the scan, to the comparison, and to
+    `--check`, and the block quietly freezes at whatever it last said.
     """
     lines = markdown.splitlines()
     found: dict[str, Block] = {}
