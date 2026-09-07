@@ -1,9 +1,8 @@
-"""The committed span index, checked without the 186 MB download.
+"""The committed span index: hex identifiers, no empty traces, no trace in both splits.
 
 This artifact is what makes the audit run on a fresh clone in seconds, and it is
 the only upstream-derived thing in the repository. If it is wrong, everything
-downstream of it is wrong quietly, so the shape checks here are deliberately
-literal.
+downstream of it is wrong quietly, so the checks here are deliberately literal.
 """
 
 from __future__ import annotations

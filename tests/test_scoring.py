@@ -1,4 +1,4 @@
-"""The driver, tested against a stand-in scorer rather than the 186 MB one.
+"""Everything in front of the pinned scorer, with a stand-in in the scorer's place.
 
 What is under test here is this repository's half: reading the denominator out of
 stdout, counting predictions over the files that were actually scored, and
