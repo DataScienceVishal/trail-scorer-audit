@@ -1,4 +1,4 @@
-"""P7, against hand-built rows rather than the 186 MB.
+"""P7, the supported-category count it rests on, and what the catf1 report prints.
 
 The real data violates it on both splits, so a suite that only ever ran against
 the clone would never take the HELD branch and would not notice if the finding
