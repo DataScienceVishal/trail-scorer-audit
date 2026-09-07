@@ -524,8 +524,12 @@ and a generator whose block is missing from the file is an error. The one-way
 version of that check is a mechanism that cannot fail. `twicerun`, an earlier
 repository of mine, shipped exactly that: it scanned only for the names its
 generator already offered, so the comparison was a set against a subset of
-itself. Deleting a generator while leaving its marker stayed invisible for the
-life of that project, and the block sat there reading like a maintained table.
+itself. Deleting a generator and leaving its marker gave a passing suite, an
+update pass reporting the file already matched, and a hand-typed figure sitting
+in the README with the tooling green over it. No test surfaced that; a
+read-through of the guard did, on 2026-08-27, and twicerun's scan takes any name
+now. This repository was started later the same day and had the check pointing
+both ways from the first version of `report.py`.
 
 The other half of the same idea is that every score in this project is written
 to three decimal places, or four in the weighted F1 column, which makes a

@@ -5,12 +5,11 @@ tests/test_readme_blocks.py. What is here is the guard: that the scan sees a
 marker nobody generates, that it sees a generator nobody publishes, and that
 neither of those can be mistaken for a file that already matches.
 
-The mutation this file exists for is the second test. `twicerun` scanned for the
-names its generator already offered, which meant deleting a generator and
-leaving its marker produced a set comparison of `TABLES` against a subset of
-`TABLES`. Nothing could fail, `--update` reported that the file already matched,
-and the block sat in the README as a hand-typed figure for the rest of the
-project's life.
+The mutation the guard exists for is written up on
+test_a_marker_with_no_generator_fails_the_check. What that test protects is the
+scan: narrow `blocks_in` to the names `BLOCKS` already offers and the comparison
+becomes a dict against a subset of itself, which cannot fail and leaves
+`--update` reporting that the file already matches.
 """
 
 from __future__ import annotations
