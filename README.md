@@ -446,8 +446,10 @@ drifted from the artifact behind it. The second reports P9 off the committed
 span index and says P3 and P4 were not measured rather than reporting them as
 held.
 
-Everything else needs the benchmark. The download lands in `.trail/`, which is
-gitignored, and its size is in the pin block above:
+Everything else needs the benchmark. `fetch` takes the pinned commit on its own,
+at depth 1, into `.trail/`, because a clone lands on `main` and then has to be
+walked back to the pin. Nothing under `.trail/` is committed here, and the corpus
+line of the pin block above sizes the part of it this project reads:
 
 ```bash
 uv run trailaudit fetch
