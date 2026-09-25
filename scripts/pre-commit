@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installed to .git/hooks/pre-commit by scripts/install-hooks.sh.
 #
-# Agents forget the style rules. This does not. It runs against the index, so
+# Style rules are easy to forget. A hook is not. It runs against the index, so
 # what gets checked is exactly what is about to be committed, not whatever
 # happens to be sitting in the working tree.
 set -euo pipefail
@@ -12,6 +12,20 @@ cd "$repo_root"
 python=python3
 if [ -x .venv/bin/python ]; then
   python=.venv/bin/python
+fi
+
+# The venv's ruff, or none. This was `command -v ruff` until 2026-09-21, and
+# the README of every project here says uv and nothing else, so uv sync puts
+# ruff in .venv/bin and never on PATH. The condition was false on exactly the
+# machine the README describes and the block was skipped in silence, which is
+# worse than a failure because a skipped check and a passed check print the
+# same nothing. twicerun let three ruff errors through that way, and
+# untrusted-rows made two commits before anyone noticed.
+ruff=""
+if [ -x .venv/bin/ruff ]; then
+  ruff=.venv/bin/ruff
+elif command -v ruff >/dev/null 2>&1; then
+  ruff=$(command -v ruff)
 fi
 
 echo "pre-commit: fingerprint check"
@@ -28,12 +42,20 @@ MSG
 fi
 
 # Ruff is cheap and catches the dead imports that pile up during a slice.
-if command -v ruff >/dev/null 2>&1; then
-  echo "pre-commit: ruff"
-  staged_py=$(git diff --cached --name-only --diff-filter=ACM -- '*.py')
-  if [ -n "$staged_py" ]; then
-    echo "$staged_py" | xargs ruff check
+staged_py=$(git diff --cached --name-only --diff-filter=ACM -- '*.py')
+if [ -n "$staged_py" ]; then
+  if [ -z "$ruff" ]; then
+    cat >&2 <<'MSG'
+
+Commit blocked: no ruff. Run `uv sync --all-extras`.
+
+Skipping it quietly is what this hook used to do, and it is worse than
+refusing, because the commit still prints a line that reads like a pass.
+MSG
+    exit 1
   fi
+  echo "pre-commit: ruff ($("$ruff" --version))"
+  echo "$staged_py" | xargs "$ruff" check
 fi
 
 echo "pre-commit: ok"
