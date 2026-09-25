@@ -1,4 +1,4 @@
-"""Constraint 4, as a test rather than as a sentence in the README.
+"""The no-model-calls rule, as a test rather than as a sentence in the README.
 
 `--disable-socket` is in `addopts`, so this passes because pytest-socket is
 switched on and not because nothing here happens to open a connection. The

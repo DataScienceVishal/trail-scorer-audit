@@ -208,7 +208,7 @@ def test_the_word_list_is_skipped_under_its_shipped_name_too(tmp_path):
 
 
 def test_the_shipped_word_list_is_found_from_a_subdirectory(tmp_path):
-    """init_project.sh writes scripts/style-words.md, so discovery has to reach it."""
+    """Setup writes scripts/style-words.md, so discovery has to reach it."""
     repo = tmp_path / "someproject"
     (repo / "scripts").mkdir(parents=True)
     (repo / "tests").mkdir()
