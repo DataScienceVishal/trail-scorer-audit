@@ -93,7 +93,9 @@ paradigm shift
 
 ## Patterns
 
-Written as Python regex, case-insensitive, applied to prose files only.
+Written as Python regex, case-insensitive. Applied to prose files, to comments
+and string literals in Python files, and in the other code files to the rest of
+a line after `#`, `//`, `/*` or `<!--`. A SQL `--` comment is not read.
 
 ```banned-regex
 not only .{1,60}? but also
