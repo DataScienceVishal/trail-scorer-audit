@@ -109,6 +109,16 @@ def test_taxonomy_comes_out_of_the_pinned_source(pin_to_fake: pathlib.Path) -> N
     assert upstream.taxonomy(pin_to_fake) == ("Alpha", "Beta Errors", "Gamma")
 
 
+def test_the_scorer_does_not_inherit_this_packages_future_imports(
+    fake_clone: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """upstream.py has `from __future__ import annotations` and the scorer does not."""
+    scorer = upstream.scorer_path(fake_clone)
+    scorer.write_text("def main(a, b) -> int:\n    return 0\n", encoding="utf-8")
+    monkeypatch.setattr(upstream, "SCORER_SHA256", upstream.sha256_of(scorer))
+    assert upstream.load_scorer(fake_clone).main.__annotations__["return"] is int
+
+
 def test_taxonomy_refuses_a_scorer_without_all_categories(
     fake_clone: pathlib.Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

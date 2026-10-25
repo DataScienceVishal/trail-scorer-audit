@@ -245,7 +245,9 @@ def load_scorer(clone: Path) -> ModuleType:
         raise MissingClone(f"cannot build an import spec for {path}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
-    exec(compile(source, str(path), "exec"), module.__dict__)
+    # dont_inherit, or this module's `from __future__ import annotations` would
+    # reach the scorer and turn its annotations into strings.
+    exec(compile(source, str(path), "exec", dont_inherit=True), module.__dict__)
     return module
 
 

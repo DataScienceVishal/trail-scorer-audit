@@ -10,6 +10,7 @@ dataset.
 from __future__ import annotations
 
 import pathlib
+import typing
 from collections import Counter
 
 import pytest
@@ -62,6 +63,11 @@ def test_importing_the_scorer_does_not_parse_sys_argv(
     module = upstream.load_scorer(clone)
     assert callable(module.calculate_metrics)
     assert callable(module.normalize_category)
+
+
+def test_the_scorer_annotations_are_the_typing_objects_upstream_wrote(clone: pathlib.Path) -> None:
+    returns = upstream.load_scorer(clone).calculate_metrics.__annotations__["return"]
+    assert returns is typing.Dict  # noqa: UP006 upstream's own spelling is what is checked
 
 
 def test_p3_exactly_one_gold_file_does_not_parse(clone: pathlib.Path) -> None:
